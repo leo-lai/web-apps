@@ -56,25 +56,76 @@
 
     <!-- Main Views -->
     <f7-views>
-      <f7-view id="main-view" :navbar-through="true" :dynamic-navbar="true" main>
+      <f7-view id="main-view" navbar-through :dynamic-navbar="true" main>
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
+          <f7-nav-left>
+            <f7-link icon="icon-bars" open-panel="left"></f7-link>
+          </f7-nav-left>
           <f7-nav-center sliding>{{toolbar.active.title}}</f7-nav-center>
+          <f7-nav-right>
+            <f7-link icon="icon-bars" open-panel="right"></f7-link>
+          </f7-nav-right>
         </f7-navbar>
         <!-- Pages -->
         <f7-pages>
-          <f7-page name="welcome"></f7-page>
+          <f7-page ref="homePage" tabs no-page-content :no-navbar="$$utils.device.isWechat" name="home">
+            <!-- toolbar tabs -->
+            <f7-toolbar tabbar labels>
+              <f7-link v-for="(item,index) in toolbar.data" :tab-link="'#' + item.id" 
+                :active="toolbar.active.id === item.id">
+                <f7-icon :icon="item.icon">
+                  <f7-badge v-show="item.badge > 0" color="red">{{item.badge}}</f7-badge>
+                </f7-icon>
+                <span class="tabbar-label">{{item.title}}</span>
+              </f7-link>
+            </f7-toolbar>
+            <!-- toolbar tabs end-->
+            
+            <!-- tabs concent -->
+            <f7-page-content tab ref="home-tab-chat" id="home-tab-chat">
+              <f7-block-title>Navigation</f7-block-title>
+              <f7-list>
+                <f7-list-item link="/about/" title="About"></f7-list-item>
+                <f7-list-item link="/form/" title="Form"></f7-list-item>
+                <f7-list-item link="/dynamic-route/blog/45/post/125/?foo=bar#about" title="Dynamic Route"></f7-list-item>
+              </f7-list>
+            </f7-page-content>
+            <f7-page-content tab ref="home-tab-contacts" id="home-tab-contacts">
+              <f7-block-title>Welcome to my App</f7-block-title>
+              <f7-block inner>
+                <p>Duis sed erat ac eros ultrices pharetra id ut tellus. Praesent rhoncus enim ornare ipsum aliquet ultricies. Pellentesque sodales erat quis elementum sagittis.</p>
+              </f7-block>
+            </f7-page-content>
+            <f7-page-content tab ref="home-tab-find" id="home-tab-find">
+              <f7-block-title>Side Panels</f7-block-title>
+              <f7-block>
+                <f7-grid>
+                  <f7-col width="50">
+                    <f7-button open-panel="left">Left Panel</f7-button>
+                  </f7-col>
+                  <f7-col width="50">
+                    <f7-button open-panel="right">Right Panel</f7-button>
+                  </f7-col>
+                </f7-grid>
+              </f7-block>
+            </f7-page-content>
+            <f7-page-content tab ref="home-tab-me" id="home-tab-me">
+              <f7-block-title>Modals</f7-block-title>
+              <f7-block>
+                <f7-grid>
+                  <f7-col width="50">
+                    <f7-button open-popup="#popup">Popup</f7-button>
+                  </f7-col>
+                  <f7-col width="50">
+                    <f7-button open-login-screen="#login-screen">Login Screen</f7-button>
+                  </f7-col>
+                </f7-grid>
+              </f7-block>
+            </f7-page-content>
+            <!-- tabs concent end-->
+          </f7-page>
         </f7-pages>
-        <!-- toolbar tabs -->
-        <f7-toolbar tabbar labels>
-          <f7-link v-for="(item,index) in toolbar.data" :key="item.id" @click="showTab(item)" :active="item.id === toolbar.active.id">
-            <f7-icon :icon="item.icon">
-              <f7-badge v-show="item.badge > 0" color="red">{{item.badge}}</f7-badge>
-            </f7-icon>
-            <span class="tabbar-label">{{item.title}}</span>
-          </f7-link>
-        </f7-toolbar>
-        <!-- toolbar tabs end-->
       </f7-view>
     </f7-views>
 
@@ -130,33 +181,23 @@ export default {
 	data() {
 		return {
       toolbar: {
-        active: {
-          title: '微信定制版'
-        },
+        active: {},
         data: [
           {
-            id: 'chat',
-            url: '/chat',
-            active: false,
+            id: 'home-tab-chat',
             icon: 'l-icon-e608',
             title: '微信',
             badge: 9
           },{
-            id: 'contacts',
-            url: '/contacts',
-            active: false,
+            id: 'home-tab-contacts',
             icon: 'l-icon-e610',
             title: '通讯录'
           },{
-            id: 'find',
-            url: '/find',
-            active: false,
+            id: 'home-tab-find',
             icon: 'l-icon-e60c',
             title: '发现'
           },{
-            id: 'me',
-            url: '/me',
-            active: false,
+            id: 'home-tab-me',
             icon: 'l-icon-e655',
             title: '我'
           }
@@ -222,43 +263,39 @@ export default {
         }, 700)
       })
     },
-    showTab(active = {}) {
-      if (!active.id) return
-      this.toolbar.active = active
+    bindTabShowEvent() {
+      this.$refs['home-tab-chat'].$on('tab:show', this.tabShowEvent)
+      this.$refs['home-tab-contacts'].$on('tab:show', this.tabShowEvent)
+      this.$refs['home-tab-find'].$on('tab:show', this.tabShowEvent)
+      this.$refs['home-tab-me'].$on('tab:show', this.tabShowEvent)
 
-      this.$f7.mainView.router.load({
-        url: active.url,
-        animatePages: false,
-        reload: true,
-        pushState: true
-      })
+      this.tabShowEvent(this.$$storage.session.get('home-tab-index') || 0)
+    },
+    tabShowEvent(e) {
+      let index = Number(e)
+      if(Number.isNaN(index)){
+        index = this.$$(e.currentTarget).index() - 1
+      }else{
+        this.$f7.showTab('#' + this.toolbar.data[index].id)
+      }
+      this.toolbar.active = this.toolbar.data[index]
+      this.$$storage.session.set('home-tab-index', index)
+      // this.$$url.replace(this.$$url.join(this.$$url.getRootPath(), '#' + this.toolbar.active.id), this.toolbar.active.title)
     }
 	},
 	mounted() {
-    const that = this
-    setTimeout(() => {
-      let url = that.$f7.getCurrentView().url
-      let active = that.toolbar.data.filter(item => item.url === url)[0]
-      if (url === '#welcome') {
-        that.showTab(that.toolbar.data[0])
-      } else if(active) {
-        that.toolbar.active = active
+    console.log(this.$device)
+    this.$nextTick(()=>{
+      if(this.$$utils.device.isWechat){
+        this.$f7.mainView.hideNavbar()  
       }
-      that.$f7.onPageReinit('welcome', page => {
-        that.$f7.onPageAfterAnimation('welcome', page => {
-          setTimeout(() => {
-            that.showTab(that.toolbar.data[0])  
-          }, 50)
-        })
-      })
-
-      if (that.$$utils.device.isWechat) {
-        this.$f7.mainView.hideNavbar()
-      }
+      
+      this.bindTabShowEvent()
     })
 	}
 }
 </script>
 <style lang="less">
-@import url('~assets/css/framework7-custom.less');
+// @import url('~assets/css/base.less');
+
 </style>

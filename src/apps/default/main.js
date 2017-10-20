@@ -1,6 +1,6 @@
-// import FastClick from 'fastclick'
 import Vue from 'vue'
 import Framework7 from 'framework7'
+import wilddog from 'wilddog'
 // import Framework7Vue from 'framework7-vue'
 import Framework7Vue from 'framework7-vue/src/framework7-vue'
 import Framework7Theme from 'framework7/dist/css/framework7.ios.min.css'
@@ -14,10 +14,10 @@ import config from './config'
 
 import app from './app'
 
-// 解决移动端点击延迟
-// FastClick.attach(document.body)
-
+// Framework7Vue
 Vue.use(Framework7Vue)
+// wilddog 监听版本更新
+wilddog.initializeApp(config.wilddog)
 
 utils.url.getRootPath = function(){
 	return utils.url.join(config.framework7.pushStateRoot, config.framework7.pushStateSeparator) 
@@ -26,6 +26,8 @@ utils.url.getRootPath = function(){
 Vue.mixin({
   created() {
   	this.$$config = config
+    // 野狗
+    this.$$wilddog = wilddog
     // 小工具
     this.$$utils = utils
     // url操作

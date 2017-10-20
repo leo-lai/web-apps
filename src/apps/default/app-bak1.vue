@@ -55,27 +55,18 @@
     </f7-panel>
 
     <!-- Main Views -->
-    <f7-views>
-      <f7-view id="main-view" :navbar-through="true" :dynamic-navbar="true" main>
-        <!-- iOS Theme Navbar -->
-        <f7-navbar v-if="$theme.ios">
-          <f7-nav-center sliding>{{toolbar.active.title}}</f7-nav-center>
-        </f7-navbar>
-        <!-- Pages -->
-        <f7-pages>
-          <f7-page name="welcome"></f7-page>
-        </f7-pages>
-        <!-- toolbar tabs -->
-        <f7-toolbar tabbar labels>
-          <f7-link v-for="(item,index) in toolbar.data" :key="item.id" @click="showTab(item)" :active="item.id === toolbar.active.id">
-            <f7-icon :icon="item.icon">
-              <f7-badge v-show="item.badge > 0" color="red">{{item.badge}}</f7-badge>
-            </f7-icon>
-            <span class="tabbar-label">{{item.title}}</span>
-          </f7-link>
-        </f7-toolbar>
-        <!-- toolbar tabs end-->
-      </f7-view>
+    <f7-views tabs navbar-through toolbar-through>
+      <f7-view v-for="(item,index) in toolbar.data" :key="item.id"
+        :id="'view-' + item.id" :url="'/_home-tab' + item.url" :main="item.main" tab></f7-view>
+      <f7-toolbar tabbar labels>
+        <f7-link v-for="(item,index) in toolbar.data" :key="item.id" tab-link
+          :id="'tab-' + item.id" @click="showTab(item)" :active="item.id === toolbar.active.id">
+          <f7-icon :icon="item.icon">
+            <f7-badge v-show="item.badge > 0" color="red">{{item.badge}}</f7-badge>
+          </f7-icon>
+          <span class="tabbar-label">{{item.title}}</span>
+        </f7-link>
+      </f7-toolbar>
     </f7-views>
 
     <!-- Popup -->
@@ -96,7 +87,7 @@
 
     <!-- Login Screen -->
     <f7-login-screen id="login-screen">
-      <f7-view id="view-login">
+      <f7-view>
         <f7-pages>
           <f7-page login-screen>
             <f7-login-screen-title>Login</f7-login-screen-title>
@@ -126,13 +117,12 @@
 
 <script>
 
+
 export default {
 	data() {
 		return {
       toolbar: {
-        active: {
-          title: '微信定制版'
-        },
+        active: {},
         data: [
           {
             id: 'chat',
@@ -225,36 +215,38 @@ export default {
     showTab(active = {}) {
       if (!active.id) return
       this.toolbar.active = active
-
-      this.$f7.mainView.router.load({
-        url: active.url,
-        animatePages: false,
-        reload: true,
-        pushState: true
-      })
+      this.$f7.showTab('#view-' + active.id)
+      this.$root.$emit('app:tab', active)
+      this.$$storage.session.set('activeId', active.id)
+      this.$$url.replace(this.$$url.join(this.$$url.getRootPath(), '#' + active.id), active.title)
     }
 	},
 	mounted() {
     const that = this
-    setTimeout(() => {
-      let url = that.$f7.getCurrentView().url
-      let active = that.toolbar.data.filter(item => item.url === url)[0]
-      if (url === '#welcome') {
-        that.showTab(that.toolbar.data[0])
-      } else if(active) {
-        that.toolbar.active = active
-      }
-      that.$f7.onPageReinit('welcome', page => {
-        that.$f7.onPageAfterAnimation('welcome', page => {
-          setTimeout(() => {
-            that.showTab(that.toolbar.data[0])  
-          }, 50)
-        })
+
+    that.$nextTick(()=>{
+      let activeId = that.$$storage.session.get('activeId') || that.$$utils.url.getArgs()._hash
+      let active = that.toolbar.data.filter(item => item.id === activeId)[0] || that.toolbar.data[0]
+      setTimeout(() => {
+        if(this.$$utils.device.isWechat){
+          this.$f7.views.forEach(view => {
+            view.hideNavbar()
+          })
+        }
+        that.showTab(active)
       })
 
-      if (that.$$utils.device.isWechat) {
-        this.$f7.mainView.hideNavbar()
-      }
+      that.$$wilddog.sync().ref('/appinfo').on('value', function (snapshot) {
+        let version = that.$$storage.local.get('version')
+        let appinfo = snapshot.val()
+        if(version && appinfo && appinfo.version !== version) {
+          that.$$storage.local.set('version', appinfo.version)
+          window.location.reload()
+        }
+      }, function (error) {
+        console.error(error)
+      })
+
     })
 	}
 }

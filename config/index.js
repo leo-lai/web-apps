@@ -1,7 +1,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 
-//【apps】，默认为apps，修改这里的配置的同时，也要同时重命名/src/apps的这个文件夹名称  
+//【apps】，默认为apps，修改这里配置的同时，也要同时重命名/src/apps的这个文件夹名称  
 // 对应编译后部署到服务器的路径是 http://192.168.0.100:8085/apps/default/index.html
 var moduleName = 'apps'
 

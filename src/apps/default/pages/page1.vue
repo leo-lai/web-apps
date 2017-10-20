@@ -1,7 +1,8 @@
 <template>
-  <f7-page :no-navbar="$$utils.device.isWechat">
+  <f7-page name="about" no-toolbar>
     <f7-navbar title="About" back-link="Back" sliding></f7-navbar>
     <f7-block inner>
+      <div @click="$router.back()">router back</div>
       <p>Here is About page!</p>
       <p>You can go <f7-link back>back</f7-link>.</p>
       <p>Mauris posuere sit amet metus id venenatis. Ut ante dolor, tempor nec commodo rutrum, varius at sem. Nullam ac nisi non neque ornare pretium. Nulla mauris mauris, consequat et elementum sit amet, egestas sed orci. In hac habitasse platea dictumst.</p>
@@ -13,7 +14,9 @@
 <script>
 export default {
 	mounted() {
-		console.log('page1')
+    // this.$f7.onPageBack('about', page => {
+    //   console.log(page)
+    // })
 	}
 }
 </script>

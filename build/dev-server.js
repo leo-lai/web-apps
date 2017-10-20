@@ -69,7 +69,7 @@ app.use(staticPath, express.static('./static'))
 // })
 
 
-var uri = 'http://192.168.0.88:' + port 
+var uri = 'http://localhost:' + port 
 
 devMiddleware.waitUntilValid(function () {
   console.log('> 构建完成，已自动在浏览器打开页面，如未自动打开，请手工复制下面的链接，复制到浏览器里打开。')

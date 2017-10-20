@@ -1,8 +1,8 @@
 {
   "name": "vue2-webpack2-cli-vux2-multe-page",
   "version": "2.0.1",
-  "description": "blue fox",
-  "author": "蓝狐 <bluefox1688>",
+  "description": "leolai",
+  "author": "leolai.mail@qq.com",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -21,7 +21,8 @@
     "vue": "^2.2.2",
     "vue-router": "^2.2.0",
     "vuex": "^2.1.1",
-    "vuex-i18n": "^1.3.1"
+    "vuex-i18n": "^1.3.1",
+    "wilddog": "^2.5.15"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",
