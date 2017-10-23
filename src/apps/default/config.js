@@ -10,11 +10,11 @@ let config = {
 	framework7: {
 		root: '#app',
 		uniqueHistory: true,
-		swipeBackPage: false,
+		// swipeBackPage: true,
 		pushState: true,
 		pushStateRoot: '/',
 		pushStateSeparator: '!',
-		pushStateNoAnimation: true,
+		// pushStateNoAnimation: true,
 		routes: Routes
 	}
 }

@@ -1,6 +1,6 @@
 <template>
   <f7-page name="about" no-toolbar>
-    <f7-navbar title="About" back-link="Back" sliding></f7-navbar>
+    <f7-navbar title="About" back-link="返回" sliding></f7-navbar>
     <f7-block inner>
       <div @click="$router.back()">router back</div>
       <p>Here is About page!</p>

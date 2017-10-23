@@ -56,7 +56,7 @@
 
     <!-- Main Views -->
     <f7-views>
-      <f7-view id="main-view" :navbar-through="true" :dynamic-navbar="true" main>
+      <f7-view id="main-view" navbar-fixed tabbar-fixed main :dynamic-navbar="true">
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
           <f7-nav-center sliding>{{toolbar.active.title}}</f7-nav-center>
@@ -244,6 +244,7 @@ export default {
       } else if(active) {
         that.toolbar.active = active
       }
+      
       that.$f7.onPageReinit('welcome', page => {
         that.$f7.onPageAfterAnimation('welcome', page => {
           setTimeout(() => {
@@ -253,7 +254,15 @@ export default {
       })
 
       if (that.$$utils.device.isWechat) {
-        this.$f7.mainView.hideNavbar()
+        that.$f7.mainView.hideNavbar(false)
+        that.$$(that.$f7.mainView.selector).removeClass('navbar-through')
+        that.$$(document).on('pageInit', e => {
+          if (e.detail) {
+            e.detail.page.container.classList.add('no-navbar')
+          } else {
+            that.$f7.mainView.activePage.container.classList.add('no-navbar')
+          }
+        }).trigger('pageInit')
       }
     })
 	}
