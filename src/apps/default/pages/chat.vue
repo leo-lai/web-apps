@@ -3,7 +3,7 @@
     <f7-navbar sliding title="微信"></f7-navbar>
     <f7-searchbar cancel-link="取消" placeholder="搜索":clear="true"></f7-searchbar>
     <f7-list media-list class="l-chat-session">
-      <f7-list-item link="/about" v-for="item in 18" swipeout>
+      <f7-list-item link="/about" v-for="item in 18" :key="item" swipeout>
         <f7-swipeout-actions>
           <f7-swipeout-button delete>Delete</f7-swipeout-button>
         </f7-swipeout-actions>

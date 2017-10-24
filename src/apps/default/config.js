@@ -1,5 +1,5 @@
 import Routes from './routes'
-
+let isWechat = /micromessenger/i.test(navigator.userAgent)
 let config = {
 	// 野狗配置
   wilddog: {
@@ -10,7 +10,7 @@ let config = {
 	framework7: {
 		root: '#app',
 		uniqueHistory: true,
-		// swipeBackPage: true,
+		swipeBackPage: !isWechat,
 		pushState: true,
 		pushStateRoot: '/',
 		pushStateSeparator: '!',

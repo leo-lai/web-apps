@@ -56,14 +56,38 @@
 
     <!-- Main Views -->
     <f7-views>
-      <f7-view id="main-view" navbar-fixed tabbar-fixed main :dynamic-navbar="true">
+      <f7-view id="main-view" class="theme-white" navbar-fixed tabbar-fixed main :dynamic-navbar="true">
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
           <f7-nav-center sliding>{{toolbar.active.title}}</f7-nav-center>
         </f7-navbar>
         <!-- Pages -->
         <f7-pages>
-          <f7-page name="welcome"></f7-page>
+          <f7-page name="welcome" no-navbar no-tabbar>
+            <div class="l-welcome-page" v-if="welcome.visable">
+              <f7-chip class="_skip" text="跳过" @click="closeWelcome"></f7-chip>
+              <f7-swiper ref="welcomeSwiper" :pagination="true" :params="welcome.swiper">
+                <f7-swiper-slide class="l-flex-vhc">
+                  <div>
+                    <f7-icon f7="images" size="100"></f7-icon>
+                    <p style="margin: 2rem 0 0;">在这里展示您日常风采</p>
+                  </div>
+                </f7-swiper-slide>
+                <f7-swiper-slide class="l-flex-vhc">
+                  <div>
+                    <f7-icon f7="albums" size="100"></f7-icon>
+                    <p style="margin: 2rem 0 0;">在这里聆听美妙的音乐</p>
+                  </div>
+                </f7-swiper-slide>
+                <f7-swiper-slide class="l-flex-vhc">
+                  <div>
+                    <f7-icon f7="world" size="100"></f7-icon>
+                    <p style="margin: 2rem 0 0;">在这里找到交心的陌生人</p>
+                  </div>
+                </f7-swiper-slide>
+              </f7-swiper>
+            </div>
+          </f7-page>
         </f7-pages>
         <!-- toolbar tabs -->
         <f7-toolbar tabbar labels>
@@ -128,7 +152,19 @@
 
 export default {
 	data() {
+    const that = this
 		return {
+      welcome: {
+        visable: true,
+        swiper: {
+          // effect: 'coverflow',
+          onTransitionStart (swiper) {
+            if(swiper.swipeDirection === 'next' && swiper.slides.length - 1 === swiper.previousIndex){
+              that.closeWelcome()
+            }
+          } 
+        }
+      },
       toolbar: {
         active: {
           title: '微信定制版'
@@ -165,102 +201,58 @@ export default {
 		}
 	},
 	methods: {
-		preventScroll() {
-      this.$nextTick(()=>{
-        setTimeout(()=>{
-          Array.from(document.querySelectorAll('.l-page')).forEach((elem)=>{
-            let scrollElem = elem.querySelector('.l-page-body')
-            let data = {
-              posY: 0,
-              maxscroll: 0
-            }
-            if(scrollElem){
-              elem.addEventListener('touchstart', (e)=>{
-                let events = e.touches[0] || e
-
-                  // 垂直位置标记
-                data.posY = events.pageY
-                data.scrollY = scrollElem.scrollTop
-                // 是否可以滚动
-                data.maxscroll = scrollElem.scrollHeight - scrollElem.clientHeight
-              }, false)
-              elem.addEventListener('touchmove', (e)=>{
-                let events = e.touches[0] || e
-
-                // 如果不足于滚动，则禁止触发整个窗体元素的滚动
-                if (data.maxscroll <= 0) {
-                    // 禁止滚动
-                    e.preventDefault()
-                }
-        
-                // 现在移动的垂直位置，用来判断是往上移动还是往下
-                // 移动距离
-                let distanceY = events.pageY - data.posY
-
-
-                // 上下边缘检测
-                if (distanceY > 0 && scrollElem.scrollTop == 0) {
-                    // 往上滑，并且到头
-                    // 禁止滚动的默认行为
-                    event.preventDefault()
-                    return
-                }
-        
-                // 下边缘检测
-                if (distanceY < 0 && (scrollElem.scrollTop + 1 >= data.maxscroll)) {
-                    // 往下滑，并且到头
-                    // 禁止滚动的默认行为
-                    event.preventDefault()
-                    return
-                }
-              }, false)
-              elem.addEventListener('touchend', (e)=>{
-                data.maxscroll = 0
-              }, false)  
-            }
-          })
-        }, 700)
+    closeWelcome() {
+      let mainView = this.$f7.mainView
+      let active = this.toolbar.data[0]
+      this.toolbar.active = active
+      mainView.router.load({
+        url: active.url,
+        animatePages: true,
+        reload: true,
+        pushState: false
       })
+      if(!this.$$utils.device.isWechat){
+        mainView.showNavbar()
+      }
+      mainView.showToolbar()
     },
-    showTab(active = {}) {
-      if (!active.id) return
+    showTab(active) {
+      if (!active) active = this.toolbar.data[0]
       this.toolbar.active = active
 
       this.$f7.mainView.router.load({
         url: active.url,
         animatePages: false,
-        reload: true,
-        pushState: true
+        reload: true
       })
     }
 	},
 	mounted() {
-    const that = this
     setTimeout(() => {
-      let url = that.$f7.getCurrentView().url
-      let active = that.toolbar.data.filter(item => item.url === url)[0]
-      if (url === '#welcome') {
-        that.showTab(that.toolbar.data[0])
-      } else if(active) {
-        that.toolbar.active = active
-      }
-      
-      that.$f7.onPageReinit('welcome', page => {
-        that.$f7.onPageAfterAnimation('welcome', page => {
-          setTimeout(() => {
-            that.showTab(that.toolbar.data[0])  
-          }, 50)
-        })
+      let mainView = this.$f7.mainView
+      let url = mainView.url
+      let active = this.toolbar.data.filter(item => item.url === url)[0]
+
+      let welcomeCb = this.$f7.onPageReinit('welcome', page => {
+        mainView.hideNavbar(false)
+        mainView.hideToolbar(false)
+        this.welcome.visable = true
       })
 
-      if (that.$$utils.device.isWechat) {
-        that.$f7.mainView.hideNavbar(false)
-        that.$$(that.$f7.mainView.selector).removeClass('navbar-through')
-        that.$$(document).on('pageInit', e => {
+      if (url === '#welcome') {
+        welcomeCb.trigger()
+      } else if(active) {
+        this.toolbar.active = active
+      }
+
+      if (this.$$utils.device.isWechat) {
+        mainView.hideNavbar(false)
+        this.$$(this.$f7.mainView.selector).removeClass('navbar-through')
+        this.$$(document).on('pageInit', e => {
           if (e.detail) {
             e.detail.page.container.classList.add('no-navbar')
           } else {
-            that.$f7.mainView.activePage.container.classList.add('no-navbar')
+            this.$f7.mainView.activePage.container.classList.add('no-navbar')
           }
         }).trigger('pageInit')
       }
@@ -270,4 +262,22 @@ export default {
 </script>
 <style lang="less">
 @import url('~assets/css/framework7-custom.less');
+.l-welcome-page{
+  height: 100%;
+  position: relative;
+  ._skip{
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 100;
+  }
+  .swiper-container{
+    height: 100%;
+    background: rgb(13, 166, 236);
+    color: #fff;
+    text-align: center;
+  }
+  i.f7-icons{color: #fff;}
+}
+
 </style>
