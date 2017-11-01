@@ -1,13 +1,7 @@
 import Vue from 'vue'
-import Framework7 from 'framework7'
 import wilddog from 'wilddog'
-// import Framework7Vue from 'framework7-vue'
-import Framework7Vue from 'framework7-vue/src/framework7-vue'
-import Framework7Theme from 'framework7/dist/css/framework7.ios.min.css'
-import Framework7ThemeColors from 'framework7/dist/css/framework7.ios.colors.min.css'
-import Framework7Icons from 'framework7-icons/css/framework7-icons.css'
-import CSSfont from 'assets/css/font.less'
-import CSSbase from 'assets/css/base.less'
+import Framework7 from 'framework7'
+import Framework7Vue from 'framework7-vue'
 
 import { storage, utils } from 'assets/js/utils'
 import config from './config'
@@ -45,3 +39,4 @@ new Vue({
   	app
   }
 })
+

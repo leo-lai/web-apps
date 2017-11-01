@@ -151,6 +151,7 @@
 <script>
 
 export default {
+  name: 'app',
 	data() {
     const that = this
 		return {
@@ -228,40 +229,61 @@ export default {
     }
 	},
 	mounted() {
-    setTimeout(() => {
-      let mainView = this.$f7.mainView
-      let url = mainView.url
-      let active = this.toolbar.data.filter(item => item.url === url)[0]
+    this.$nextTick(() => {
+      setTimeout(() => {
+        let mainView = this.$f7.mainView
+        let url = mainView.url
+        let active = this.toolbar.data.filter(item => item.url === url)[0]
 
-      let welcomeCb = this.$f7.onPageReinit('welcome', page => {
-        mainView.hideNavbar(false)
-        mainView.hideToolbar(false)
-        this.welcome.visable = true
-      })
+        let welcomeCb = this.$f7.onPageReinit('welcome', page => {
+          mainView.hideNavbar(false)
+          mainView.hideToolbar(false)
+          this.welcome.visable = true
+        })
 
-      if (url === '#welcome') {
-        welcomeCb.trigger()
-      } else if(active) {
-        this.toolbar.active = active
-      }
+        if (url === '#welcome') {
+          welcomeCb.trigger()
+        } else if(active) {
+          this.toolbar.active = active
+        } else {
+          mainView.hideToolbar(false)
+        }
 
-      if (this.$$utils.device.isWechat) {
-        mainView.hideNavbar(false)
-        this.$$(this.$f7.mainView.selector).removeClass('navbar-through')
-        this.$$(document).on('pageInit', e => {
-          if (e.detail) {
-            e.detail.page.container.classList.add('no-navbar')
-          } else {
-            this.$f7.mainView.activePage.container.classList.add('no-navbar')
+        if (this.$$utils.device.isWechat) {
+          mainView.hideNavbar(false)
+          this.$$(this.$f7.mainView.selector).removeClass('navbar-through')
+          this.$$(document).on('pageInit', e => {
+            if (e.detail) {
+              e.detail.page.container.classList.add('no-navbar')
+            } else {
+              this.$f7.mainView.activePage.container.classList.add('no-navbar')
+            }
+          }).trigger('pageInit')
+        }
+
+        // 野狗推送版本更新
+        this.$$wilddog.sync().ref('/appinfo').on('value', snapshot => {
+          let version = this.$$storage.local.get('version')
+          let appinfo = snapshot.val()
+          if(version && appinfo && appinfo.version !== version) {
+            this.$$storage.local.set('version', appinfo.version)
+            window.location.reload()
           }
-        }).trigger('pageInit')
-      }
+        }, function (error) {
+          console.error(error)
+        })
+      })
     })
 	}
 }
 </script>
 <style lang="less">
-@import url('~assets/css/framework7-custom.less');
+@import '~framework7/dist/css/framework7.ios.min.css';
+@import '~framework7/dist/css/framework7.ios.colors.min.css';
+@import '~framework7-icons/css/framework7-icons.css';
+@import '~assets/css/font.less';
+@import '~assets/css/base.less';
+@import '~assets/css/framework7-custom.less';
 .l-welcome-page{
   height: 100%;
   position: relative;
@@ -279,5 +301,4 @@ export default {
   }
   i.f7-icons{color: #fff;}
 }
-
 </style>

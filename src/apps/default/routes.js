@@ -1,7 +1,7 @@
-import Chat from './pages/chat.vue'
-import Contacts from './pages/contacts.vue'
-import Find from './pages/find.vue'
-import Me from './pages/me.vue'
+import Chat from './pages/chat'
+import Contacts from './pages/contacts'
+import Find from './pages/find'
+import Me from './pages/me'
 
 const routes = [
   {
@@ -22,15 +22,15 @@ const routes = [
   },
 	{
     path: '/about',
-    component: require('./pages/page1.vue')
+    component: require('./pages/form')
   },
   {
     path: '/form',
-    component: require('./pages/form.vue')
+    component: require('./pages/form')
   },
   {
     path: '/dynamic-route/blog/:blogId/post/:postId',
-    component: require('./pages/page2.vue')
+    component: require('./pages/page2')
   }
 ]
 

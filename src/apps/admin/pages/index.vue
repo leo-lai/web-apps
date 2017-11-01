@@ -1,19 +1,16 @@
 <template>
-  <div class="l-app">
-    other page
-  </div>
+	<div class="l-main-body"></div>
 </template>
-
 <script>
 export default {
 	data() {
 		return {
 		}
 	},
-	created() {
+	mounted() {
 	}
 }
 </script>
-<style lang="less">
 
+<style lang="less">
 </style>

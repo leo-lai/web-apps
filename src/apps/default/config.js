@@ -1,4 +1,4 @@
-import Routes from './routes'
+import routes from './routes'
 let isWechat = /micromessenger/i.test(navigator.userAgent)
 let config = {
 	// 野狗配置
@@ -15,7 +15,7 @@ let config = {
 		pushStateRoot: '/',
 		pushStateSeparator: '!',
 		// pushStateNoAnimation: true,
-		routes: Routes
+		routes
 	}
 }
 

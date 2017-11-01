@@ -5,7 +5,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-var PrerenderSpaPlugin = require('prerender-spa-plugin')
+// var PrerenderSpaPlugin = require('prerender-spa-plugin')
 
 var utils = require('./utils')
 var config = require('../config')
@@ -94,7 +94,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     //   name: 'manifest',
     //   chunks: ['vendor']
     // }),
-    /*
+    
     // copy custom static assets
     new CopyWebpackPlugin([
       {
@@ -102,7 +102,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ]),*/
+    ]),
     // new PrerenderSpaPlugin(
     //   // Absolute path to compiled SPA
     //   path.join(__dirname, '../dist'),
@@ -141,9 +141,9 @@ for (var pathname in pages) {
     inject: true,                                           // js插入位置
     minify: { // more options:https://github.com/kangax/html-minifier#options-quick-reference
       minifyCSS: true,
-      // minifyJS: true,
+      minifyJS: true,
       removeComments: true,
-      // collapseWhitespace: true,
+      collapseWhitespace: true,
       removeAttributeQuotes: false
     },
     favicon: ''

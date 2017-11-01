@@ -1,0 +1,43 @@
+html, body, #app{ height:  100%;}
+body{ font-size:  0.65rem; }
+.l-header{
+	background: #373d41; color: #fff; padding: 0 ; 
+	.el-dropdown-link{ color: #fff; font-size: 0.6rem; }
+	.l-logo{
+		box-sizing: border-box;
+		width: 8.5rem; 
+		padding: 0 0.75rem;
+		line-height: 60px;
+		height: 60px;
+		color: #fff;
+		border-right: 1px solid #2a2f32;
+		font-size: 0.6rem;
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-between;
+	}
+	.l-header-nav {
+		background: #373d41; 
+		padding: 0 0.75rem; 
+		box-sizing: border-box;
+		color: #fff;
+	}
+}
+.l-menu{ border: none;}
+.l-aside {
+	box-sizing: border-box; transition: 0.2s linear; overflow: inherit; background: #373d41; color: #fff;
+	.l-menu{ width: 8.5rem; }
+	.el-submenu .el-menu-item { background: #373d41 !important;}
+	.el-submenu .el-menu-item:hover{ background: rgb(72, 90, 150) !important;	}
+	.el-submenu .el-menu-item, .el-submenu__title { height: 45px ; line-height: 45px ; padding: 0 0.5rem !important; }
+	.el-submenu__icon-arrow { display: none !important; }
+	.el-submenu [class^=el-icon-] { transform: scale(0.8); }
+	.is-opened .el-submenu__title .el-icon-caret-right{ transform: scale(0.8) rotate(90deg); }
+	.is-active .el-icon-caret-right {color: rgb(255, 208, 75) !important;}
+	.el-menu--collapse{ width: 64px; }
+	.el-menu--collapse .el-submenu__title{ padding: 0 20px !important; }
+}
+.l-main{ padding: 0 ; }
+.l-main-body{ padding: 0.75rem; }
+.l-breadcrumb{ padding: 0.75rem; margin-bottom: -0.75rem; position: relative; z-index: 1; }
+.l-copy-right{text-align: center; font-size: 0.5rem; color: #ccc; padding: 0.75rem 0;}
