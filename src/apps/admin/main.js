@@ -2,9 +2,11 @@ import 'babel-polyfill'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import ElementUI from 'element-ui'
+import NProgress from 'nprogress'
 
 import { storage, utils } from 'assets/js/utils'
 import config from './config'
+import api from './api'
 import routes from './routes'
 import app from './app'
 
@@ -35,6 +37,8 @@ Vue.mixin({
     this.$$url = utils.url
     // 本地缓存
     this.$$storage = storage
+    // 接口对象
+    this.$$api = api
   }
 })
 
@@ -48,13 +52,18 @@ const router = new VueRouter({
   }
 })
 router.beforeEach((to, from, next) => {
-	next()
+  NProgress.start()
+  if (!api.auth.check() && to.path != '/login') {
+    NProgress.done()
+    api.auth.logout()
+    next(false)
+  } else {
+    next()
+  }
 })
-router.afterEach((to) => {
 
-})
-router.onReady(()=>{
-
+router.afterEach((to, from) => {
+  NProgress.done()
 })
 new Vue({
 	router,

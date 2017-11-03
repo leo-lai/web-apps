@@ -1,9 +1,9 @@
-import frame from './pages/frame'
+import layout from './pages/layout'
 
 const routes = [
   {
     path: '/',
-    component: frame,
+    component: layout,
     meta: { hidden: true },
     children: [
       { 
@@ -15,7 +15,7 @@ const routes = [
   },
   {
     path: '/base',
-    component: frame,
+    component: layout,
     meta: { title: '基础设置' },
     children: [
       { 
