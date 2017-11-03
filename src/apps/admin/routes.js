@@ -31,14 +31,10 @@ const routes = [
     component: resolve => require(['./pages/login'], resolve),
   },
   {
-    path: '/404',
+    path: '/*',
     meta: { title: '找不到页面', hidden: true },
     hidden: true,
     component: resolve => require(['./pages/404'], resolve),
-  },
-  {
-    path: '*',
-    redirect: '/'
   }
 ]
 export default routes

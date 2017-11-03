@@ -44,7 +44,7 @@ Vue.mixin({
 
 const router = new VueRouter({
   routes,
-  base: '/admin',
+  base: config.router.base,
 	mode: 'history',
 	scrollBehavior (to, from, savedPosition) {
     // return 期望滚动到哪个的位置

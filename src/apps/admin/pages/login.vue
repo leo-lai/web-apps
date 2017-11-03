@@ -27,8 +27,8 @@ export default {
       	loading: false,	
       	remember: true,
       	data: {
-      		userName: 'admin',
-        	password: '123456'
+      		userName: '18602029524',
+        	password: '123'
       	},
       	rules: {
       		userName: [
@@ -48,7 +48,12 @@ export default {
     submitForm(ev) {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.$router.replace('/')
+          this.loginForm.loading = true
+          this.$$api.auth.login(this.loginForm.data).then(({data}) => {
+            this.$$href(this.$route.query.to || '/', 'replace')
+          }).finally(()=>{
+            this.loginForm.loading = false
+          })
         }
       })
     }

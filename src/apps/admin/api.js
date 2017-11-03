@@ -1,26 +1,26 @@
 import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
-
-let baseURL = 'http://111.230.170.36/tauto/management/admin/'
-// 正式
-// if (['admin.ushiyihao.com'].indexOf(window.location.host) > -1) {
-//   baseURL = 'https://api.ushiyihao.com/useeproject02/management/admin'
-// }
+import config from './config'
 
 // 创建axios实例
-const service = axios.create({
-  baseURL,
+export const service = axios.create({
+  baseURL: config.api.baseURL,
   timeout: 60000
 })
 // request拦截器
 service.interceptors.request.use(config => {
   // Do something before request is sent
   config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-  console.log(config.transformRequest)
+  config.transformRequest = [function(data) {
+    let ret = []
+    for (let key in data) {
+      ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+    }
+    return ret.join('&')
+  }]
   return config
 }, error => {
-  // Do something with request error
   return Promise.reject(error)
 })
 // respone拦截器
@@ -42,7 +42,6 @@ service.interceptors.response.use(response => {
   }
   return Promise.reject(data)
 }, error => {
-  // Do something with request error
   if (error && error.response) {
     switch (error.response.status) {
       case 400:
@@ -86,23 +85,17 @@ service.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 
-const fetch = {
+export const fetch = {
   ajax(url = '', data = {}, method = 'GET', contentType = 'form') {
     data.sessionId = storage.local.get('sessionId')
     return new Promise((resolve, reject) => {
       service({
-        url,
-        method,
-        data,
-        transformRequest: [function(data) {
-          let ret = []
-          for (let key in data) {
-            ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-          }
-          return ret.join('&')
-        }]
+        url, method, data
       }).then(resolve).catch(error => {
-        error && error.message && Message(error.message)
+        error && error.message && Message({
+          type: 'error',
+          message: error.message
+        })
         reject(error)
       })
     })
@@ -116,15 +109,16 @@ const fetch = {
 }
 
 const api = {
-  baseURL,
+  baseURL: config.api.baseURL,
   auth: {
     check() {
       return !!storage.local.get('sessionId')
     },
     login(formData) {
       return fetch.post('/login', formData).then((response) => {
-        // storage.local.set('sessionId', response.data.sessionId)
-        console.log(response)
+        storage.local.set('sessionId', response.data.sessionId)
+        // 生成权限菜单路由
+        
         return response
       })
     },
