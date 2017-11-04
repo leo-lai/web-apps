@@ -1,10 +1,11 @@
+import config from '../config'
 import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
-import config from './config'
+
 
 // 创建axios实例
-export const service = axios.create({
+const service = axios.create({
   baseURL: config.api.baseURL,
   timeout: 60000
 })
@@ -85,7 +86,7 @@ service.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 
-export const fetch = {
+const fetch = {
   ajax(url = '', data = {}, method = 'GET', contentType = 'form') {
     data.sessionId = storage.local.get('sessionId')
     return new Promise((resolve, reject) => {
@@ -114,25 +115,12 @@ const api = {
     check() {
       return !!storage.local.get('sessionId')
     },
-    login(formData) {
-      return fetch.post('/login', formData).then((response) => {
-        storage.local.set('sessionId', response.data.sessionId)
-        // 生成权限菜单路由
-        
-        return response
-      })
+    login(formData = {}) {
+      formData.userName = (formData.userName || '').trim()
+      return fetch.post('/login', formData)
     },
     logout() {
-      return new Promise((resolve, reject) => {
-        if (storage.local.get('sessionId')) {
-          fetch.post('/loginOut').then(resolve, reject)
-        } else {
-          resolve()
-        }
-      }).finally(() => {
-        storage.local.remove('sessionId')
-        location.replace('/admin/login')
-      })
+      return fetch.post('/loginOut')
     }
   }
 }

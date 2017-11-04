@@ -1,7 +1,8 @@
 <template>
 	<div class="page-404">
 		<p>404 page not found</p><br>
-		<router-link to="/"><el-button type="primary">返回首页</el-button></router-link>
+		<el-button type="primary" @click="$router.back()">返回上一页</el-button>
+		<router-link class="l-margin-l" to="/"><el-button>首页</el-button></router-link>
 	</div>
 </template>
 <style scoped lang="less">

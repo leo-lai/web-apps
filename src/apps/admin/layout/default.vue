@@ -4,82 +4,30 @@
 			<el-aside class="l-aside" :class="{'l-aside-collapse': collapse}">
 				<div class="l-logo">
     			<span>传创金融管理系统</span>
-    			<i class="el-icon-menu" title="菜单-展开/闭合" @click="collapse = !collapse"></i>
+    			<i class="el-icon-menu" title="菜单-展开/闭合" @click="doCollapse"></i>
     		</div>
-        <el-menu class="l-menu" :default-active="$route.path" :collapse="collapse" :unique-opened="true" 
+        <el-menu class="l-menu" :default-active="$route.path" :collapse="collapse" :router="true" :unique-opened="false" 
         	background-color="#38415f" text-color="#fff" active-text-color="#ffd04b">
-          <el-submenu index="1">
-				    <template slot="title">
-				      <i class="el-icon-caret-right"></i>
-				      <span slot="title">基础设置</span>
-				    </template>
-			      <el-menu-item index="1-1">
+          <template v-for="menu in userMenus" v-if="!menu.hidden">
+          	<el-submenu v-if="menu.children.length > 1" :index="menu.path">
+			        <template slot="title">
+			          <i class="el-icon-caret-right"></i>
+			          <span>{{menu.meta.title}}</span>
+			        </template>
+			        <el-menu-item v-for="submenu in menu.children" :key="submenu.path" :index="menu.path +'/'+ submenu.path">
+				      	<template slot="title">
+						      <i class="el-icon-arrow-right"></i>
+						      <span slot="title">{{submenu.meta.title}}</span>
+						    </template>
+				      </el-menu-item>
+			      </el-submenu>
+			      <el-menu-item v-else :index="menu.path">
 			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">菜单设置</span>
+					      <i class="el-icon-caret-right"></i>
+					      <span slot="title">{{menu.meta.title}}</span>
 					    </template>
 			      </el-menu-item>
-			      <el-menu-item index="1-2">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">供应商管理</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="1-3">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">车辆资料</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="1-4">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">权限管理</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="1-5">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">用户管理</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="1-6">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">机构设置</span>
-					    </template>
-			      </el-menu-item>
-				  </el-submenu>
-				  <el-submenu index="2">
-				    <template slot="title">
-				      <i class="el-icon-caret-right"></i>
-				      <span slot="title">库存管理</span>
-				    </template>
-			      <el-menu-item index="2-1">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">订车需求</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="2-2">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">车辆库存</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="2-3">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">车辆入库</span>
-					    </template>
-			      </el-menu-item>
-			      <el-menu-item index="2-4">
-			      	<template slot="title">
-					      <i class="el-icon-arrow-right"></i>
-					      <span slot="title">出库记录</span>
-					    </template>
-			      </el-menu-item>
-				  </el-submenu>
+          </template>
         </el-menu>
       </el-aside>
 	    <el-container direction="vertical">
@@ -134,13 +82,13 @@
 	</div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 import screenfull from 'screenfull'
+
 export default {
 	name: 'frame',
   data() {
     return {
-    	fullscreen: false,
-    	collapse: false,
     	pwdForm: {
     		visible: false,
 				submiting: false,
@@ -159,25 +107,34 @@ export default {
     	}
     }
   },
+  computed: {
+  	...mapGetters([
+  		'userMenus',
+  		'fullscreen',
+      'collapse'
+    ])
+  },
   methods: {
+  	doCollapse() {
+  		this.$store.dispatch('toggleCollapse')
+  	},
   	initSomething() {
   		// 全屏设置
 	  	if (screenfull.enabled) {
 				screenfull.on('change', () => {
-					this.fullscreen = screenfull.isFullscreen
+					this.$store.dispatch('toggleFullscreen', screenfull.isFullscreen)
 				})
 			}
 			document.addEventListener('keyup', e => {
 				e = e || window.event
-				console.log(e.keyCode)
 				if (e && e.keyCode === 122){
 					this.fullScreen()
 				}
 			})
 
-			window.onbeforeunload = function (e) {
-				return '确定离开此页吗？' 
-			} 
+			// window.onbeforeunload = function (e) {
+			// 	return '确定离开此页吗？' 
+			// }
   	},
   	fullScreen() {
   		if (!screenfull.enabled) {
@@ -185,13 +142,13 @@ export default {
           message: 'sorry, you browser can not work!',
           type: 'warning'
         })
-        this.fullscreen = !this.fullscreen
+        this.$store.dispatch('toggleFullscreen')
         return false
       }
       screenfull.toggle()
   	},
   	logout() {
-  		this.$router.replace('/login')
+  		this.$store.dispatch('logout')
   	},
   	submitPwdForm() {
 

@@ -1,5 +1,7 @@
 <template>
-	<div class="l-main-body"></div>
+	<div class="l-main-body">
+		{{$route.meta.title}}
+	</div>
 </template>
 <script>
 export default {

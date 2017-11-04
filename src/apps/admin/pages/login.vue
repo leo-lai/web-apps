@@ -49,11 +49,11 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loginForm.loading = true
-          this.$$api.auth.login(this.loginForm.data).then(({data}) => {
+          this.$store.dispatch('login', this.loginForm.data).then(data => {
             this.$$href(this.$route.query.to || '/', 'replace')
           }).finally(()=>{
             this.loginForm.loading = false
-          })
+          })  
         }
       })
     }
