@@ -1161,7 +1161,7 @@ camelcase-keys@^2.0.0:
     camelcase "^2.0.0"
     map-obj "^1.0.0"
 
-camelcase@^1.0.2:
+camelcase@^1.0.2, camelcase@^1.2.1:
   version "1.2.1"
   resolved "http://registry.npm.taobao.org/camelcase/download/camelcase-1.2.1.tgz#9bb5304d2e0b56698b2c758b08a3eaa9daa58a39"
 
@@ -5857,6 +5857,12 @@ upper-case@^1.1.1:
   version "1.1.3"
   resolved "http://registry.npm.taobao.org/upper-case/download/upper-case-1.1.3.tgz#f6b4501c2ec4cdd26ba78be7222961de77621598"
 
+uppercamelcase@^1.1.0:
+  version "1.1.0"
+  resolved "http://registry.npm.taobao.org/uppercamelcase/download/uppercamelcase-1.1.0.tgz#324d98a6b3afc7e8a8953e10641509b0e4e23f97"
+  dependencies:
+    camelcase "^1.2.1"
+
 url-loader@^0.5.7:
   version "0.5.9"
   resolved "http://registry.npm.taobao.org/url-loader/download/url-loader-0.5.9.tgz#cc8fea82c7b906e7777019250869e569e995c295"
@@ -5950,6 +5956,16 @@ vm-browserify@0.0.4:
 void-elements@^2.0.0:
   version "2.0.1"
   resolved "http://registry.npm.taobao.org/void-elements/download/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
+
+vue-amap@^0.4.1:
+  version "0.4.1"
+  resolved "http://registry.npm.taobao.org/vue-amap/download/vue-amap-0.4.1.tgz#3e28de4a8bb34a1ffcf0c2347a6d9508c5f001d4"
+  dependencies:
+    uppercamelcase "^1.1.0"
+
+vue-count-to@^1.0.10:
+  version "1.0.10"
+  resolved "http://registry.npm.taobao.org/vue-count-to/download/vue-count-to-1.0.10.tgz#5ab453bfefcb2adc826fabeab0c0c49472e78280"
 
 vue-hot-reload-api@^2.0.11:
   version "2.2.0"

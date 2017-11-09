@@ -48,7 +48,7 @@ for (var pathname in pages) {
       // minifyCSS: true,
       // minifyJS: true,
       removeComments: true,
-      // collapseWhitespace: true,
+      collapseWhitespace: true,
       removeAttributeQuotes: false
     },
     favicon: ''
