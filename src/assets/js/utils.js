@@ -189,19 +189,47 @@ export let utils = {
   regexp: {
     mobile: /^\s*1\d{10}\s*$/
   },
-  noop(){},
+  noop() {},
   extend(target, ...objs) {
     if(!utils.isPlainObject(target)) return null
     objs.forEach((obj) => {
       if(utils.isPlainObject(obj)){
-        Object.keys(obj).forEach((key)=>{
-          if(obj[key] !== null && obj[key] !== undefined){
+        Object.keys(obj).forEach(key => {
+          if(obj[key] !== undefined){
             target[key] = obj[key]
           }
         })
       }
     })
     return target
+  },
+  copyObj(target, ...objs) {
+    if(!utils.isPlainObject(target)) return null
+    objs.forEach((obj) => {
+      if(utils.isPlainObject(obj)){
+        Object.keys(target).forEach(key => {
+          if(obj[key] !== null && obj[key] !== undefined){
+            target[key] = obj[key]
+          }
+        })
+      }else{
+        Object.keys(target).forEach(key => {
+          target[key] = ''
+        })
+      }
+    })
+    return target
+  },
+  getArray(arr = [], children = 'children', key) { // 递归遍历数组
+    let ret = []
+    arr.forEach(item => {
+      item[key] !== undefined && ret.push(item[key])
+
+      if(utils.isArray(item[children]) && item[children].length > 0) {
+        ret = ret.concat(utils.getArray(item[children], children, key))
+      }
+    }) 
+    return ret
   },
   type(value) {
     //如果是null或者undefined，直接转成String返回

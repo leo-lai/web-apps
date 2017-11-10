@@ -7,18 +7,22 @@
 		  <el-tab-pane label="系统用户" name="user">
 		  	<base-setting-user></base-setting-user>
 		  </el-tab-pane>
-		  <el-tab-pane label="角色及权限" name="roles">角色及权限</el-tab-pane>
+		  <el-tab-pane label="角色及权限" name="role">
+		  	<base-setting-role></base-setting-role>
+		  </el-tab-pane>
 		</el-tabs>
 	</div>
 </template>
 <script>
 import baseSettingZuzhi from './base-setting-zuzhi'
 import baseSettingUser from './base-setting-user'
+import baseSettingRole from './base-setting-role'
 export default {
 	name: 'base-setting',
 	components: {
 		baseSettingZuzhi,
-		baseSettingUser
+		baseSettingUser,
+		baseSettingRole
 	},
 	data() {
 		return {

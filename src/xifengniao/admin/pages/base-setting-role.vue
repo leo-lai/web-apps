@@ -1,0 +1,262 @@
+<template>
+	<div>
+		<el-row class="l-margin-b">
+  		<el-col :span="8">
+  			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
+  		</el-col>
+  		<el-col :span="16" class="l-text-right">
+  			
+  		</el-col>
+  	</el-row>
+  	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
+  		:data="list.data" v-loading="list.loading">
+	    <el-table-column label="系统角色" prop="roleName" width="200"></el-table-column>
+	    <el-table-column label="备注" prop="remark"></el-table-column>
+	    <el-table-column label="操作" width="300">
+	    	<template slot-scope="scope">
+	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        <el-button class="l-text-warn" type="text" size="small" @click="showDialogMenu(scope.row)">配置权限</el-button>
+	      </template>
+	    </el-table-column>
+	  </el-table>
+	  <el-row class="l-text-center l-margin-t">
+	  	<el-pagination layout="total, sizes, prev, pager, next, jumper"
+	  	 	@size-change="sizeChange" 
+	  	 	@current-change="pageChange" 
+	  	 	:page-sizes="$$api.pageSizes"
+	  	 	:page-size="list.rows"
+	  	 	:current-page="list.page"
+	  	 	:total="list.total">
+			</el-pagination>
+	  </el-row>
+
+	  <!-- 新增/编辑用户 -->
+		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
+  		<el-form ref="infoForm" label-width="90px" style="width: 432px;"
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+			  <el-form-item label="系统角色" prop="roleName">
+			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="备注信息" prop="remark">
+			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
+			  </el-form-item>
+			</el-form>
+			<span slot="footer" class="l-margin-r-m">
+				<el-button @click="closeDialogInfo()">取消</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		  </span>
+		</el-dialog>
+
+		<!-- 配置权限菜单 -->
+		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogMenu"
+			:title="dialogMenu.title" :visible.sync="dialogMenu.visible" width="600px">
+			<div class="l-scroll" style="max-height: 400px;">
+				<el-tree show-checkbox  default-expand-all highlight-current node-key="menuId" ref="menuTree"
+				  :data="dialogMenu.menuList" :props="dialogMenu.props" @check-change="menuCheckChange">
+				</el-tree>	
+			</div>
+			<span slot="footer" class="l-margin-r-m">
+				<el-button @click="closeDialogMenu()">取消</el-button>
+		    <el-button type="primary" :loading="dialogMenu.loading" @click="submitMenu">确定提交</el-button>
+		  </span>
+		</el-dialog>
+	</div>
+</template>
+<script>
+import { mapGetters } from 'vuex'
+export default {
+	name: 'base-setting-user',
+	data() {
+		return {
+			list: {
+				filter: {},
+				rules: {},
+				loading: false,
+				page: 1,
+				rows: 100,
+				total: 0,
+				data: []
+			},
+			dialogInfo: {
+				type: 'new',
+				title: '新增系统角色',
+				visible: false,
+				loading: false,
+				rules: {
+					roleName: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					remark: []
+				},
+				data: {
+					roleId: '',
+					roleName: '',
+					remark: ''
+				}
+			},
+			dialogMenu: {
+				title: '配置权限',
+				visible: false,
+				loading: false,
+				props: {
+          children: 'children',
+          label: 'menuName'
+        },
+				menuList: [],
+				checkedList: [],
+				data: {
+					roleId: '',
+					menuIds: ''
+				}
+			}
+		}
+	},
+	methods: {
+		sizeChange(size = 100) {
+			this.getList(1, size)
+		},
+		pageChange(page = 1) {
+			this.getList(page)
+		},
+		getList(page = 1, rows) {
+			this.list.loading = true
+			this.$$api.role.getList(this.list.filter, page, rows)
+			.then(({data}) => {
+				this.list.total = data.total
+        this.list.page = data.page
+        this.list.rows = data.rows
+        this.list.data = data.list
+			}).finally(() => {
+				this.list.loading = false
+			})
+		},
+		refreshList() {
+			this.getList(this.list.page)
+		},
+		search() {
+			this.getList()
+		},
+		clear() {
+			this.$refs.listFilter && this.$refs.listFilter.resetFields()
+			this.getList()
+		},
+		showDialogInfo(type = 'new', row) { // 新增/修改角色弹出信息
+			this.dialogInfo.type = type
+			if(type === 'edit') {
+				this.dialogInfo.title = '修改系统角色'
+				this.$$utils.copyObj(this.dialogInfo.data, row)
+			} else {
+				this.dialogInfo.title = '新增系统角色'
+				this.$$utils.copyObj(this.dialogInfo.data, '')
+			}
+			this.dialogInfo.visible = true	
+		},
+		closeDialogInfo(done) {
+			if(done) {
+				done()
+			}else{
+				this.dialogInfo.visible = false	
+			}
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+			this.$refs.infoForm.resetFields()	
+		},
+		submitInfo() { // 提交角色信息
+			this.$refs.infoForm.validate(valid => {
+        if (valid) {
+          this.dialogInfo.loading = true
+          this.$$api.role.add(this.dialogInfo.data).then(data => {
+            this.closeDialogInfo()
+            this.$message({
+							type: 'success',
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '用户信息成功'
+						})
+            this.refreshList()
+          }).finally(()=>{
+            this.dialogInfo.loading = false
+          })  
+        }
+      })
+		},
+		getMenuList(roleId) {
+			return new Promise((resolve, reject) => {
+				if(!roleId) {
+					if(this.dialogMenu.menuList.length === 0) {
+						this.$$api.role.getMenuList().then(({data}) => {
+							this.dialogMenu.menuList = data
+							resolve(this.dialogMenu.menuList)
+						}, reject)
+					}else {
+						resolve(this.dialogMenu.menuList)
+					}
+				} else {
+					this.$$api.role.getMenuList(roleId).then(({data}) => {
+						resolve(this.$$utils.getArray(data, 'children', 'menuId'))
+					}, reject)
+				}
+			})
+		},
+		showDialogMenu(row) {
+			const loading = this.$loading()
+			this.dialogMenu.data.roleId = row.roleId
+			this.getMenuList(row.roleId).then(data => {
+				setTimeout(() => {
+					this.$refs.menuTree.setCheckedKeys(data)	
+				}, 500)
+				this.dialogMenu.title = '配置权限：' + row.roleName
+				this.dialogMenu.visible = true
+			}).finally(() => {
+				loading.close()
+			})
+		},
+		closeDialogMenu(done) {
+			if(done) {
+				done()
+			} else {
+				this.dialogMenu.visible = false	
+			}
+			this.$refs.menuTree.setCheckedKeys([])
+		},
+		menuCheckChange(data, checked) {
+			// if (checked) {
+			// 	this.dialogMenu.checkedList.push()
+			// } else {
+
+			// }
+		},
+		submitMenu() {
+			// 叶子节点选中列表
+			let leafCheckedList = this.$refs.menuTree.getCheckedKeys(true)
+
+			// 根据选中的叶子节点获取其祖先节点
+			// leafCheckedList.forEach(leafKey => {
+				
+			// })
+			return
+			this.dialogMenu.data.menuIds = this.$refs.menuTree.getCheckedKeys().join(',')
+			this.dialogMenu.loading = true
+			this.$$api.role.setRoleMenu(this.dialogMenu.data).then(() => {
+				this.closeDialogMenu()
+        this.$message({
+					type: 'success',
+					message: '配置权限成功'
+				})
+        this.refreshList()
+			}).finally(() => {
+				this.dialogMenu.loading = false
+			})
+		}
+	},
+	mounted() {
+		this.$$event.$on('tab:show', activeName => {
+			if(activeName === 'role' && this.list.data.length === 0) {
+				this.getMenuList()
+				this.getList()
+			}
+		})
+	}
+}
+</script>
+<style scoped lang="less">
+
+</style>

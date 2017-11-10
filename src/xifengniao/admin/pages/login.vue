@@ -2,8 +2,8 @@
   <div class="l-login-container l-flex-vhc">
     <el-form class="l-login-form" :model="loginForm.data" :rules="loginForm.rules" ref="loginForm" label-position="left" label-width="0px">
       <h3 class="_tit">传创金融管理系统</h3>
-      <el-form-item prop="userName">
-        <el-input type="text" v-model="loginForm.data.userName" auto-complete="off" placeholder="账号"></el-input>
+      <el-form-item prop="phoneNumber">
+        <el-input type="text" v-model="loginForm.data.phoneNumber" auto-complete="off" placeholder="手机号码"></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input type="password" v-model="loginForm.data.password" auto-complete="off" placeholder="密码" @keyup.native.enter="submitForm"></el-input>
@@ -28,11 +28,11 @@ export default {
       	loading: false,	
       	remember: true,
       	data: {
-      		userName: '18602029524',
+      		phoneNumber: '18602029524',
         	password: '123'
       	},
       	rules: {
-      		userName: [
+      		phoneNumber: [
 	          { required: true, message: '请输入账号', trigger: 'blur' },
 	        ],
 	        password: [
@@ -47,7 +47,7 @@ export default {
       this.$refs.loginForm.resetFields()
     },
     submitForm(ev) {
-      this.$refs.loginForm.validate((valid) => {
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loginForm.loading = true
           this.$store.dispatch('login', this.loginForm.data).then(data => {

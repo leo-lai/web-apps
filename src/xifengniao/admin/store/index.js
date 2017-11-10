@@ -13,6 +13,8 @@ const store = new Vuex.Store({
   getters: {
   	userMenus: state => state.user.menus,
   	userInfo: state => state.user.info,
+  	zuzhiList: state => state.user.zuzhiList,
+  	roleList: state => state.user.roleList,
   	fullscreen: state => state.app.fullscreen,
   	collapse: state => state.app.collapse
   }

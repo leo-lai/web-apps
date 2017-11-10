@@ -21,12 +21,10 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="账户" prop="orgName"></el-table-column>
-	    <el-table-column label="手机号码" prop="phone"></el-table-column>
+	    <el-table-column label="账户" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="真实姓名" prop="realName"></el-table-column>
 	    <el-table-column label="系统角色" prop="roleName"></el-table-column>
-	    <el-table-column label="所属组织" prop=""></el-table-column>
-	    <el-table-column label="岗位名称" prop=""></el-table-column>
+	    <el-table-column label="所属组织" prop="orgName"></el-table-column>
 	    <el-table-column label="状态" prop="status">
 	    	<template slot-scope="scope">
 	    		<span v-if="scope.row.isEnable === 1" class="l-text-ok">正常使用</span>
@@ -35,9 +33,12 @@
 	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link" type="text" size="small">编辑</el-button>
-	        <el-button v-if="scope.row.isEnable === 1" class="l-text-error" type="text" size="small">禁用</el-button>
-	        <el-button v-else class="l-text-ok" type="text" size="small">启用</el-button>
+	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        <span v-show="scope.row.enabling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.enabling">
+	        	<el-button v-if="scope.row.isEnable === 1" class="l-text-error" type="text" size="small" @click="enable(scope.row, 0)">禁用</el-button>
+	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enable(scope.row, 1)">启用</el-button>	
+	        </span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -53,59 +54,83 @@
 	  </el-row>
 
 	  <!-- 新增/编辑用户 -->
-		<el-dialog :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
-  		<el-form class="l-form1" :inline="true" :model="dialogInfo.data" :rules="dialogInfo.rules" label-width="90px">
+		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
+  		<el-form class="l-form1" ref="infoForm" label-width="90px" @keyup.enter.native="submitInfo"
+  			:inline="true" :model="dialogInfo.data" :rules="dialogInfo.rules">
 			  <el-form-item class="_flex" label="登录账号" prop="phoneNumber" >
-			    <el-input v-model="dialogInfo.data.phoneNumber" placeholder="请输入手机号码"></el-input>
+			    <el-input v-model="dialogInfo.data.phoneNumber" placeholder="请输入手机号码" :maxlength="11"></el-input>
 			  </el-form-item>
 			  <el-form-item label="所属组织" prop="orgId">
 			    <el-select v-model="dialogInfo.data.orgId" placeholder="请选择">
-			      <el-option label="公司" value="1"></el-option>
-			      <el-option label="分公司" value="2"></el-option>
-			      <el-option label="门店" value="3"></el-option>
+			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="系统角色" prop="roleId">
 			    <el-select v-model="dialogInfo.data.roleId" placeholder="请选择">
-			      <el-option label="公司" value="1"></el-option>
-			      <el-option label="分公司" value="2"></el-option>
-			      <el-option label="门店" value="3"></el-option>
+			      <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId"></el-option>
 			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="真实姓名" prop="realName">
-			  	<el-input v-model="dialogInfo.data.realName" placeholder=""></el-input>
+			  	<el-input v-model="dialogInfo.data.realName" :maxlength="10" ></el-input>
 			  </el-form-item>
-			  <el-form-item label="性别" prop="sex">
-			  	<el-radio-group v-model="dialogInfo.data.sex">
-			      <el-radio label="男"></el-radio>
-    				<el-radio label="女"></el-radio>
+			  <el-form-item label="性别" prop="agentGender">
+			  	<el-radio-group v-model="dialogInfo.data.agentGender">
+			      <el-radio label="1">男</el-radio>
+    				<el-radio label="2">女</el-radio>
 			    </el-radio-group>
 			  </el-form-item>
-			  <el-form-item label="出生年月">
-			  	<el-date-picker type="month" v-model="dialogInfo.data.birthday"></el-date-picker>
+			  <el-form-item label="出生日期" prop="birthday">
+			  	<el-date-picker type="date" :picker-options="dateOption" value-format="yyyy-MM-dd" v-model="dialogInfo.data.birthday"></el-date-picker>
 			  </el-form-item>
-			  <el-form-item label="身份证号">
-			  	<el-input placeholder=""></el-input>
+			  <el-form-item label="身份证号" prop="cardNo">
+			  	<el-input v-model="dialogInfo.data.cardNo" :maxlength="18"></el-input>
 			  </el-form-item>
-			  <el-form-item label="入职时间">
-			  	<el-date-picker type="date" v-model="dialogInfo.data.joinday"></el-date-picker>
+			  <el-form-item label="入职时间" prop="entryTime">
+			  	<el-date-picker type="date" :picker-options="dateOption" value-format="yyyy-MM-dd" v-model="dialogInfo.data.entryTime"></el-date-picker>
 			  </el-form-item>
-			  <el-form-item label="基本工资">
-			  	<el-input placeholder=""></el-input>
+			  <el-form-item label="基本工资" prop="basePay">
+			  	<el-input v-model="dialogInfo.data.basePay" :maxlength="10"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
-				<el-button>取消</el-button>
-		    <el-button type="primary">确定提交</el-button>
+				<el-button @click="closeDialogInfo()">取消</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 	</div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 export default {
 	name: 'base-setting-user',
 	data() {
 		return {
+			dateOption: {
+				disabledDate(time) {
+					return time.getTime() > Date.now()
+				},
+				shortcuts: [{
+          text: '今天',
+          onClick(picker) {
+            picker.$emit('pick', new Date())
+          }
+        }, {
+          text: '昨天',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
+        }, {
+          text: '一周前',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', date)
+          }
+        }]
+			},
 			list: {
 				filter: {
 					realName: '',
@@ -122,20 +147,50 @@ export default {
 				data: []
 			},
 			dialogInfo: {
+				type: 'new',
 				title: '新增系统用户',
 				visible: false,
-				rules: {},
+				loading: false,
+				rules: {
+					phoneNumber: [
+						{ required: true, message: '必填项', trigger: 'blur' },
+						{ pattern: /^1\d{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+					],
+					orgId: [
+						{ required: true, type: 'number', message: '必选项', trigger: 'blur' }
+					],
+					roleId: [
+						{ required: true, type: 'number', message: '必选项', trigger: 'blur' }
+					],
+					realName: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					agentGender: [],
+					birthday: [],
+					entryTime: [],
+					basePay: [
+						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式(如：3500)', trigger: 'blur' }
+					],
+				},
 				data: {
 					phoneNumber: '',
+					userId: '',
 					orgId: '',
 					roleId: '',
 					realName: '',
-					sex: '',
+					agentGender: '',
 					birthday: '',
-					joinday: ''
+					entryTime: '',
+					basePay: ''
 				}
 			}
 		}
+	},
+	computed: {
+		...mapGetters([
+  		'zuzhiList',
+  		'roleList'
+    ])
 	},
 	methods: {
 		sizeChange(size = 100) {
@@ -151,10 +206,16 @@ export default {
 				this.list.total = data.total
         this.list.page = data.page
         this.list.rows = data.rows
-        this.list.data = data.list
+        this.list.data = data.list.map(item => {
+        	item.enabling = false
+        	return item
+        })
 			}).finally(() => {
 				this.list.loading = false
 			})
+		},
+		refreshList() {
+			this.getList(this.list.page)
 		},
 		search() {
 			this.getList()
@@ -163,8 +224,63 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', id) {
-			this.dialogInfo.visible = true
+		showDialogInfo(type = 'new', row) { // 新增/修改用户弹出信息
+			this.dialogInfo.type = type
+			if(type === 'edit') {
+				this.dialogInfo.title = '修改系统用户'
+				this.$$utils.copyObj(this.dialogInfo.data, row)
+			} else {
+				this.dialogInfo.title = '新增系统用户'
+				this.$$utils.copyObj(this.dialogInfo.data, '')
+			}
+
+			const loading = this.$loading()
+			Promise.all([
+				this.$store.dispatch('getZuzhiList'), 
+				this.$store.dispatch('getRoleList')
+			]).then(dataArr =>　{
+				this.dialogInfo.visible = true	
+			}).finally(() => {
+				loading.close()
+			})
+		},
+		closeDialogInfo(done) {
+			if(done) {
+				done()
+			}else{
+				this.dialogInfo.visible = false	
+			}
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+			this.$refs.infoForm.resetFields()
+		},
+		submitInfo() { // 提交用户信息
+			this.$refs.infoForm.validate(valid => {
+        if (valid) {
+          this.dialogInfo.loading = true
+          this.$$api.user.add(this.dialogInfo.data).then(data => {
+            this.closeDialogInfo()
+            this.$message({
+							type: 'success',
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '用户信息成功'
+						})
+            this.refreshList()
+          }).finally(()=>{
+            this.dialogInfo.loading = false
+          })  
+        }
+      })
+		},
+		enable(row, status = 1) { // 禁用/启用用户
+			row.enabling = true
+			this.$$api.user.enable(row.userId, status).then(() => {
+				row.isEnable = status
+				this.$message({
+					type: 'success',
+					message: status === 1 ? '该用户启用成功' : '该用户禁用成功'
+				})
+			}).finally(() => {
+				row.enabling = false
+			})
 		}
 	},
 	mounted() {

@@ -11,7 +11,9 @@ const user = {
 		fetching: false,
 		sessionId: storage.local.get('sessionId'),
 		info: storage.local.get('userinfo'),
-		menus: []
+		menus: [],
+		zuzhiList: [],
+		roleList: []
 	},
 	mutations: {
 		USER_INFO: (state, info = {}) => {
@@ -25,6 +27,12 @@ const user = {
 		USER_SESSIONID: (state, sessionId = '') => {
 			storage.local.set('sessionId', sessionId)
 			state.sessionId = sessionId
+		},
+		ZUZHI_LIST: (state, list) => {
+			state.zuzhiList = list
+		},
+		ROLE_LIST: (state, list) => {
+			state.roleList = list
 		}
 	},
 	actions: {
@@ -38,22 +46,23 @@ const user = {
 			})
 		},
 		logout({ commit }, toLogin = true) {
-			return new Promise((resolve, reject) => {
-        if (storage.local.get('sessionId')) {
-          api.auth.logout().then(resolve, reject)
-        } else {
-          resolve()
-        }
-      }).finally(() => {
-        storage.local.remove('sessionId')
-        storage.local.remove('usermenus')
-        storage.local.remove('userinfo')
-        toLogin && location.replace(`${router.options.base}/login`)
-      })
+			return api.auth.logout(toLogin)
 		},
 		getUserMenus({ commit }) {
 			// router.addRoutes(userMenus)
 			commit('USER_MENUS', _cache.userMenus)
+		},
+		getZuzhiList({ commit }) { // 获取登录账号的组织列表
+			return api.auth.getZuzhiList().then(({data}) => {
+				commit('ZUZHI_LIST', data)
+				return data
+			})
+		},
+		getRoleList({ commit }) { // 获取登录账号的角色列表
+			return api.auth.getRoleList().then(({data}) => {
+				commit('ROLE_LIST', data)
+				return data
+			})
 		}
 	}
 }

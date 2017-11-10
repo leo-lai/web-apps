@@ -31,12 +31,13 @@ service.interceptors.response.use(response => {
   	case 200:
   		return data
   	case 4002:
-  		storage.local.remove('sessionId')
   		Message({
         type: 'error',
-        message: data.message || '登录失效，请重新登录。'
+        message: data.message || '登录失效，请重新登录',
+        onClose() {
+          api.auth.logout()
+        }
       })
-      api.auth.logout()
       break
   }
   return Promise.reject(data)
@@ -118,8 +119,25 @@ const api = {
       formData.userName = (formData.userName || '').trim()
       return fetch.post('/login', formData)
     },
-    logout() {
-      return fetch.post('/loginOut')
+    logout(toLogin = true) {
+      return new Promise((resolve, reject) => {
+        if (storage.local.get('sessionId')) {
+          fetch.post('/loginOut').then(resolve, reject)
+        } else {
+          resolve()
+        }
+      }).finally(() => {
+        storage.local.remove('sessionId')
+        storage.local.remove('usermenus')
+        storage.local.remove('userinfo')
+        toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
+      })
+    },
+    getZuzhiList() {
+      return fetch.post('/organizationLevelList')
+    },
+    getRoleList() {
+      return fetch.post('/roleListList')
     }
   },
   zuzhi: {
@@ -134,6 +152,28 @@ const api = {
       formData.page = page
       formData.rows = rows
       return fetch.post('/userList', formData)
+    },
+    enable(userId = '', isEnable = '') {
+      return fetch.post('/userIsEnable', {userId, isEnable})
+    },
+    add(formData = {}) {
+      return fetch.post('/addUser', formData)
+    }
+  },
+  role: {
+    getList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/roleList', formData)
+    },
+    add(formData = {}) {
+      return fetch.post('/roleEdit', formData)
+    },
+    getMenuList(roleId = '') {
+      return fetch.post('/menuListTree', { roleId })
+    },
+    setRoleMenu(formData = {}) {
+      return fetch.post('/setRoleMenu', formData)
     }
   }
 }

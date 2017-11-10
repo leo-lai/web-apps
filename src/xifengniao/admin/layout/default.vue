@@ -49,7 +49,7 @@
       </el-main>
 	  </el-container>
 		<el-dialog title="修改密码" :visible.sync="pwdForm.visible" width="480px">
-  		<el-form :model="pwdForm.data" :rules="pwdForm.rules" ref="pwdForm" label-width="100px" style="width: 400px;">
+  		<el-form :model="pwdForm.data" :rules="pwdForm.rules" ref="pwdForm" label-width="100px" style="width: 432px;">
 			  <el-form-item label="旧密码" prop="passwordOld">
 			    <el-input type="password" v-model="pwdForm.data.passwordOld" auto-complete="off"></el-input>
 			  </el-form-item>
@@ -57,7 +57,7 @@
 			    <el-input type="password" v-model="pwdForm.data.password" auto-complete="off"></el-input>
 			  </el-form-item>
 			</el-form>
-			<span slot="footer" class="dialog-footer">
+			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="pwdForm.visible = false">取消</el-button>
 		    <el-button type="primary" :loading="pwdForm.submiting" @click="submitPwdForm">确定修改</el-button>
 		  </span>
