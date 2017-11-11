@@ -24,8 +24,6 @@ VueAMap.initAMapApiLoader({
   plugin: ['Scale', 'Geocoder']
 })
 
-console.log(VueAMap)
-
 // 事件控制中枢
 const eventHub = new Vue()
 

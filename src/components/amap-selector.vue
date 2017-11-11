@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :visible="show" :before-close="closeMap" title="请选择地址">
+  <el-dialog class="amap-dialog" :close-on-click-modal="false" :close-on-press-escape="false" :visible="show" :before-close="closeMap" title="请选择地址">
     <div class="amap-container">
       <div class="amap-address">
         <el-form size="small" label-position="left" label-width="40px">
@@ -12,6 +12,12 @@
           <el-form-item label="地区">
             <el-input v-model="data.area" readonly></el-input>
           </el-form-item>
+          <el-form-item label="经度">
+            <el-input v-model="data.longitude" readonly></el-input>
+          </el-form-item>
+          <el-form-item label="纬度">
+            <el-input v-model="data.latitude" readonly></el-input>
+          </el-form-item>
           <el-form-item label="地址">
             <div class="l-flex-h">
               <div class="l-margin-r-s l-rest">
@@ -22,14 +28,8 @@
               </el-tooltip>
             </div>
           </el-form-item>
-          <el-form-item label="经度">
-            <el-input v-model="data.longitude" readonly></el-input>
-          </el-form-item>
-          <el-form-item label="纬度">
-            <el-input v-model="data.latitude" readonly></el-input>
-          </el-form-item>
           <el-form-item>
-            <el-button @click="closeMap()">返回</el-button>
+            <el-button @click="closeMap()">取消</el-button>
             <el-button type="primary" @click="selected()">确定</el-button>
           </el-form-item>
         </el-form>
@@ -77,6 +77,7 @@ export default {
       show: this.visible,
       mapCenter: [121.59996, 31.197646],
       marker: {
+        icon: 'http://webapi.amap.com/theme/v1.3/markers/b/mark_r.png',
         position: [121.59996, 31.197646],
         events: {
           dragend: (e) => {
@@ -137,6 +138,7 @@ export default {
     },
     onSearchResult(pois) {
       const that = this
+      console.log(pois)
       if (pois.length > 0) {
         let poi = pois[0]
         let poiArr = [poi.lng, poi.lat]
@@ -144,6 +146,11 @@ export default {
         that.mapCenter = poiArr
         that.marker.position = poiArr
         that.getAddress(poi.lng, poi.lat)
+      }else{
+        that.$message({
+          type: 'error',
+          message: '没有搜索到相关结果'
+        })
       }
     },
     selected() {
@@ -156,7 +163,7 @@ export default {
 </script>
 
 <style lang="less">
-.el-dialog__body .amap-container{margin: -30px -5px -15px;}
+.amap-dialog .el-dialog__body{padding: 0;}
 .amap-container {display: flex; position: relative; height: 100%; }
 .amap-container .amap-address{padding: 20px 20px 0; background: rgb(239, 239, 244);}
 .amap-container .amap-view{flex:1; position: relative;}

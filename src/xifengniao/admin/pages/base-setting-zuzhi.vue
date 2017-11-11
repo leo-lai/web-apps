@@ -136,7 +136,7 @@ export default {
 	data() {
 		return {
 			amap: {
-				visible: true,
+				visible: false,
 				data: {
 					province: '',
 	        provinceId: '',
