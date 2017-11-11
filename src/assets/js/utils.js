@@ -220,17 +220,6 @@ export let utils = {
     })
     return target
   },
-  getArray(arr = [], children = 'children', key) { // 递归遍历数组
-    let ret = []
-    arr.forEach(item => {
-      item[key] !== undefined && ret.push(item[key])
-
-      if(utils.isArray(item[children]) && item[children].length > 0) {
-        ret = ret.concat(utils.getArray(item[children], children, key))
-      }
-    }) 
-    return ret
-  },
   type(value) {
     //如果是null或者undefined，直接转成String返回
     if( value == null )  return String( value )

@@ -56,8 +56,8 @@
 	  <!-- 新增/编辑用户 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
-  		<el-form class="l-form1" ref="infoForm" label-width="90px" @keyup.enter.native="submitInfo"
-  			:inline="true" :model="dialogInfo.data" :rules="dialogInfo.rules">
+  		<el-form class="l-form1" ref="infoForm" label-width="90px" :inline="true" 
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
 			  <el-form-item class="_flex" label="登录账号" prop="phoneNumber" >
 			    <el-input v-model="dialogInfo.data.phoneNumber" placeholder="请输入手机号码" :maxlength="11"></el-input>
 			  </el-form-item>

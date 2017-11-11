@@ -36,9 +36,12 @@
 	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link" type="text" size="small">编辑</el-button>
-	        <el-button v-if="scope.row.status === 1" class="l-text-error" type="text" size="small">禁用</el-button>
-	        <el-button v-else class="l-text-ok" type="text" size="small">启用</el-button>
+	        <el-button class="l-text-link l-margin-r-s" type="text" size="small">编辑</el-button>
+	        <span v-show="scope.row.enabling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.enabling">
+	        	<el-button v-if="scope.row.status === 1" class="l-text-error" type="text" size="small" @click="enable(scope.row, 0)">禁用</el-button>
+	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enable(scope.row, 1)">启用</el-button>	
+	        </span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -54,8 +57,10 @@
 	  </el-row>
 
 	  <!-- 新增/编辑组织 -->
-		<el-dialog :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
-  		<el-form class="l-form1" :inline="true" :model="dialogInfo.data" :rules="dialogInfo.rules" label-width="90px">
+		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" 
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
+  		<el-form class="l-form1" ref="infoForm" label-width="90px"  :inline="true"
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
 			  <el-form-item label="名称" prop="shortName">
 			    <el-input v-model="dialogInfo.data.shortName" placeholder="请输入公司/门店名称"></el-input>
 			  </el-form-item>
@@ -73,7 +78,7 @@
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item label="上级组织" prop="parentId">
-			    <el-select v-model="dialogInfo.data.parentId" placeholder="请选择上级组织">
+			    <el-select v-model="dialogInfo.data.parentId" placeholder="请选择">
 			      <el-option label="上级组织" value="1"></el-option>
 			    </el-select>
 			  </el-form-item>
@@ -81,10 +86,12 @@
 			  	<el-input placeholder=""></el-input>
 			  </el-form-item>
 			  <el-form-item label=""></el-form-item>
-			  <el-form-item class="_flex" label="地址">
-			  	<el-input style="width: 547px;" placeholder="如：广东省广州市海珠区东晓南路548号"></el-input>
-			  	<el-input style="width: 149px;" v-model="dialogInfo.data.longitude" placeholder="经度"></el-input>
-			  	<el-input style="width: 149px;" v-model="dialogInfo.data.latitude" placeholder="纬度"></el-input>
+			  <el-form-item class="_flex" label="地址" @click.native="amap.visible = true">
+			  	<el-input readonly style="width: 536px;" placeholder="如：广东省广州市海珠区东晓南路548号"></el-input>
+			  	<span class="l-margin-lr-s">经度</span>
+			  	<el-input readonly style="width: 109px;" v-model="dialogInfo.data.longitude"></el-input>
+			  	<span class="l-margin-lr-s">纬度</span>
+			  	<el-input readonly style="width: 109px;" v-model="dialogInfo.data.latitude"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="简要介绍">
 			  	<el-input type="textarea" placeholder=""></el-input>
@@ -102,24 +109,49 @@
 			  <el-form-item label="开户支行">
 			  	<el-input placeholder=""></el-input>
 			  </el-form-item>
-			  <el-form-item class="_flex" label="显示照片">
-			  	<el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card">
+			  <el-form-item class="_flex">
+			  	<div slot="label" style="line-height: 1.6;">显示照片<br><span style="font-size:12px;" class="l-text-gray">(最多上传9张)</span></div>
+			  	<el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" multiple :limit="9">
 					  <i class="el-icon-plus"></i>
 					</el-upload>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r">
-				<el-button>取消</el-button>
-		    <el-button type="primary">确定提交</el-button>
+				<el-button @click="closeDialogInfo()">取消</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
+
+		<!-- 地图选择 -->
+		<amap-selector :data="amap.data" :visible.sync="amap.visible" :on-selected="amap.selected"></amap-selector>
   </div>
 </template>
 <script>
+import AmapSelector from 'components/amap-selector'
 export default {
 	name: 'base-setting-zuzhi',
+	components: {
+		AmapSelector
+	},
 	data() {
 		return {
+			amap: {
+				visible: true,
+				data: {
+					province: '',
+	        provinceId: '',
+	        city: '',
+	        cityId: '',
+	        area: '',
+	        areaId: '',
+	        address: '',
+	        longitude: '',
+	        latitude: '',
+				},
+				selected(addressObj) {
+					console.log(addressObj)
+				}
+			},
 			list: {
 				filter: {
 					orgName: ''
@@ -173,7 +205,10 @@ export default {
 				this.list.total = data.total
         this.list.page = data.page
         this.list.rows = data.rows
-        this.list.data = data.list
+        this.list.data = data.list.map(item => {
+        	item.enabling = false
+        	return item
+        })
 			}).finally(() => {
 				this.list.loading = false
 			})
@@ -187,6 +222,30 @@ export default {
 		},
 		showDialogInfo(type = 'new', id) {
 			this.dialogInfo.visible = true
+		},
+		closeDialogInfo(done) {
+			if(done) {
+				done()
+			}else{
+				this.dialogInfo.visible = false	
+			}
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+			this.$refs.infoForm.resetFields()
+		},
+		submitInfo() { // 提交组织信息
+
+		},
+		enable(row, status = 1) { // 禁用/启用组织
+			row.enabling = true
+			this.$$api.zuzhi.enable(row.orgId, status).then(() => {
+				row.status = status
+				this.$message({
+					type: 'success',
+					message: status === 1 ? '启用成功' : '禁用成功'
+				})
+			}).finally(() => {
+				row.enabling = false
+			})
 		}
 	},
 	mounted() {

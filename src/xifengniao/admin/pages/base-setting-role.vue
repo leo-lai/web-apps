@@ -53,7 +53,7 @@
 			:title="dialogMenu.title" :visible.sync="dialogMenu.visible" width="600px">
 			<div class="l-scroll" style="max-height: 400px;">
 				<el-tree show-checkbox  default-expand-all highlight-current node-key="menuId" ref="menuTree"
-				  :data="dialogMenu.menuList" :props="dialogMenu.props" @check-change="menuCheckChange">
+				  :data="dialogMenu.menuList" :props="dialogMenu.props">
 				</el-tree>	
 			</div>
 			<span slot="footer" class="l-margin-r-m">
@@ -65,6 +65,31 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+function getCheckedKeys(nodeArray = []) {
+	let keys = []
+	nodeArray.forEach(node => {
+		if(node.checked || node.indeterminate) {
+			keys.push(node.data.menuId)
+		}
+
+		if(node.childNodes && node.childNodes.length > 0) {
+			keys = keys.concat(getCheckedKeys(node.childNodes))
+		}
+	})
+	return keys
+}
+
+function getLeafMenuIds(nodeArray = []) {
+	let menuIds = []
+	nodeArray.forEach(node => {
+		if(node.children && node.children.length > 0) {
+			menuIds = menuIds.concat(getLeafMenuIds(node.children))
+		} else {
+			menuIds.push(node.menuId)
+		}
+	})
+	return menuIds
+}
 export default {
 	name: 'base-setting-user',
 	data() {
@@ -191,7 +216,7 @@ export default {
 					}
 				} else {
 					this.$$api.role.getMenuList(roleId).then(({data}) => {
-						resolve(this.$$utils.getArray(data, 'children', 'menuId'))
+						resolve(getLeafMenuIds(data))
 					}, reject)
 				}
 			})
@@ -200,11 +225,11 @@ export default {
 			const loading = this.$loading()
 			this.dialogMenu.data.roleId = row.roleId
 			this.getMenuList(row.roleId).then(data => {
-				setTimeout(() => {
-					this.$refs.menuTree.setCheckedKeys(data)	
-				}, 500)
-				this.dialogMenu.title = '配置权限：' + row.roleName
 				this.dialogMenu.visible = true
+				setTimeout(() => {
+					this.dialogMenu.title = '配置权限：' + row.roleName
+					this.$refs.menuTree.setCheckedKeys(data)	
+				}, 50)
 			}).finally(() => {
 				loading.close()
 			})
@@ -217,23 +242,15 @@ export default {
 			}
 			this.$refs.menuTree.setCheckedKeys([])
 		},
-		menuCheckChange(data, checked) {
-			// if (checked) {
-			// 	this.dialogMenu.checkedList.push()
-			// } else {
-
-			// }
-		},
 		submitMenu() {
-			// 叶子节点选中列表
-			let leafCheckedList = this.$refs.menuTree.getCheckedKeys(true)
-
-			// 根据选中的叶子节点获取其祖先节点
-			// leafCheckedList.forEach(leafKey => {
-				
-			// })
-			return
-			this.dialogMenu.data.menuIds = this.$refs.menuTree.getCheckedKeys().join(',')
+			this.dialogMenu.data.menuIds = getCheckedKeys(this.$refs.menuTree.root.childNodes).join(',')
+			if(!this.dialogMenu.data.menuIds) {
+				this.$message({
+					type: 'error',
+					message: '请配置权限'
+				})
+				return
+			}
 			this.dialogMenu.loading = true
 			this.$$api.role.setRoleMenu(this.dialogMenu.data).then(() => {
 				this.closeDialogMenu()

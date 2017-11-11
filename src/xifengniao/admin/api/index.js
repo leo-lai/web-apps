@@ -145,6 +145,9 @@ const api = {
       formData.page = page
       formData.rows = rows
       return fetch.post('/organizationList', formData)
+    },
+    enable(orgId = '', isOn = '') {
+      return fetch.post('/organizationOnOff', {orgId, isOn})
     }
   },
   user: {
