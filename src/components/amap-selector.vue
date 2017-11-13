@@ -4,24 +4,24 @@
       <div class="amap-address">
         <el-form size="small" label-position="left" label-width="40px">
           <el-form-item label="省份">
-            <el-input v-model="data.province" readonly></el-input>
+            <el-input v-model="options.province" readonly></el-input>
           </el-form-item>
           <el-form-item label="城市">
-            <el-input v-model="data.city" readonly></el-input>
+            <el-input v-model="options.city" readonly></el-input>
           </el-form-item>
           <el-form-item label="地区">
-            <el-input v-model="data.area" readonly></el-input>
+            <el-input v-model="options.area" readonly></el-input>
           </el-form-item>
           <el-form-item label="经度">
-            <el-input v-model="data.longitude" readonly></el-input>
+            <el-input v-model="options.longitude" readonly></el-input>
           </el-form-item>
           <el-form-item label="纬度">
-            <el-input v-model="data.latitude" readonly></el-input>
+            <el-input v-model="options.latitude" readonly></el-input>
           </el-form-item>
           <el-form-item label="地址">
             <div class="l-flex-h">
               <div class="l-margin-r-s l-rest">
-                <el-input autosize type="textarea" v-model="data.address"></el-input>  
+                <el-input autosize type="textarea" v-model="options.address"></el-input>  
               </div>
               <el-tooltip content="如地址定位不准确，可自行修改" placement="right" effect="light">
                 <i class="el-icon-question" style="margin-top:10px;"></i>
@@ -30,7 +30,7 @@
           </el-form-item>
           <el-form-item>
             <el-button @click="closeMap()">取消</el-button>
-            <el-button type="primary" @click="selected()">确定</el-button>
+            <el-button style="width: 120px;" type="primary" @click="selected()">确定</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -52,7 +52,7 @@ export default {
       type: Boolean,
       default: false
     },
-    data: {
+    options: {
       type: Object,
       default: {
         province: '',
@@ -62,19 +62,16 @@ export default {
         area: '',
         areaId: '',
         address: '',
-        longitude: '',
-        latitude: '',
+        longitude: 121.59996,
+        latitude: 31.197646,
+        onSelected: function () {}
       }
-    },
-    onSelected: {
-      type: Function,
-      default: function () {}
     }
   },
   data() {
     let that = this
     return {
-      show: this.visible,
+      show: false,
       mapCenter: [121.59996, 31.197646],
       marker: {
         icon: 'http://webapi.amap.com/theme/v1.3/markers/b/mark_r.png',
@@ -122,12 +119,12 @@ export default {
             let addressComponent = result.regeocode.addressComponent
             let address = result.regeocode.formattedAddress.split(addressComponent.district)[1] || (addressComponent.street + addressComponent.streetNumber)
 
-            this.data.province = addressComponent.province
-            this.data.city = addressComponent.city || addressComponent.province
-            this.data.area = addressComponent.district
-            this.data.address = address
-            this.data.longitude = lng
-            this.data.latitude = lat
+            this.options.province = addressComponent.province
+            this.options.city = addressComponent.city || addressComponent.province
+            this.options.area = addressComponent.district
+            this.options.address = address
+            this.options.longitude = lng
+            this.options.latitude = lat
             
             resolve(result)
           } else{
@@ -138,7 +135,6 @@ export default {
     },
     onSearchResult(pois) {
       const that = this
-      console.log(pois)
       if (pois.length > 0) {
         let poi = pois[0]
         let poiArr = [poi.lng, poi.lat]
@@ -154,8 +150,7 @@ export default {
       }
     },
     selected() {
-      // 获取省市区id
-      this.onSelected(this.data)
+      this.options.onSelected(this.options)
       this.closeMap()
     }
   }
@@ -169,7 +164,7 @@ export default {
 .amap-container .amap-view{flex:1; position: relative;}
 .amap-search-box {position: absolute !important; top: 15px; left: 15px; z-index: 999; background: rgba(255, 255, 255, 1)!important;}
 .amap-search-box .search-tips{ max-height: 300px; min-width: 358px;}
-.amap-search-box .search-btn{ background: #409eff !important; color: #fff; min-width: 70px; text-align: center;}
+.amap-search-box .search-btn{ background: #efeff4 !important; min-width: 70px; text-align: center;}
 .amap-search-box .search-btn:active{background: #3a8ee6 !important;}
 .amap-search-box .search-box-wrapper input{background: transparent;}
 </style>

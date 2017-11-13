@@ -148,6 +148,9 @@ const api = {
     },
     enable(orgId = '', isOn = '') {
       return fetch.post('/organizationOnOff', {orgId, isOn})
+    },
+    add(formData = {}) {
+      return fetch.post('/organizationEdit', formData)
     }
   },
   user: {

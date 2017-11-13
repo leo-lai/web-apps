@@ -5,7 +5,7 @@
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
-  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent="search">
+  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="orgName">
 				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
@@ -157,10 +157,10 @@ export default {
 						{ pattern: /^1\d{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }
 					],
 					orgId: [
-						{ required: true, type: 'number', message: '必选项', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必选项', trigger: 'change' }
 					],
 					roleId: [
-						{ required: true, type: 'number', message: '必选项', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必选项', trigger: 'change' }
 					],
 					realName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -170,7 +170,7 @@ export default {
 					entryTime: [],
 					basePay: [
 						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式(如：3500)', trigger: 'blur' }
-					],
+					]
 				},
 				data: {
 					phoneNumber: '',
