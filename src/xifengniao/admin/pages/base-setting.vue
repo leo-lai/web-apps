@@ -32,7 +32,7 @@ export default {
 	methods: {
 		tabClick() {
 			this.$$utils.history.replace('?tab=' + this.tabActive)
-			this.$$event.$emit('tab:show', this.tabActive)
+			this.$$event.$emit('base-setting:tab', this.tabActive)
 		}
 	},
 	mounted() {
@@ -41,6 +41,3 @@ export default {
 	}
 }
 </script>
-<style scoped lang="less">
-
-</style>

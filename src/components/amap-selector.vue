@@ -37,7 +37,7 @@
       <div class="amap-view">
         <el-amap-search-box class="amap-search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap vid="amapSeletor" :center="mapCenter" :zoom="15" :plugin="plugin">
-          <el-amap-marker :position="marker.position" :events="marker.events" :visible="marker.visible" :draggable="marker.draggable"></el-amap-marker>
+          <el-amap-marker title="拖动此选择地点" :position="marker.position" :events="marker.events" :visible="marker.visible" :draggable="marker.draggable"></el-amap-marker>
         </el-amap>  
       </div>
     </div>
@@ -62,8 +62,8 @@ export default {
         area: '',
         areaId: '',
         address: '',
-        longitude: 121.59996,
-        latitude: 31.197646,
+        longitude: 113.289201,
+        latitude: 23.081646,
         onSelected: function () {}
       }
     }
@@ -72,10 +72,10 @@ export default {
     let that = this
     return {
       show: false,
-      mapCenter: [121.59996, 31.197646],
+      mapCenter: [113.289201, 23.081646],
       marker: {
         icon: 'http://webapi.amap.com/theme/v1.3/markers/b/mark_r.png',
-        position: [121.59996, 31.197646],
+        position: [113.289201, 23.081646],
         events: {
           dragend: (e) => {
             that.getAddress(e.lnglat.lng, e.lnglat.lat)
@@ -101,6 +101,16 @@ export default {
   watch: {
     visible(val) {
       this.show = val
+      if(val) {
+        // 显示当前地址
+        setTimeout(() => {
+          if(this.options.longitude && this.options.latitude){
+            this.mapCenter = [this.options.longitude, this.options.latitude]
+            this.marker.position = [this.options.longitude, this.options.latitude]
+            this.getAddress(this.options.longitude, this.options.latitude)    
+          }
+        }, 300)
+      }
     },
     show(val) {
       this.$emit('update:visible', val)

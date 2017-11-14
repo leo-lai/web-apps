@@ -6,7 +6,7 @@
     		<div class="l-rest l-header-nav">
     			<el-menu class="l-menu" :default-active="$route.path" mode="horizontal" :router="true"
     				background-color="#334057" text-color="#b7c3d1" active-text-color="#21a0ff">
-    				<el-menu-item index="/">首页</el-menu-item>
+    				<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
 					  <el-menu-item index="/stock">库存管理</el-menu-item>
 					  <el-menu-item index="/customer">客户体系</el-menu-item>
 					  <el-submenu index="/base">

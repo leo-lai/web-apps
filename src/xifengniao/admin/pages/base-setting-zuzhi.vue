@@ -20,14 +20,14 @@
   		:data="list.data" v-loading="list.loading" >
 	    <el-table-column label="公司/门店名称" prop="shortName"></el-table-column>
 	    <el-table-column label="上级机构" prop="parentName"></el-table-column>
-	    <el-table-column label="标签" prop="orgLevel">
+	    <el-table-column label="标签" prop="orgLevel" >
 	    	<template slot-scope="scope">
 	    		<el-tag v-if="scope.row.orgLevel === 1" type="success">公司</el-tag>
 	    		<el-tag v-else-if="scope.row.orgLevel === 2" type="warning">分公司</el-tag>
 	    		<el-tag v-else="success" type="primary">门店</el-tag>
 	      </template>
 	    </el-table-column>
-	    <el-table-column label="地址" prop="address"></el-table-column>
+	    <el-table-column label="地址" prop="address" min-width="200"></el-table-column>
 	    <el-table-column label="状态" prop="status">
 	    	<template slot-scope="scope">
 	    		<span v-if="scope.row.status === 1" class="l-text-ok">运营中</span>
@@ -36,11 +36,11 @@
 	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small">编辑</el-button>
+	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        <span v-show="scope.row.enabling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.enabling">
-	        	<el-button v-if="scope.row.status === 1" class="l-text-error" type="text" size="small" @click="enable(scope.row, 0)">禁用</el-button>
-	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enable(scope.row, 1)">启用</el-button>	
+	        	<el-button v-if="scope.row.status === 1" class="l-text-error" type="text" size="small" @click="enableAsk(scope.row, 0)">禁用</el-button>
+	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enableAsk(scope.row, 1)">启用</el-button>	
 	        </span>
 	      </template>
 	    </el-table-column>
@@ -65,7 +65,7 @@
 			    <el-input v-model="dialogInfo.data.shortName" placeholder="请输入公司/门店名称" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="级别" prop="orgLevel">
-			    <el-select v-model="dialogInfo.data.orgLevel" placeholder="请选择公司/分公司/门店">
+			    <el-select v-model="dialogInfo.data.orgLevel" placeholder="请选择公司/分公司/门店" @change="orgLevelChange">
 			      <el-option label="公司" :value="1"></el-option>
 			      <el-option label="分公司" :value="2"></el-option>
 			      <el-option label="门店" :value="3"></el-option>
@@ -78,7 +78,7 @@
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item label="上级组织" prop="parentId">
-			  	<el-select v-model="dialogInfo.data.parentId" placeholder="请选择">
+			  	<el-select v-model="dialogInfo.data.parentId" placeholder="请选择" :disabled="!dialogInfo.isParent">
 			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 			    </el-select>
 			  </el-form-item>
@@ -87,12 +87,12 @@
 			  </el-form-item>
 			  <el-form-item label=""></el-form-item>
 			  <el-form-item class="_flex" label="地址" @click.native="amapOpts.visible = true" prop="region">
-			  	<el-input style="width: 526px;" placeholder="如：广东省广州市海珠区东晓南路548号"
+			  	<el-input readonly style="width: 526px;" placeholder="如：广东省广州市海珠区东晓南路548号"
 				  	:value="amapAddress"></el-input>
 			  	<span class="l-margin-lr-s">经度</span>
-			  	<el-input style="width: 109px;" v-model="dialogInfo.data.longitude"></el-input>
+			  	<el-input readonly style="width: 109px;" v-model="dialogInfo.data.longitude"></el-input>
 			  	<span class="l-margin-lr-s">纬度</span>
-			  	<el-input style="width: 109px;" v-model="dialogInfo.data.latitude"></el-input>
+			  	<el-input readonly style="width: 109px;" v-model="dialogInfo.data.latitude"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="简要介绍" prop="introduce">
 			  	<el-input type="textarea" placeholder="" :maxlength="500" v-model="dialogInfo.data.introduce"></el-input>
@@ -110,10 +110,18 @@
 			  <el-form-item label="开户支行" prop="openingBranch">
 			  	<el-input :maxlength="50" v-model="dialogInfo.data.openingBranch"></el-input>
 			  </el-form-item>
-			  <el-form-item class="_flex" prop="imageUrl">
+			  <el-form-item class="_flex" prop="imageUpload">
 			  	<div slot="label" style="display:inline;">
-			  		显示照片<span style="font-size:12px;" class="l-text-gray">(最多上传9张)</span></div>
-			  	<el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" multiple :limit="9">
+			  		显示照片<p style="font-size:12px;" class="l-text-gray">(最多上传9张)</p></div>
+			  	<el-upload accept="image/*" list-type="picture-card" multiple :limit="9"
+			  		:file-list="upload.list"
+			  		:action="$$api.baseURL + 'uploadImage'" name="img_file"
+			  		:on-success="uploadSuccess"
+			  		:on-remove="uploadRemove"
+			  		:on-preview="uploadPreview" 
+			  		:on-progress="uploadProgress" 
+			  		:on-error="uploadError" 
+			  		:on-exceed="uploadExceed">
 					  <i class="el-icon-plus"></i>
 					</el-upload>
 			  </el-form-item>
@@ -126,6 +134,13 @@
 
 		<!-- 地图选择 -->
 		<amap-selector :visible.sync="amapOpts.visible" :options="amapOpts"></amap-selector>
+
+		<!-- 预览图片 -->
+		<el-dialog :visible.sync="upload.visible">
+		  <div class="l-text-center">
+		  	<img :src="upload.previewUrl" alt="">
+		  </div>
+		</el-dialog>
   </div>
 </template>
 <script>
@@ -141,8 +156,8 @@ export default {
 	data() {
 		const that = this
 		let validateRegion = function(rule, value, callback) {
-      if (!(dialogInfo.data.provinceId && dialogInfo.data.cityId 
-      	&& dialogInfo.data.areaId && that.dialogInfo.data.address)){
+      if (!(that.dialogInfo.data.provinceId && that.dialogInfo.data.cityId 
+      	&& that.dialogInfo.data.areaId && that.dialogInfo.data.address)){
         callback(new Error('请选择地址'))
       } else if(!that.dialogInfo.data.longitude || !that.dialogInfo.data.latitude){
         callback(new Error('经纬度不正确'))
@@ -151,10 +166,34 @@ export default {
       }
 		}
 
-		let validateUpload = function() {
-
+		let validateUpload = function(rule, value, callback) {
+			if(that.upload.loading) {
+				callback(new Error('图片正在上传中'))
+			}else if(that.upload.list.length === 0) {
+				callback(new Error('请上传照片'))
+			}else if(that.upload.list.length > 9) {
+				callback(new Error('最多上传9张照片'))
+			}else {
+				that.dialogInfo.data.imageUrl = that.upload.list.map(item => item.src || item.url).join(',')
+				callback()
+			}
 		}
+
+		let validateParent = function(rule, value, callback) {
+			if(that.dialogInfo.data.orgLevel === 1 || that.dialogInfo.data.parentId) {
+				callback()
+			}else if(!that.dialogInfo.data.parentId){
+				callback(new Error('必选项'))
+			}
+		}
+
 		return {
+			upload: {
+				list: [],
+				loading: false,
+				visible: false,
+				previewUrl: ''
+			},
 			amapOpts: {
 				visible: false,
 				province: '',
@@ -193,6 +232,7 @@ export default {
 			dialogInfo: {
 				title: '新增公司/门店',
 				visible: false,
+				isParent: true,
 				rules: {
 					shortName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -204,7 +244,7 @@ export default {
 						{ required: true, type: 'number', message: '必选项', trigger: 'change' }
 					],
 					parentId: [
-						{ required: true, type: 'number', message: '必选项', trigger: 'change' }
+						{ required: true, validator: validateParent, trigger: 'change' }
 					],
 					telePhone: [
 						{ required: true, message: '必填项', trigger: 'blur' },
@@ -227,11 +267,12 @@ export default {
 					region: [
 						{ required: true, validator: validateRegion, trigger: 'change' },
 					],
-					imageUrl: [
+					imageUpload: [
 						{ required: true, validator: validateUpload, trigger: 'change' },
 					]
 				},
 				data: {
+					orgId: '',
 					shortName: '',
 					orgLevel: '',
 					orgType: '',
@@ -269,6 +310,49 @@ export default {
     ])
 	},
 	methods: {
+		orgLevelChange(value) {
+			if(value == 1){
+				this.dialogInfo.data.parentId = ''
+				this.dialogInfo.isParent = false
+			}else{
+				this.dialogInfo.isParent = true
+			}
+		},
+		uploadSuccess(response, file, fileList) {
+			this.upload.loading = false
+			this.upload.list.push({
+				name: file.name,
+				url: response.data,
+				src: response.data
+			})
+		},
+		uploadPreview(file) {
+			this.upload.visible = true
+			this.upload.previewUrl = file.src || file.url
+		},
+		uploadRemove(file, fileList) {
+			if(file.status === 'success') {
+				this.upload.list = this.upload.list.filter(item =>  {
+					if(file.response) {
+						return item.src !== file.response.data
+					}else {
+						return item.src !== (file.src || file.url)
+					}
+				})
+			}
+		},
+		uploadProgress(event, file, fileList) {
+			this.upload.loading = true
+		},
+		uploadError(error, file, fileList) {
+			this.upload.loading = false
+		},
+		uploadExceed(files, fileList) {
+			this.$message({
+				type: 'error',
+				message: '最多上传9张照片'
+			})
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},
@@ -290,6 +374,9 @@ export default {
 				this.list.loading = false
 			})
 		},
+		refreshList() {
+			this.getList(this.list.page)
+		},
 		search() {
 			this.getList()
 		},
@@ -297,20 +384,27 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', id) {
+		showDialogInfo(type = 'new', row) {
 			this.dialogInfo.type = type
+			let promises = [this.$store.dispatch('getZuzhiList')]
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改公司/门店'
-				this.$$utils.copyObj(this.dialogInfo.data, row)
+				let zuzhiInfo = this.$$api.zuzhi.getInfo(row.orgId).then(({data}) => {
+					this.$$utils.copyObj(this.amapOpts, data)
+					this.$$utils.copyObj(this.dialogInfo.data, data)
+					this.upload.list = this.dialogInfo.data.imageUrl.split(',').map(imageUrl => {
+						return {url: this.$$utils.image.thumb(imageUrl, 150), name: imageUrl, src: imageUrl}
+					})
+					return data
+				})
+				promises.push(zuzhiInfo)
 			} else {
 				this.dialogInfo.title = '新增公司/门店'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
 
 			const loading = this.$loading()
-			Promise.all([
-				this.$store.dispatch('getZuzhiList') 
-			]).then(dataArr =>　{
+			Promise.all(promises).then(dataArr =>　{
 				this.dialogInfo.visible = true	
 			}).finally(() => {
 				loading.close()
@@ -339,8 +433,26 @@ export default {
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
+        }else {
+        	this.$message({
+						type: 'error',
+						message: '请完善表单信息'
+					})
         }
       })
+		},
+		enableAsk(row, status = 1) {
+			if(status == 0){
+				this.$confirm('是否确定禁用该组织?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+        	this.enable(row, status)  
+        })
+			}else{
+				this.enable(row, status)
+			}
 		},
 		enable(row, status = 1) { // 禁用/启用组织
 			row.enabling = true
@@ -356,7 +468,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('tab:show', activeName => {
+		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'zuzhi' && this.list.data.length === 0) {
 				this.getList()
 			}
@@ -364,6 +476,3 @@ export default {
 	}
 }
 </script>
-<style scoped lang="less">
-
-</style>

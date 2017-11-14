@@ -265,7 +265,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('tab:show', activeName => {
+		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'role' && this.list.data.length === 0) {
 				this.getMenuList()
 				this.getList()
@@ -274,6 +274,3 @@ export default {
 	}
 }
 </script>
-<style scoped lang="less">
-
-</style>

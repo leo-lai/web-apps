@@ -140,11 +140,14 @@ const api = {
       return fetch.post('/roleListList')
     }
   },
-  zuzhi: {
+  zuzhi: { // 组织架构管理
     getList(formData = {}, page = 1, rows = 100) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/organizationList', formData)
+    },
+    getInfo(orgId = '') {
+      return fetch.post('/organizationInfo', { orgId })
     },
     enable(orgId = '', isOn = '') {
       return fetch.post('/organizationOnOff', {orgId, isOn})
@@ -153,7 +156,7 @@ const api = {
       return fetch.post('/organizationEdit', formData)
     }
   },
-  user: {
+  user: { // 系统用户管理
     getList(formData = {}, page = 1, rows = 100) {
       formData.page = page
       formData.rows = rows
@@ -166,7 +169,7 @@ const api = {
       return fetch.post('/addUser', formData)
     }
   },
-  role: {
+  role: { // 角色管理
     getList(formData = {}, page = 1, rows = 100) {
       formData.page = page
       formData.rows = rows
@@ -180,6 +183,49 @@ const api = {
     },
     setRoleMenu(formData = {}) {
       return fetch.post('/setRoleMenu', formData)
+    }
+  },
+  supplier: { // 供应商管理
+    getList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/supplierList', formData)
+    },
+    add(formData = {}) {
+      return fetch.post('/supplierEdit', formData)
+    },
+    del(supplierId = '') {
+      return fetch.post('/supplierDelete', { supplierId })
+    }
+  },
+  car: { // 车型管理
+    getList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/carsList', formData)
+    },
+    add(formData = {}) {
+      return fetch.post('/carsEdit', formData)
+    }
+  },
+  color: { // 车型管理
+    getList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/carsList', formData)
+    },
+    add(formData = {}) {
+      return fetch.post('/carsEdit', formData)
+    }
+  },
+  customer: { // 车型管理
+    getList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/customerOrgList', formData)
+    },
+    add(formData = {}) {
+      return fetch.post('/carsEdit', formData)
     }
   }
 }

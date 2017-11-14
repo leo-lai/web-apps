@@ -10,7 +10,7 @@
 				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
 				  <el-form-item prop="realName">
-				    <el-input placeholder="请输入员工姓名" v-model="list.filter.realName"></el-input>
+				    <el-input placeholder="请输入供应商名称" v-model="list.filter.realName"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -21,7 +21,7 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="账户" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="账号/手机号" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="真实姓名" prop="realName"></el-table-column>
 	    <el-table-column label="系统角色" prop="roleName"></el-table-column>
 	    <el-table-column label="所属组织" prop="orgName"></el-table-column>
@@ -36,8 +36,8 @@
 	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        <span v-show="scope.row.enabling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.enabling">
-	        	<el-button v-if="scope.row.isEnable === 1" class="l-text-error" type="text" size="small" @click="enable(scope.row, 0)">禁用</el-button>
-	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enable(scope.row, 1)">启用</el-button>	
+	        	<el-button v-if="scope.row.isEnable === 1" class="l-text-error" type="text" size="small" @click="enableAsk(scope.row, 0)">禁用</el-button>
+	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enableAsk(scope.row, 1)">启用</el-button>	
 	        </span>
 	      </template>
 	    </el-table-column>
@@ -81,13 +81,13 @@
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item label="出生日期" prop="birthday">
-			  	<el-date-picker type="date" :picker-options="dateOption" value-format="yyyy-MM-dd" v-model="dialogInfo.data.birthday"></el-date-picker>
+			  	<el-date-picker type="date" value-format="yyyy-MM-dd" v-model="dialogInfo.data.birthday"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="身份证号" prop="cardNo">
 			  	<el-input v-model="dialogInfo.data.cardNo" :maxlength="18"></el-input>
 			  </el-form-item>
 			  <el-form-item label="入职时间" prop="entryTime">
-			  	<el-date-picker type="date" :picker-options="dateOption" value-format="yyyy-MM-dd" v-model="dialogInfo.data.entryTime"></el-date-picker>
+			  	<el-date-picker type="date" value-format="yyyy-MM-dd" v-model="dialogInfo.data.entryTime"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="基本工资" prop="basePay">
 			  	<el-input v-model="dialogInfo.data.basePay" :maxlength="10"></el-input>
@@ -267,8 +267,26 @@ export default {
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
+        }else {
+        	this.$message({
+						type: 'error',
+						message: '请完善表单信息'
+					})
         }
       })
+		},
+		enableAsk(row, status = 1) {
+			if(status == 0){
+				this.$confirm('是否确定禁用该用户?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+        	this.enable(row, status)  
+        })
+			}else{
+				this.enable(row, status)
+			}
 		},
 		enable(row, status = 1) { // 禁用/启用用户
 			row.enabling = true
@@ -284,7 +302,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('tab:show', activeName => {
+		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'user' && this.list.data.length === 0) {
 				this.getList()
 			}
@@ -292,6 +310,3 @@ export default {
 	}
 }
 </script>
-<style scoped lang="less">
-
-</style>
