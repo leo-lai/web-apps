@@ -3,6 +3,7 @@ body{ font-size:  0.53rem; color: #475669; }
 h2, h3, h4, strong, b, th{ font-weight: 600;}
 h3{font-size: 0.65rem;}
 h4{font-size: 0.55rem;}
+.l-viewer{position: absolute; bottom: 0; height: 0; visibility: hidden;}
 #app{height:  100%; position: relative; min-width: 1240px;}
 .l-header{
 	background: #334057; color: #fff; padding: 0 ; transition: 0.3s linear;
@@ -55,9 +56,6 @@ h4{font-size: 0.55rem;}
 	width: 100%;
 	th{background: #e5e9f2; }
 	td{padding: 9px 0;}
-	td:first-child .cell, th:first-child .cell{
-		padding-left: 10px;
-	}
 }
 .el-table--striped .el-table__body tr.el-table__row--striped td{
 	background: rgba(239, 239, 244, 0.6);
@@ -73,4 +71,15 @@ h4{font-size: 0.55rem;}
 		display: flex;
 		.el-form-item__content{flex: 1; padding-right: 1px;}
 	}
+}
+
+.l-upload-card{
+	.el-upload-list--picture-card .el-upload-list__item,
+	.el-upload--picture-card{
+		width: 80px; height: 80px;
+	}
+	.el-upload--picture-card{
+		line-height: 80px;
+	}
+	.el-icon-close-tip{font-size: 0;}
 }

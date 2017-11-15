@@ -206,16 +206,40 @@ const api = {
     },
     add(formData = {}) {
       return fetch.post('/carsEdit', formData)
+    },
+    del(carId = '') {
+      return fetch.post('/carsDelete', { carId })
+    },
+    getBrandList() { // 品牌列表
+      return fetch.post('/carsBrandList')
+    },
+    getFamilyList(brandId = '') { // 车系列表
+      return fetch.post('/carsFamilyList', { brandId })
+    },
+    getStyleList(brandId = '') { // 车等级列表
+      return fetch.post('/carsStyleList', { brandId })
     }
   },
-  color: { // 车型管理
-    getList(formData = {}, page = 1, rows = 100) {
+  color: { // 车身颜色内饰管理
+    getList(formData = {}, page = 1, rows = 100) { // 车系列表(分页)
       formData.page = page
       formData.rows = rows
-      return fetch.post('/carsList', formData)
+      return fetch.post('/carsFamilyListPage', formData)
+    },
+    getCheshenList(familyId = '') { // 获取车身颜色列表
+      return fetch.post('/carColourGetByBrand', { familyId })
     },
     add(formData = {}) {
-      return fetch.post('/carsEdit', formData)
+      return fetch.post('/carColourEdit', formData)
+    },
+    del(carColourId = '') {
+      return fetch.post('/carColourDelete', { carColourId })
+    },
+    addImages(formData = {}) {
+      return fetch.post('/carColourImageAdd', formData)
+    },
+    getImages(carColourId = '') { // 获取车身照片
+      return fetch.post('/carColourImageGetByCarColour', { carColourId })
     }
   },
   customer: { // 车型管理

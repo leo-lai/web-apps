@@ -1249,7 +1249,7 @@ chokidar@^1.4.1, chokidar@^1.6.1, chokidar@^1.7.0:
   optionalDependencies:
     fsevents "^1.0.0"
 
-chromedriver@^2.27.2:
+chromedriver@^2.33.2:
   version "2.33.2"
   resolved "http://registry.npm.taobao.org/chromedriver/download/chromedriver-2.33.2.tgz#8fc779d54b6e45bef55d264a1eceed52427a9b49"
   dependencies:
@@ -1964,9 +1964,9 @@ electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.27:
   version "1.3.27"
   resolved "http://registry.npm.taobao.org/electron-to-chromium/download/electron-to-chromium-1.3.27.tgz#78ecb8a399066187bb374eede35d9c70565a803d"
 
-element-ui@^2.0.0:
+element-ui@^2.0.4:
   version "2.0.4"
-  resolved "http://registry.npm.taobao.org/element-ui/download/element-ui-2.0.1.tgz#800a74a8ecf2843576fd6786b3ece07c2484b61a"
+  resolved "http://registry.npm.taobao.org/element-ui/download/element-ui-2.0.4.tgz#ebb4623eb1aabc1f53ce91a42839a5ec259e4dac"
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -5704,6 +5704,10 @@ timers-browserify@^2.0.2:
   dependencies:
     setimmediate "^1.0.4"
 
+tinymce@^4.6.6:
+  version "4.7.2"
+  resolved "http://registry.npm.taobao.org/tinymce/download/tinymce-4.7.2.tgz#24bf64ff1d1e68190e15461a658dc257a426c5ee"
+
 tmp@0.0.31:
   version "0.0.31"
   resolved "http://registry.npm.taobao.org/tmp/download/tmp-0.0.31.tgz#8f38ab9438e17315e5dbd8b3657e8bfb277ae4a7"
@@ -5918,6 +5922,12 @@ uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0:
   version "3.1.0"
   resolved "http://registry.npm.taobao.org/uuid/download/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
 
+v-viewer@^0.2.0:
+  version "0.2.0"
+  resolved "http://registry.npm.taobao.org/v-viewer/download/v-viewer-0.2.0.tgz#8aff8256f9e4e5325f407a7c62ee28ac34dfb18c"
+  dependencies:
+    viewerjs "^0.7.2"
+
 v8flags@^2.1.1:
   version "2.1.1"
   resolved "http://registry.npm.taobao.org/v8flags/download/v8flags-2.1.1.tgz#aab1a1fa30d45f88dd321148875ac02c0b55e5b4"
@@ -5946,6 +5956,10 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+viewerjs@^0.7.2:
+  version "0.7.2"
+  resolved "http://registry.npm.taobao.org/viewerjs/download/viewerjs-0.7.2.tgz#71c87eb15c47e7b329362673ab0820d5a30a32e9"
 
 vm-browserify@0.0.4:
   version "0.0.4"
@@ -6010,9 +6024,20 @@ vue-template-es2015-compiler@^1.2.2:
   version "1.6.0"
   resolved "http://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
+vue-tinymce-editor@^1.4.4:
+  version "1.4.4"
+  resolved "http://registry.npm.taobao.org/vue-tinymce-editor/download/vue-tinymce-editor-1.4.4.tgz#417e3e2e5b168877522e6637da3823e130711b92"
+  dependencies:
+    tinymce "^4.6.6"
+    vue "^2.4.2"
+
 vue@^2.2.2:
   version "2.5.2"
   resolved "http://registry.npm.taobao.org/vue/download/vue-2.5.2.tgz#fd367a87bae7535e47f9dc5c9ec3b496e5feb5a4"
+
+vue@^2.4.2:
+  version "2.5.3"
+  resolved "http://registry.npm.taobao.org/vue/download/vue-2.5.3.tgz#e1a3b1f49b6e93e574ce040b95cbc873912fecc1"
 
 vuex-i18n@^1.3.1:
   version "1.7.0"

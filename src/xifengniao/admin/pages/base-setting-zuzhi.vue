@@ -5,7 +5,7 @@
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
-  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+  			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="orgName">
 				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
@@ -59,7 +59,7 @@
 	  <!-- 新增/编辑组织 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" 
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
-  		<el-form class="l-form1" ref="infoForm" label-width="100px"  :inline="true"
+  		<el-form class="l-form1" ref="infoForm" label-width="100px"  inline
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
 			  <el-form-item label="名称" prop="shortName">
 			    <el-input v-model="dialogInfo.data.shortName" placeholder="请输入公司/门店名称" :maxlength="50"></el-input>
@@ -154,7 +154,7 @@ export default {
 		AmapSelector
 	},
 	data() {
-		const that = this
+		let that = this
 		let validateRegion = function(rule, value, callback) {
       if (!(that.dialogInfo.data.provinceId && that.dialogInfo.data.cityId 
       	&& that.dialogInfo.data.areaId && that.dialogInfo.data.address)){
@@ -370,7 +370,7 @@ export default {
         	item.enabling = false
         	return item
         })
-			}).finally(() => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
 		},
@@ -406,7 +406,7 @@ export default {
 			const loading = this.$loading()
 			Promise.all(promises).then(dataArr =>　{
 				this.dialogInfo.visible = true	
-			}).finally(() => {
+			}).finally(_ => {
 				loading.close()
 			})
 		},
@@ -423,7 +423,7 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.zuzhi.add(this.dialogInfo.data).then(data => {
+          this.$$api.zuzhi.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
@@ -462,7 +462,7 @@ export default {
 					type: 'success',
 					message: status === 1 ? '启用成功' : '禁用成功'
 				})
-			}).finally(() => {
+			}).finally(_ => {
 				row.enabling = false
 			})
 		}

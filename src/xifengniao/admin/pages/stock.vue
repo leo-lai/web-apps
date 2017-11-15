@@ -3,7 +3,7 @@
 		<el-tabs type="border-card">
 		  <el-tab-pane label="车辆库存">
 		  	<el-row class="l-text-right">
-			  	<el-form :inline="true">
+			  	<el-form inline>
 					  <el-form-item label="">
 					    <el-select  placeholder="请输入门店/公司名称" value="">
 					      <el-option label="门店名称1" value="1"></el-option>

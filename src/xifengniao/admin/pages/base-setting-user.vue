@@ -5,7 +5,7 @@
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
-  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+  			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="orgName">
 				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
@@ -56,7 +56,7 @@
 	  <!-- 新增/编辑用户 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
-  		<el-form class="l-form1" ref="infoForm" label-width="90px" :inline="true" 
+  		<el-form class="l-form1" ref="infoForm" label-width="90px" inline 
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
 			  <el-form-item class="_flex" label="登录账号" prop="phoneNumber" >
 			    <el-input v-model="dialogInfo.data.phoneNumber" placeholder="请输入手机号码" :maxlength="11"></el-input>
@@ -81,16 +81,16 @@
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item label="出生日期" prop="birthday">
-			  	<el-date-picker type="date" value-format="yyyy-MM-dd" v-model="dialogInfo.data.birthday"></el-date-picker>
+			  	<el-date-picker type="date" value-format="yyyy-MM-dd" :editable="false" v-model="dialogInfo.data.birthday"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="身份证号" prop="cardNo">
 			  	<el-input v-model="dialogInfo.data.cardNo" :maxlength="18"></el-input>
 			  </el-form-item>
 			  <el-form-item label="入职时间" prop="entryTime">
-			  	<el-date-picker type="date" value-format="yyyy-MM-dd" v-model="dialogInfo.data.entryTime"></el-date-picker>
+			  	<el-date-picker type="date" value-format="yyyy-MM-dd" :editable="false" v-model="dialogInfo.data.entryTime"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="基本工资" prop="basePay">
-			  	<el-input v-model="dialogInfo.data.basePay" :maxlength="10"></el-input>
+			  	<el-input v-model.number="dialogInfo.data.basePay" :maxlength="10"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -169,7 +169,8 @@ export default {
 					birthday: [],
 					entryTime: [],
 					basePay: [
-						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式(如：3500)', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式(如：3500)', trigger: 'blur' }
 					]
 				},
 				data: {
@@ -210,7 +211,7 @@ export default {
         	item.enabling = false
         	return item
         })
-			}).finally(() => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
 		},
@@ -240,7 +241,7 @@ export default {
 				this.$store.dispatch('getRoleList')
 			]).then(dataArr =>　{
 				this.dialogInfo.visible = true	
-			}).finally(() => {
+			}).finally(_ => {
 				loading.close()
 			})
 		},
@@ -257,7 +258,7 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.user.add(this.dialogInfo.data).then(data => {
+          this.$$api.user.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
@@ -296,7 +297,7 @@ export default {
 					type: 'success',
 					message: status === 1 ? '该用户启用成功' : '该用户禁用成功'
 				})
-			}).finally(() => {
+			}).finally(_ => {
 				row.enabling = false
 			})
 		}

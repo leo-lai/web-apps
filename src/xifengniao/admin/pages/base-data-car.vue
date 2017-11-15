@@ -5,7 +5,7 @@
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
-  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+  			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="carsName">
 				    <el-input placeholder="请输入车型名称" v-model="list.filter.carsName"></el-input>
 				  </el-form-item>
@@ -24,7 +24,10 @@
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
 	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">图片配置</el-button>
+	        <span v-show="scope.row.deling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.deling">
+	        	<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
+	        </span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -41,23 +44,50 @@
 
 	  <!-- 新增/编辑车型 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
-  		<el-form ref="infoForm" label-width="100px" style="width: 432px;"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
+  		<el-form class="l-form1" ref="infoForm" label-width="100px" inline
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item class="_flex" label="供应商名称" prop="carsName" >
-			    <el-input v-model="dialogInfo.data.carsName" :maxlength="50"></el-input>
+  			<el-form-item class="_flex" label="品牌型号" prop="carModel" style="width: 622px;">
+			    <el-cascader style="width: 100%;" @active-item-change="cascaderChange"
+			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 			  </el-form-item>
-			  <el-form-item class="_flex" label="联系方式" prop="phoneNumber" >
-			    <el-input v-model="dialogInfo.data.phoneNumber" :maxlength="20"></el-input>
+			  <el-form-item label="车辆级别" prop="vehicleName" >
+			    <el-select v-model="dialogInfo.data.vehicleName" placeholder="请选择">
+				    <el-option value="SUV"></el-option>
+				    <el-option value="桥车"></el-option>
+				  </el-select>
+			  </el-form-item>	
+  			<el-form-item label="变速箱类型" prop="gearboxName" >
+  				<el-select v-model="dialogInfo.data.gearboxName" placeholder="请选择">
+				    <el-option value="手动"></el-option>
+				    <el-option value="自动"></el-option>
+				  </el-select>
 			  </el-form-item>
-
-			  <el-form-item label="服务公司" prop="orgId">
-			    <el-select v-model="dialogInfo.data.orgId" placeholder="请选择">
-			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
-			    </el-select>
+			  <el-form-item label="排量" prop="pl" >
+			    <el-input placeholder="如：1.8L" class="l-text-upper" v-model="dialogInfo.data.pl" :maxlength="20"></el-input>
 			  </el-form-item>
-			  <el-form-item label="备注" prop="remark">
-			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
+			  <el-form-item label="综合油耗" prop="oilConsumption" >
+			    <el-input placeholder="单位：L/100km" v-model.number="dialogInfo.data.oilConsumption" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="座位数" prop="seat" >
+			    <el-input v-model.number="dialogInfo.data.seat" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="年款" prop="yearPattern" >
+			  	<el-select v-model="dialogInfo.data.yearPattern" placeholder="请选择">
+				    <el-option v-for="year in yearList" :key="year" :value="year"></el-option>
+				  </el-select>
+			  </el-form-item>
+			  <el-form-item label="上市时间" prop="marketDate" >
+			  	<el-date-picker type="date" value-format="yyyy-MM-dd" :editable="false" v-model="dialogInfo.data.marketDate" :picker-options="dateOptions"></el-date-picker>
+			  </el-form-item>
+			  <el-form-item label="裸车价" prop="bareCarPrice" >
+			    <el-input v-model.number="dialogInfo.data.bareCarPrice" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="指导价" prop="price" >
+			    <el-input v-model.number="dialogInfo.data.price" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item class="_flex" label="车辆介绍" prop="introduce" >
+			    <el-input type="textarea" :rows="5" v-model="dialogInfo.data.introduce"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -68,19 +98,43 @@
 	</div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
+
 export default {
 	name: 'base-data-car',
 	data() {
+		let that = this
+		let validateCarModel = function(rule, value, callback) {
+			if (that.cascader.value.length === 0){
+        callback(new Error('必填项'))
+      }else{
+      	that.dialogInfo.data.brandId = that.cascader.value[0] || ''
+      	that.dialogInfo.data.familyId = that.cascader.value[1] || ''
+      	that.dialogInfo.data.styleId = that.cascader.value[2] || ''
+        callback()
+      }
+		}
 		return {
+			yearList: [],
+			dateOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        }
+      },
+			cascader: {
+				value: [],
+				data: [],
+        props: {
+        	label: 'name',
+          value: 'id',
+          children: 'children'
+        }
+			},
 			list: {
 				filter: {
-					carsName: '',
-					orgName: ''
+					carsName: ''
 				},
 				rules: {
-					carsName: [],
-					orgName: []
+					carsName: []
 				},
 				loading: false,
 				page: 1,
@@ -90,36 +144,93 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增供应商',
+				title: '新增车型资料',
 				visible: false,
 				loading: false,
 				rules: {
-					carsName: [
+					carModel: [
+						{ required: true, validator: validateCarModel, trigger: 'change' }
+					],
+					vehicleName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
-					phoneNumber: [
+					gearboxName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
-					orgId: [
+					pl: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					oilConsumption: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式', trigger: 'blur' }
+					],
+					seat: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d+$/, message: '请输入正确格式', trigger: 'blur' }
+					],
+					yearPattern: [
 						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
+					],
+					marketDate: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					bareCarPrice: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式', trigger: 'blur' }
+					],
+					price: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式', trigger: 'blur' }
 					]
 				},
 				data: {
-					supplierId: '',
-					carsName: '',
-					phoneNumber: '',
-					orgId: '',
-					remark: ''
+					carId: '',
+					brandId: '',
+					familyId: '',
+					styleId: '',
+					vehicleName: '',
+					gearboxName: '',
+					pl: '',
+					oilConsumption: '',
+					seat: '',
+					yearPattern: '',
+					marketDate: '',
+					bareCarPrice: '',
+					price: '',
+					introduce: ''
 				}
 			}
 		}
 	},
-	computed: {
-		...mapGetters([
-  		'zuzhiList'
-    ])
-	},
 	methods: {
+		cascaderChange(valArr) {
+			let promise = null
+			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
+      if(valArr.length === 1) { // 获取车系(by brandId)
+      	if(currentBrand && currentBrand.children && currentBrand.children.length === 0) {
+	      	promise = this.$$api.car.getFamilyList(valArr[0]).then(({data}) => {
+	      		let familyList = data.map(family => {
+	      			family.children = []
+	      			return family
+	      		})
+	      		currentBrand.children = familyList.length > 0 ? familyList : null
+	      		return data
+	      	})	
+      	}
+      }else if(valArr.length === 2) { // 获取车等级(by brandId)
+      	let currentFamily = currentBrand.children.filter(family => family.id === valArr[1])[0]
+      	if(currentFamily && currentFamily.children && currentFamily.children.length === 0) {
+	      	promise = this.$$api.car.getStyleList(valArr[0]).then(({data}) => {
+	      		currentFamily.children = data
+	      		return data
+	      	})	
+      	}
+      }else {
+      	promise = Promise.resolve()
+      }
+      console.log(promise)
+      return promise
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},
@@ -137,7 +248,7 @@ export default {
         	item.deling = false
         	return item
         })
-			}).finally(() => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
 		},
@@ -152,21 +263,40 @@ export default {
 			this.getList()
 		},
 		showDialogInfo(type = 'new', row) { // 新增/修改车型弹出信息
+			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
+				this.cascader.data = data.map(item => {
+					item.children = []
+					return item
+				})
+				return data
+			})
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改供应商'
+				this.dialogInfo.title = '修改车型资料'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
+				this.cascader.value = [row.brandId, row.familyId, row.styleId]
+
+				if(row.brandId) {
+					brandPromise.then(data => {
+						this.cascaderChange([row.brandId]).then(() => {
+							if(row.familyId) {
+								this.cascaderChange([row.brandId, row.familyId])
+							}		
+						})
+						return data
+					})
+				}
 			} else {
-				this.dialogInfo.title = '新增供应商'
+				this.dialogInfo.title = '新增车型资料'
+				this.cascader.value = []
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
 
 			const loading = this.$loading()
-			Promise.all([
-				this.$store.dispatch('getZuzhiList')
-			]).then(dataArr =>　{
-				this.dialogInfo.visible = true	
-			}).finally(() => {
+			Promise.all([brandPromise]).then(dataArr =>　{
+				console.log(this.cascader.value)
+				this.dialogInfo.visible = true
+			}).finally(_ => {
 				loading.close()
 			})
 		},
@@ -179,15 +309,16 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交供应商
+		submitInfo() { // 提交车型资料
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.supplier.add(this.dialogInfo.data).then(data => {
+          this.dialogInfo.data.pl = this.dialogInfo.data.pl.toUpperCase()
+          this.$$api.car.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '供应商成功'
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '车型资料成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -202,25 +333,30 @@ export default {
       })
 		},
 		deleteInfo(row) { // 禁用/启用车型
-			this.$confirm('是否确定删除该供应商?', '提示', {
+			this.$confirm('是否确定删除该车型资料?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
       	row.deling = true
-				this.$$api.supplier.del(row.supplierId).then(() => {
+				this.$$api.car.del(row.carId).then(() => {
 					this.$message({
 						type: 'success',
-						message: '删除供应商成功'
+						message: '删除车型资料成功'
 					})
 					this.refreshList()
-				}).finally(() => {
+				}).finally(_ => {
 					row.deling = false
 				})
       })
 		}
 	},
 	mounted() {
+		let year = 2010
+		while(year <= 2025) {
+			this.yearList.push(year++)
+		}
+
 		this.$$event.$on('base-data:tab', activeName => {
 			if(activeName === 'car' && this.list.data.length === 0) {
 				this.getList()

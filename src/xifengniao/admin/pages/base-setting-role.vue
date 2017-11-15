@@ -51,7 +51,7 @@
 		<!-- 配置权限菜单 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogMenu"
 			:title="dialogMenu.title" :visible.sync="dialogMenu.visible" width="600px">
-			<div class="l-scroll" style="max-height: 400px;">
+			<div class="l-scroll" style="max-height: 400px; margin: -20px 0;">
 				<el-tree show-checkbox  default-expand-all highlight-current node-key="menuId" ref="menuTree"
 				  :data="dialogMenu.menuList" :props="dialogMenu.props">
 				</el-tree>	
@@ -152,7 +152,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list
-			}).finally(() => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
 		},
@@ -190,7 +190,7 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.role.add(this.dialogInfo.data).then(data => {
+          this.$$api.role.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
@@ -230,7 +230,7 @@ export default {
 					this.dialogMenu.title = '配置权限：' + row.roleName
 					this.$refs.menuTree.setCheckedKeys(data)	
 				}, 50)
-			}).finally(() => {
+			}).finally(_ => {
 				loading.close()
 			})
 		},
@@ -259,7 +259,7 @@ export default {
 					message: '配置权限成功'
 				})
         this.refreshList()
-			}).finally(() => {
+			}).finally(_ => {
 				this.dialogMenu.loading = false
 			})
 		}

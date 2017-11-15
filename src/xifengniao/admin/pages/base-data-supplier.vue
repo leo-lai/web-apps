@@ -5,7 +5,7 @@
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
-  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+  			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="orgName">
 				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
@@ -24,7 +24,7 @@
 	    <el-table-column label="供应商名称" prop="supplierName"></el-table-column>
 	    <el-table-column label="服务公司" prop="orgName"></el-table-column>
 	    <el-table-column label="联系方式" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="备注" prop="remark" min-width="300"></el-table-column>
+	    <el-table-column label="备注" prop="remark" min-width="200"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
 	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
@@ -56,12 +56,6 @@
 			  </el-form-item>
 			  <el-form-item class="_flex" label="联系方式" prop="phoneNumber" >
 			    <el-input v-model="dialogInfo.data.phoneNumber" :maxlength="20"></el-input>
-			  </el-form-item>
-
-			  <el-form-item label="服务公司" prop="orgId">
-			    <el-select v-model="dialogInfo.data.orgId" placeholder="请选择">
-			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
-			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="备注" prop="remark">
 			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
@@ -115,7 +109,6 @@ export default {
 					supplierId: '',
 					supplierName: '',
 					phoneNumber: '',
-					orgId: '',
 					remark: ''
 				}
 			}
@@ -144,7 +137,7 @@ export default {
         	item.deling = false
         	return item
         })
-			}).finally(() => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
 		},
@@ -173,7 +166,7 @@ export default {
 				this.$store.dispatch('getZuzhiList')
 			]).then(dataArr =>　{
 				this.dialogInfo.visible = true	
-			}).finally(() => {
+			}).finally(_ => {
 				loading.close()
 			})
 		},
@@ -190,7 +183,7 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.supplier.add(this.dialogInfo.data).then(data => {
+          this.$$api.supplier.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
@@ -221,7 +214,7 @@ export default {
 						message: '删除供应商成功'
 					})
 					this.refreshList()
-				}).finally(() => {
+				}).finally(_ => {
 					row.deling = false
 				})
       })

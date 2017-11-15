@@ -5,7 +5,7 @@
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
-  			<el-form :inline="true" ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+  			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="carsName">
 				    <el-input placeholder="请输入车型名称" v-model="list.filter.carsName"></el-input>
 				  </el-form-item>
@@ -137,7 +137,7 @@ export default {
         	item.deling = false
         	return item
         })
-			}).finally(() => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
 		},
@@ -166,7 +166,7 @@ export default {
 				this.$store.dispatch('getZuzhiList')
 			]).then(dataArr =>　{
 				this.dialogInfo.visible = true	
-			}).finally(() => {
+			}).finally(_ => {
 				loading.close()
 			})
 		},
@@ -183,7 +183,7 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.supplier.add(this.dialogInfo.data).then(data => {
+          this.$$api.supplier.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
@@ -214,7 +214,7 @@ export default {
 						message: '删除供应商成功'
 					})
 					this.refreshList()
-				}).finally(() => {
+				}).finally(_ => {
 					row.deling = false
 				})
       })

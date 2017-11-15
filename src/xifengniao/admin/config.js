@@ -4,6 +4,23 @@ let config = {
 	},
 	api: {
 		baseURL: 'http://111.230.170.36/tauto/management/admin/'
+	},
+	viewer: {
+		options: {
+			inline: false,
+      button: true,
+      navbar: true,
+      title: false,
+      toolbar: true,
+      tooltip: false,
+      movable: true,
+      zoomable: true,
+      rotatable: true,
+      scalable: true,
+      transition: true,
+      fullscreen: true,
+      keyboard: true
+		}
 	}
 }
 
