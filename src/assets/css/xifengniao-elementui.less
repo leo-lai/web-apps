@@ -96,3 +96,19 @@ h4{font-size: 0.55rem;}
 .viewer-container{background-color: rgba(0, 0, 0, .9) !important}
 .viewer-button{width: 90px !important; height: 90px !important; transform: scale(1.2);}
 .el-button--text.l-margin-r-s{margin-right: 10px;}
+
+
+.l-basedata-menu{
+	line-height: 50px;
+	.el-tree-node__expand-icon{color: #333f57; font-weight: 600; margin-left: 15px;}
+	.el-icon-caret-right:before{content: '\E62B'}
+	.el-tree-node__expand-icon.expanded{transform: rotate(180deg);}
+	.el-tree-node__expand-icon.expanded:before{content: '\E621'}
+	.el-tree-node__expand-icon.is-leaf{visibility: hidden;}
+	.el-tree-node__content{height: auto;}
+	>.el-tree-node{ border-bottom: 1px solid #efeff4;}
+	>.el-tree-node:nth-child(2n){ background: rgba(239, 239, 244, 0.6); }
+	.el-tree-node__content:hover{
+		background: rgba(64, 158, 255, 0.2)
+	}
+}

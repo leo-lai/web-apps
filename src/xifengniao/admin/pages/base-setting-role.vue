@@ -52,7 +52,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogMenu"
 			:title="dialogMenu.title" :visible.sync="dialogMenu.visible" width="600px">
 			<div class="l-scroll" style="max-height: 400px; margin: -20px 0;">
-				<el-tree show-checkbox  default-expand-all highlight-current node-key="menuId" ref="menuTree"
+				<el-tree ref="menuTree" show-checkbox  default-expand-all highlight-current node-key="menuId"
 				  :data="dialogMenu.menuList" :props="dialogMenu.props">
 				</el-tree>	
 			</div>
