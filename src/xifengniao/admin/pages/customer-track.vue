@@ -206,9 +206,9 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(_ => {
       	row.deling = true
-				this.$$api.supplier.del(row.supplierId).then(() => {
+				this.$$api.supplier.del(row.supplierId).then(_ => {
 					this.$message({
 						type: 'success',
 						message: '删除供应商成功'

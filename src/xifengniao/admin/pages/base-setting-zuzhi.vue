@@ -393,7 +393,7 @@ export default {
 					this.$$utils.copyObj(this.amapOpts, data)
 					this.$$utils.copyObj(this.dialogInfo.data, data)
 					this.upload.list = this.dialogInfo.data.imageUrl.split(',').map(imageUrl => {
-						return {url: this.$$utils.image.thumb(imageUrl, 150), name: imageUrl, src: imageUrl}
+						return {url: this.$$utils.image.thumb(imageUrl, 150), src: imageUrl, name: imageUrl}
 					})
 					return data
 				})
@@ -447,7 +447,7 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
+        }).then(_ => {
         	this.enable(row, status)  
         })
 			}else{
@@ -456,7 +456,7 @@ export default {
 		},
 		enable(row, status = 1) { // 禁用/启用组织
 			row.enabling = true
-			this.$$api.zuzhi.enable(row.orgId, status).then(() => {
+			this.$$api.zuzhi.enable(row.orgId, status).then(_ => {
 				row.status = status
 				this.$message({
 					type: 'success',

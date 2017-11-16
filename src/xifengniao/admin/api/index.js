@@ -229,17 +229,26 @@ const api = {
     getCheshenList(familyId = '') { // 获取车身颜色列表
       return fetch.post('/carColourGetByBrand', { familyId })
     },
-    add(formData = {}) {
+    addCheshen(formData = {}) {
       return fetch.post('/carColourEdit', formData)
     },
-    del(carColourId = '') {
+    delCheshen(carColourId = '') {
       return fetch.post('/carColourDelete', { carColourId })
+    },
+    getNeishiList(familyId = '') { // 获取内饰颜色列表
+      return fetch.post('/carInteriorGetByBrand', { familyId })
+    },
+    addNeishi(formData = {}) {
+      return fetch.post('/carInteriorEdit', formData)
+    },
+    delNeishi(interiorId = '') {
+      return fetch.post('/carInteriorDelete', { interiorId })
     },
     addImages(formData = {}) {
       return fetch.post('/carColourImageAdd', formData)
     },
-    getImages(carColourId = '') { // 获取车身照片
-      return fetch.post('/carColourImageGetByCarColour', { carColourId })
+    getImages(carsId = '',  carColourId = '') { // 获取车身照片
+      return fetch.post('/carColourImageGetByCarColour', { carsId, carColourId })
     }
   },
   customer: { // 车型管理

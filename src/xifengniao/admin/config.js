@@ -1,13 +1,13 @@
 let config = {
-	router: {
-		base: '/admin'
-	},
-	api: {
-		baseURL: 'http://111.230.170.36/tauto/management/admin/'
-	},
-	viewer: {
-		options: {
-			inline: false,
+  router: {
+    base: '/admin'
+  },
+  api: {
+    baseURL: 'http://111.230.170.36/tauto/management/admin/'
+  },
+  viewer: {
+    options: {
+      inline: false,
       button: true,
       navbar: true,
       title: false,
@@ -19,9 +19,10 @@ let config = {
       scalable: true,
       transition: true,
       fullscreen: true,
-      keyboard: true
-		}
-	}
+      keyboard: true,
+      url: 'data-source'
+    }
+  }
 }
 
 // 正式

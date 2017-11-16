@@ -282,7 +282,7 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
+        }).then(_ => {
         	this.enable(row, status)  
         })
 			}else{
@@ -291,7 +291,7 @@ export default {
 		},
 		enable(row, status = 1) { // 禁用/启用用户
 			row.enabling = true
-			this.$$api.user.enable(row.userId, status).then(() => {
+			this.$$api.user.enable(row.userId, status).then(_ => {
 				row.isEnable = status
 				this.$message({
 					type: 'success',

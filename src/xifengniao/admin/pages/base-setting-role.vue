@@ -226,7 +226,7 @@ export default {
 			this.dialogMenu.data.roleId = row.roleId
 			this.getMenuList(row.roleId).then(data => {
 				this.dialogMenu.visible = true
-				setTimeout(() => {
+				setTimeout(_ => {
 					this.dialogMenu.title = '配置权限：' + row.roleName
 					this.$refs.menuTree.setCheckedKeys(data)	
 				}, 50)
@@ -252,7 +252,7 @@ export default {
 				return
 			}
 			this.dialogMenu.loading = true
-			this.$$api.role.setRoleMenu(this.dialogMenu.data).then(() => {
+			this.$$api.role.setRoleMenu(this.dialogMenu.data).then(_ => {
 				this.closeDialogMenu()
         this.$message({
 					type: 'success',

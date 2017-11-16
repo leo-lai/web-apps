@@ -23,7 +23,8 @@
 	    <el-table-column label="官方指导价" prop="price"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        <el-button class="l-text-ok l-margin-r-s" type="text" size="small" @click="showDialogCheshen(scope.row)">图片配置</el-button>
 	        <span v-show="scope.row.deling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.deling">
 	        	<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
@@ -95,12 +96,68 @@
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
+
+		<!-- 车身颜色图片配置管理 -->
+		<el-dialog :close-on-press-escape="false" title="车身颜色图片配置" :visible.sync="dialogCheshen.visible" width="600px">
+			<div style="margin: -20px 0 10px;">
+				<span>当前车辆型号：</span>
+				<span class="l-text-gray">{{dialogCheshen.carsName}}</span>
+			</div>
+			<div ref="cheshenScroll" class="l-scroll" style="max-height: 400px;">
+	  		<el-table class="l-table-hdbg" :data="dialogCheshen.list">
+			    <el-table-column label="车身颜色" prop="carColourName" min-width="100"></el-table-column>
+			    <el-table-column label="操作" align="center">
+			    	<template slot-scope="scope">
+			        <el-button class="l-text-link" type="text" size="small" @click="dialogCheshenImages(scope.row)">编辑图片</el-button>
+			      </template>
+			    </el-table-column>
+			  </el-table>
+		  </div>
+
+		  <!-- 车身颜色图片编辑 -->
+		  <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" append-to-body width="600px"
+		  	:title="dialogCheshen.title" :visible.sync="dialogCheshen.innerVisible">
+		  	<el-form inline class="l-form1" ref="cheshenColorForm" label-width="90px" style="width: 552px;"
+	  			:model="dialogCheshen.data" :rules="dialogCheshen.rules" @keyup.enter.native="submitCheshenImages">
+				  <el-form-item label="车身颜色" prop="carColourName">
+				    <el-input readonly :value="dialogCheshen.data.carColourName"></el-input>
+				  </el-form-item>
+				  <el-form-item class="_flex" label="车身照片" prop="imageUpload">
+				  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
+				  		:file-list="dialogCheshen.upload.list"
+				  		:action="$$api.baseURL + 'uploadImage'" name="img_file"
+				  		:on-success="uploadSuccess"
+				  		:on-remove="uploadRemove"
+				  		:on-preview="uploadPreview" 
+				  		:on-progress="uploadProgress" 
+				  		:on-error="uploadError" 
+				  		:on-exceed="uploadExceed">
+						  <i class="el-icon-plus"></i>
+						</el-upload>
+				  </el-form-item>
+				</el-form>
+				<span slot="footer" class="l-margin-r-m">
+					<el-button @click="dialogCheshen.innerVisible = false">返回</el-button>
+			    <el-button type="primary" :loading="dialogCheshen.loading" @click="submitCheshenImages">确定提交</el-button>
+			  </span>
+		  </el-dialog>
+		</el-dialog>
+
+		<!-- 预览图片 -->
+		<viewer ref="viewer" class="l-viewer" :options="$$config.viewer.options" :images="viewer.images" @inited="viewerInited">
+      <template slot-scope="scope">
+      	<img v-for="{url, src} in scope.images" :key="src" :src="url" :data-source="src" >
+      </template>
+    </viewer>
 	</div>
 </template>
 <script>
-
+import viewer from 'v-viewer/src/component.vue'
 export default {
 	name: 'base-data-car',
+	components: {
+    viewer
+  },
 	data() {
 		let that = this
 		let validateCarModel = function(rule, value, callback) {
@@ -113,8 +170,24 @@ export default {
         callback()
       }
 		}
+
+		let validateUpload = function(rule, value, callback) {
+			if(that.dialogCheshen.upload.loading) {
+				callback(new Error('图片正在上传中'))
+			}else if(that.dialogCheshen.upload.list.length > 9) {
+				callback(new Error('最多上传9张照片'))
+			}else {
+				that.dialogCheshen.data.imagePath = that.dialogCheshen.upload.list.map(item => item.src || item.url).join(',')
+				callback()
+			}
+		}
 		return {
 			yearList: [],
+			viewer: {
+				options: {},
+				visible: true,
+				images: []
+			},
 			dateOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now();
@@ -199,10 +272,75 @@ export default {
 					price: '',
 					introduce: ''
 				}
+			},
+			dialogCheshen: {
+				visible: false,
+				loading: false,
+				carsId: '',
+				familyId: '',
+				carsName: '',
+				list: [],
+
+				title: '编辑车身颜色图片',
+				innerVisible: false,
+				upload: {
+					list: [],
+					loading: false
+				},
+				rules: {
+					imageUpload: [
+						{ validator: validateUpload, trigger: 'change' },
+					]
+				},
+				data: {
+					carsId: '',
+					carColourId: '',
+					carColourImageId: '',
+					carColourName: '',
+					imagePath: ''
+				}
 			}
 		}
 	},
 	methods: {
+		viewerInited(viewer) {
+			this.$$viewer = viewer
+		},
+		uploadSuccess(response, file, fileList) {
+			this.dialogCheshen.upload.loading = false
+			this.dialogCheshen.upload.list.push({
+				name: file.name,
+				url: response.data,
+				src: response.data
+			})
+		},
+		uploadPreview(file) {
+			this.$$viewer.index = this.dialogCheshen.upload.list.findIndex(item => item.url === file.url) || 0
+			this.$$viewer.show()
+		},
+		uploadRemove(file, fileList) {
+			if(file.status === 'success') {
+				this.dialogCheshen.upload.list = this.dialogCheshen.upload.list.filter(item =>  {
+					if(file.response) {
+						return item.src !== file.response.data
+					}else {
+						return item.src !== (file.src || file.url)
+					}
+				})
+			}
+		},
+		uploadProgress(event, file, fileList) {
+			this.dialogCheshen.upload.loading = true
+		},
+		uploadError(error, file, fileList) {
+			this.dialogCheshen.upload.loading = false
+		},
+		uploadExceed(files, fileList) {
+			this.$message({
+				type: 'error',
+				message: '最多上传9张照片'
+			})
+		},
 		cascaderChange(valArr) {
 			let promise = null
 			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
@@ -278,7 +416,7 @@ export default {
 
 				if(row.brandId) {
 					brandPromise.then(data => {
-						this.cascaderChange([row.brandId]).then(() => {
+						this.cascaderChange([row.brandId]).then(_ => {
 							if(row.familyId) {
 								this.cascaderChange([row.brandId, row.familyId])
 							}		
@@ -337,9 +475,9 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(_ => {
       	row.deling = true
-				this.$$api.car.del(row.carId).then(() => {
+				this.$$api.car.del(row.carId).then(_ => {
 					this.$message({
 						type: 'success',
 						message: '删除车型资料成功'
@@ -348,6 +486,66 @@ export default {
 				}).finally(_ => {
 					row.deling = false
 				})
+      })
+		},
+		getCheshenColors(carFamilyId = '') { // 获取车身颜色列表
+			return this.$$api.color.getCheshenList(carFamilyId).then(({data}) => {
+				this.dialogCheshen.list = data.map(item => {
+        	item.loading = false
+        	item.editing = false
+        	return item
+        })
+        return data
+			})
+		},
+		showDialogCheshen(row) { // 车身颜色图片弹窗管理
+			const loading = this.$loading()
+			this.dialogCheshen.carsId = row.carsId
+			this.dialogCheshen.carsName = row.carsName
+			this.dialogCheshen.familyId = row.familyId
+			this.getCheshenColors(row.familyId).then(_ => {
+        this.dialogCheshen.visible = true	
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		dialogCheshenImages(row) { // 编辑车身颜色图片
+			this.dialogCheshen.data.carsId = this.dialogCheshen.carsId
+			this.dialogCheshen.data.carColourId = row.carColourId
+			this.dialogCheshen.data.carColourName = row.carColourName
+
+			const loading = this.$loading()
+			this.$$api.color.getImages(this.dialogCheshen.carsId, row.carColourId)
+			.then(({data}) => {
+				if(data) {
+					this.dialogCheshen.data.carColourImageId = data.carColourImageId
+					this.dialogCheshen.upload.list = data.imagePath.split(',').map(imageUrl => {
+						return {url: this.$$utils.image.thumb(imageUrl, 150), name: imageUrl, src: imageUrl}
+					})
+				}else {
+					this.dialogCheshen.data.carColourImageId = ''
+					this.dialogCheshen.upload.list = []
+				}
+				this.viewer.images = this.dialogCheshen.upload.list
+			}).finally(_ => {
+				loading.close()
+				this.dialogCheshen.innerVisible = true
+			})
+		},
+		submitCheshenImages() { // 提交车身颜色图片
+			this.$refs.cheshenColorForm.validate(valid => {
+        if (valid) {
+          this.dialogCheshen.loading = true
+          this.$$api.color.addImages(this.dialogCheshen.data).then(_ => {
+          	this.$message({
+							type: 'success',
+							message: '上传车身颜色图片成功'
+						})
+          }).finally(()=>{
+            this.dialogCheshen.loading = false
+            this.dialogCheshen.innerVisible = false
+          })
+        }
       })
 		}
 	},
