@@ -108,7 +108,10 @@ h4{font-size: 0.55rem;}
 	.el-tree-node__content{height: auto;}
 	>.el-tree-node{ border-bottom: 1px solid #efeff4;}
 	>.el-tree-node:nth-child(2n){ background: rgba(239, 239, 244, 0.6); }
-	.el-tree-node__content:hover{
-		background: rgba(64, 158, 255, 0.2)
+	&.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
+		background: rgba(64, 158, 255, 0.3)
+	}
+	.el-tree-node__content:hover,{
+		background: rgba(64, 158, 255, 0.1)
 	}
 }

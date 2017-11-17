@@ -39,6 +39,8 @@ service.interceptors.response.use(response => {
         }
       })
       break
+    default:
+      data.message = data.message || '服务器接口出错'
   }
   return Promise.reject(data)
 }, error => {
@@ -183,6 +185,14 @@ const api = {
     },
     setRoleMenu(formData = {}) {
       return fetch.post('/setRoleMenu', formData)
+    }
+  },
+  menu: {
+    add(formData = {}) {
+      return fetch.post('/editMenu', formData)
+    },
+    del(menuId = '') {
+      return fetch.post('/deleteMenu', { menuId })
     }
   },
   supplier: { // 供应商管理

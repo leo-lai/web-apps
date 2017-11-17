@@ -470,7 +470,7 @@ export default {
         }
       })
 		},
-		deleteInfo(row) { // 禁用/启用车型
+		deleteInfo(row) { // 删除车型资料
 			this.$confirm('是否确定删除该车型资料?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
