@@ -169,6 +169,9 @@ const api = {
     },
     add(formData = {}) {
       return fetch.post('/addUser', formData)
+    },
+    getSalesList(formData = {}) {
+      return fetch.post('/salesList', formData)
     }
   },
   role: { // 角色管理
@@ -228,6 +231,9 @@ const api = {
     },
     getStyleList(brandId = '') { // 车等级列表
       return fetch.post('/carsStyleList', { brandId })
+    },
+    getCarsList(familyId = '') { // 车大类列表
+      return fetch.post('/carsListList', { familyId })
     }
   },
   color: { // 车身颜色内饰管理
@@ -261,14 +267,24 @@ const api = {
       return fetch.post('/carColourImageGetByCarColour', { carsId, carColourId })
     }
   },
-  customer: { // 车型管理
+  customer: { // 客户管理
     getList(formData = {}, page = 1, rows = 100) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/customerOrgList', formData)
     },
-    add(formData = {}) {
-      return fetch.post('/carsEdit', formData)
+    add(formData = {}) { // 新增客户
+      return fetch.post('/addCustomerUsersr', formData)
+    }, // 跟踪列表
+    getTrackList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/trackCustomerOrgList', formData)
+    }, // 预约列表
+    getBespeakList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/bespeakCustomerOrgList', formData)
     }
   }
 }

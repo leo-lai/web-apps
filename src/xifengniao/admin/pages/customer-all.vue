@@ -3,8 +3,13 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-				  <el-form-item prop="carsName">
-				    <el-input placeholder="请输入客户手机号码" v-model="list.filter.carsName"></el-input>
+  				<el-form-item>
+  					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
+				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
+				    </el-select>
+  				</el-form-item>
+				  <el-form-item prop="phoneNumber">
+				    <el-input placeholder="请输入客户手机号码" v-model="list.filter.phoneNumber"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -17,14 +22,14 @@
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="意向/购置车辆" prop="intentionCarInfo" min-width="200"></el-table-column>
+	    <el-table-column label="意向/购置车辆" prop="intentionCarInfo" min-width="150"></el-table-column>
 	    <el-table-column label="销售顾问" prop="systemUserName"></el-table-column>
 	    <el-table-column label="最新购车状态" prop="orderState"></el-table-column>
-	    <el-table-column label="购车方案" prop=""></el-table-column>
+	    <el-table-column label="购车方案" prop="expectWayName" min-width="150"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">查看</el-button>
-	        <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        <el-button class="l-text-link" type="text" size="small">查看</el-button>
+	        <el-button class="l-text-link" type="text" size="small">编辑</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -44,7 +49,7 @@
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="100px" style="width: 432px;"
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item class="_flex" label="供应商名称" prop="carsName" >
+			  <el-form-item class="_flex" label="客户名称" prop="carsName" >
 			    <el-input v-model="dialogInfo.data.carsName" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="联系方式" prop="phoneNumber" >
@@ -75,12 +80,12 @@ export default {
 		return {
 			list: {
 				filter: {
-					carsName: '',
-					orgName: ''
+					phoneNumber: '',
+					orgId: ''
 				},
 				rules: {
-					carsName: [],
-					orgName: []
+					phoneNumber: [],
+					orgId: []
 				},
 				loading: false,
 				page: 1,
@@ -90,7 +95,7 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增供应商',
+				title: '新增客户',
 				visible: false,
 				loading: false,
 				rules: {
@@ -154,10 +159,10 @@ export default {
 		showDialogInfo(type = 'new', row) { // 新增/修改车型弹出信息
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改供应商'
+				this.dialogInfo.title = '修改客户'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
-				this.dialogInfo.title = '新增供应商'
+				this.dialogInfo.title = '新增客户'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
 
@@ -179,7 +184,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交供应商
+		submitInfo() { // 提交客户
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -187,7 +192,7 @@ export default {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '供应商成功'
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '客户成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -202,7 +207,7 @@ export default {
       })
 		},
 		deleteInfo(row) { // 禁用/启用车型
-			this.$confirm('是否确定删除该供应商?', '提示', {
+			this.$confirm('是否确定删除该客户?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -211,7 +216,7 @@ export default {
 				this.$$api.supplier.del(row.supplierId).then(_ => {
 					this.$message({
 						type: 'success',
-						message: '删除供应商成功'
+						message: '删除客户成功'
 					})
 					this.refreshList()
 				}).finally(_ => {
@@ -224,6 +229,7 @@ export default {
 		this.$$event.$on('customer:tab', activeName => {
 			if(activeName === 'all' && this.list.data.length === 0) {
 				this.getList()
+				this.$store.dispatch('getZuzhiList')
 			}
 		})
 	}

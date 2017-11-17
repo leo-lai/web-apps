@@ -366,7 +366,6 @@ export default {
       }else {
       	promise = Promise.resolve()
       }
-      console.log(promise)
       return promise
 		},
 		sizeChange(size = 100) {
@@ -432,7 +431,6 @@ export default {
 
 			const loading = this.$loading()
 			Promise.all([brandPromise]).then(dataArr =>　{
-				console.log(this.cascader.value)
 				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()

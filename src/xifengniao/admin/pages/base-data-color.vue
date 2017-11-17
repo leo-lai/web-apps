@@ -3,8 +3,8 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent >
-				  <el-form-item prop="brandId" label="车辆品牌">
-				  	<el-select v-model="list.filter.brandId" placeholder="请选择" @change="search()">
+				  <el-form-item prop="brandId">
+				  	<el-select v-model="list.filter.brandId" placeholder="请选择车辆品牌" @change="search()">
 				      <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id"></el-option>
 				    </el-select>
 				  </el-form-item>

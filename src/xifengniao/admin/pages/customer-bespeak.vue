@@ -1,13 +1,18 @@
 <template>
 	<div>
 		<el-row>
-  		<el-col :span="8">
-  			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
-  		</el-col>
-  		<el-col :span="16" class="l-text-right">
+  		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-				  <el-form-item prop="carsName">
-				    <el-input placeholder="请输入车型名称" v-model="list.filter.carsName"></el-input>
+  				<el-form-item>
+  					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
+				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
+				    </el-select>
+  				</el-form-item>
+				  <el-form-item prop="dateRange">
+				  	<el-date-picker type="daterange" unlink-panels range-separator="至" 
+				  		start-placeholder="预约开始日期" end-placeholder="预约结束日期"
+					  	:picker-options="dateOptions" v-model="list.filter.dateRange">
+				    </el-date-picker>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -18,13 +23,18 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="车型名称" prop="carsName" min-width="300"></el-table-column>
-	    <el-table-column label="裸车价" prop="bareCarPrice"></el-table-column>
-	    <el-table-column label="官方指导价" prop="price"></el-table-column>
+	    <el-table-column label="预约车型" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="预约门店" prop="customerUsersName"></el-table-column>
+	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
+	    <el-table-column label="客户电话" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="提交时间" prop="orderState"></el-table-column>
+	    <el-table-column label="到店日期" prop="expectWayName"></el-table-column>
+	    <el-table-column label="打算购车时间" prop="expectWayName"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">图片配置</el-button>
+	    		<el-button class="l-text-link" type="text" size="small">编辑</el-button>
+	        <el-button class="l-text-link" type="text" size="small">标记为已到店</el-button>
+	        <el-button class="l-text-link" type="text" size="small">标记为不购车</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -39,32 +49,6 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 新增/编辑车型 -->
-		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
-  		<el-form ref="infoForm" label-width="100px" style="width: 432px;"
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item class="_flex" label="供应商名称" prop="carsName" >
-			    <el-input v-model="dialogInfo.data.carsName" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="联系方式" prop="phoneNumber" >
-			    <el-input v-model="dialogInfo.data.phoneNumber" :maxlength="20"></el-input>
-			  </el-form-item>
-
-			  <el-form-item label="服务公司" prop="orgId">
-			    <el-select v-model="dialogInfo.data.orgId" placeholder="请选择">
-			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
-			    </el-select>
-			  </el-form-item>
-			  <el-form-item label="备注" prop="remark">
-			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
-			  </el-form-item>
-			</el-form>
-			<span slot="footer" class="l-margin-r-m">
-				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
-		  </span>
-		</el-dialog>
 	</div>
 </template>
 <script>
@@ -73,14 +57,41 @@ export default {
 	name: 'customer-bespeak',
 	data() {
 		return {
+			dateOptions: {
+				shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+			},
 			list: {
 				filter: {
-					carsName: '',
-					orgName: ''
+					dateRange: '',
+					orgId: ''
 				},
 				rules: {
-					carsName: [],
-					orgName: []
+					phoneNumber: [],
+					orgId: []
 				},
 				loading: false,
 				page: 1,
@@ -90,7 +101,7 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增供应商',
+				title: '新增客户',
 				visible: false,
 				loading: false,
 				rules: {
@@ -128,7 +139,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.car.getList(this.list.filter, page, rows)
+			this.$$api.customer.getBespeakList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -154,10 +165,10 @@ export default {
 		showDialogInfo(type = 'new', row) { // 新增/修改车型弹出信息
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改供应商'
+				this.dialogInfo.title = '修改客户'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
-				this.dialogInfo.title = '新增供应商'
+				this.dialogInfo.title = '新增客户'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
 
@@ -179,7 +190,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交供应商
+		submitInfo() { // 提交客户
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -187,7 +198,7 @@ export default {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '供应商成功'
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '客户成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -202,7 +213,7 @@ export default {
       })
 		},
 		deleteInfo(row) { // 禁用/启用车型
-			this.$confirm('是否确定删除该供应商?', '提示', {
+			this.$confirm('是否确定删除该客户?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -211,7 +222,7 @@ export default {
 				this.$$api.supplier.del(row.supplierId).then(_ => {
 					this.$message({
 						type: 'success',
-						message: '删除供应商成功'
+						message: '删除客户成功'
 					})
 					this.refreshList()
 				}).finally(_ => {
@@ -224,6 +235,7 @@ export default {
 		this.$$event.$on('customer:tab', activeName => {
 			if(activeName === 'bespeak' && this.list.data.length === 0) {
 				this.getList()
+				this.$store.dispatch('getZuzhiList')
 			}
 		})
 	}

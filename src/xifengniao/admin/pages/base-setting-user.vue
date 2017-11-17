@@ -237,7 +237,7 @@ export default {
 
 			const loading = this.$loading()
 			Promise.all([
-				this.$store.dispatch('getZuzhiList'), 
+				this.$store.dispatch('getZuzhiList'),
 				this.$store.dispatch('getRoleList')
 			]).then(dataArr =>　{
 				this.dialogInfo.visible = true	
