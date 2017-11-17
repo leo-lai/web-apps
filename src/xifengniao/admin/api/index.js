@@ -286,6 +286,13 @@ const api = {
       formData.rows = rows
       return fetch.post('/bespeakCustomerOrgList', formData)
     }
+  },
+  stock: { // 库存管理
+    getInList(formData = {}, page = 1, rows = 100) { // 入库列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/storageList', formData)
+    }
   }
 }
 

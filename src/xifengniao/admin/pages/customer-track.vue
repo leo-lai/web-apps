@@ -80,7 +80,7 @@
 			  </el-form-item>
 			  <el-form-item label="销售顾问" prop="systemUserId" >
 			  	<el-select filterable v-model="dialogAdd.data.systemUserId" placeholder="请选择">
-				    <el-option v-for="user in dialogAdd.salesList" :label="user.systemUserName" :value="user.systemUserId"></el-option>
+				    <el-option v-for="user in dialogAdd.salesList" :key="user.systemUserId" :label="user.systemUserName" :value="user.systemUserId"></el-option>
 				  </el-select>
 			  </el-form-item>
 			</el-form>
