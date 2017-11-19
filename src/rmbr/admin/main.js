@@ -12,6 +12,9 @@ import api from './api'
 
 import app from './app'
 
+// import Mock from './mock'
+// Mock.bootstrap()
+
 
 Vue.use(ElementUI)
 
@@ -40,17 +43,25 @@ Vue.mixin({
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
-  if (!api.auth.check() && to.path !== '/login') {
-    NProgress.done()
-    store.dispatch('logout')
-    next(false)
+  if(api.auth.check()) {
+    next()
+    // if(to.path === '/login') {
+    //   next({path: '/'})
+    // }else {
+    //   if(!store.getters.userMenus || store.getters.userMenus.length === 0){
+    //     store.dispatch('getUserMenus')
+    //     next(to)
+    //   } else {
+    //     next()  
+    //   }
+    // }
+  } else if(to.path !== '/login'){
+    store.dispatch('logout').finally(() => {
+      NProgress.done()
+      next(false)
+    })
   } else {
-    if(!store.getters.userMenus || store.getters.userMenus.length === 0){
-      store.dispatch('getUserMens')
-      next(to)
-    } else {
-      next()  
-    }
+    next()
   }
 })
 

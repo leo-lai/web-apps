@@ -3,7 +3,7 @@
 		<el-container direction="horizontal " class="l-h100" :class="{'l-fullscreen': fullscreen}">
 			<el-aside class="l-aside" :class="{'l-aside-collapse': collapse}">
 				<div class="l-logo">
-    			<span>传创金融管理系统</span>
+    			<span>新疆瑞曼博尔管理系统</span>
     			<i class="el-icon-menu" title="菜单-展开/闭合" @click="doCollapse"></i>
     		</div>
         <el-menu class="l-menu" :default-active="$route.path" :collapse="collapse" :router="true" :unique-opened="false" 
@@ -22,10 +22,8 @@
 				      </el-menu-item>
 			      </el-submenu>
 			      <el-menu-item v-else :index="menu.path">
-			      	<template slot="title">
-					      <i class="el-icon-caret-right"></i>
-					      <span slot="title">{{menu.meta.title}}</span>
-					    </template>
+				      <i class="el-icon-caret-right"></i>
+				      <span slot="title">{{menu.meta.title}}</span>
 			      </el-menu-item>
           </template>
         </el-menu>
@@ -33,10 +31,7 @@
 	    <el-container direction="vertical">
 		    <el-header class="l-header l-flex-hc">
 	    		<div class="l-rest l-header-nav">
-	    			<el-menu class="l-menu" :default-active="$route.path" mode="horizontal" 
-	    				background-color="#373d41" text-color="#fff" active-text-color="#ffd04b">
-						  <el-menu-item index="/">首页</el-menu-item>
-						</el-menu>
+	    			
 	    		</div>
 	    		<div class="l-rest l-text-right l-padding-lr">
 	    			<el-dropdown size="medium" trigger="click">
@@ -54,11 +49,11 @@
 	    		</div>
 		    </el-header>
 	      <el-main class="l-main">
-	      	<div class="l-breadcrumb" v-show="$route.path !== '/'">
+	      	<!-- <div class="l-breadcrumb" v-show="$route.path !== '/'">
 		      	<el-breadcrumb separator-class="el-icon-arrow-right">
 						  <el-breadcrumb-item v-if="item.path" v-for="item in $route.matched" :key="item.path">{{ item.meta.title }}</el-breadcrumb-item>
 						</el-breadcrumb>	
-	      	</div>
+	      	</div> -->
 	        <transition name="fade" mode="out-in">
 	          <router-view></router-view>
 	        </transition>
@@ -75,7 +70,7 @@
 			  </el-form-item>
 			  <el-form-item>
 			    <el-button type="primary" :loading="pwdForm.submiting" @click="submitPwdForm">确定修改</el-button>
-			    <el-button >取消</el-button>
+			    <el-button @click="pwdForm.visible = false">取消</el-button>
 			  </el-form-item>
 			</el-form>
 		</el-dialog>
@@ -84,11 +79,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import screenfull from 'screenfull'
-
+import { userMenus } from '../router/routes'
 export default {
 	name: 'frame',
   data() {
     return {
+    	userMenus,
     	pwdForm: {
     		visible: false,
 				submiting: false,
@@ -109,7 +105,6 @@ export default {
   },
   computed: {
   	...mapGetters([
-  		'userMenus',
   		'fullscreen',
       'collapse'
     ])

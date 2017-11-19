@@ -17,5 +17,5 @@ export default {
 @import '~element-ui/lib/theme-chalk/index.css';
 @import '~nprogress/nprogress.css';
 @import '~assets/css/base.less';
-@import '~assets/css/elementui-custom.less';
+@import '~assets/css/rmbr-elementui.less';
 </style>

@@ -1,13 +1,13 @@
-import config from '../config'
 import { storage, utils } from 'assets/js/utils'
 import { userMenus } from '../router/routes'
 import api from '../api'
 import router from '../router'
-
+let _cache = {
+	userMenus: storage.local.get('usermenus') || userMenus
+}
 const user = {
 	state: {
 		fetching: false,
-		sessionId: storage.local.get('sessionId'),
 		info: storage.local.get('userinfo'),
 		menus: []
 	},
@@ -19,36 +19,21 @@ const user = {
 		USER_MENUS: (state, menus = []) => {
 			storage.local.set('usermenus', menus)
 			state.menus = menus
-			menus.length > 0 && router.addRoutes(menus)
-		},
-		USER_SESSIONID: (state, sessionId = '') => {
-			storage.local.set('sessionId', sessionId)
-			state.sessionId = sessionId
 		}
 	},
 	actions: {
 		login({ commit }, formData) {
 			return api.auth.login(formData).then(({data}) => {
-				commit('USER_SESSIONID', data.sessionId)
 				commit('USER_INFO', data)
 				return data
 			})
 		},
-		logout() {
-			return new Promise((resolve, reject) => {
-        if (storage.local.get('sessionId')) {
-          api.auth.logout().then(resolve, reject)
-        } else {
-          resolve()
-        }
-      }).finally(() => {
-        storage.local.remove('sessionId')
-        storage.local.remove('userinfo')
-        location.replace(`${config.router.base}/login`)
-      })
+		logout({ commit }, toLogin = true) {
+			return api.auth.logout(toLogin)
 		},
-		getUserMens({ commit }) {
-			commit('USER_MENUS', userMenus)
+		getUserMenus({ commit }) {
+			// router.addRoutes(userMenus)
+			commit('USER_MENUS', _cache.userMenus)
 		}
 	}
 }

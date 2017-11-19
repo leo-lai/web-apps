@@ -12,7 +12,10 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(config => {
   // Do something before request is sent
+  let userinfo = storage.local.get('userinfo')
   config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+  config.headers['token'] = userinfo && userinfo.token ? userinfo.token : ''
+  // config.headers['uid'] = userinfo && userinfo.id ? userinfo.id : ''
   config.transformRequest = [function(data) {
     let ret = []
     for (let key in data) {
@@ -24,72 +27,73 @@ service.interceptors.request.use(config => {
 }, error => {
   return Promise.reject(error)
 })
+
 // respone拦截器
 service.interceptors.response.use(response => {
-  const data = response.data
-  switch(data.resultCode) {
+  let data = response.data
+  switch(data.code) {
   	case 200:
   		return data
-  	case 4002:
-  		storage.local.remove('sessionId')
-  		Message({
-        type: 'error',
-        message: data.message || '登录失效，请重新登录。',
-        onClose(instance) {
-          api.auth.logout()
-        }
-      })
-      break
   }
+  data.message = data.msg
   return Promise.reject(data)
 }, error => {
+  let err = { message: '' }
   if (error && error.response) {
+    err.message = error.response.data.msg
     switch (error.response.status) {
       case 400:
-        error.message = '请求错误'
+        err.message = '请求错误'
         break
       case 401:
-        error.message = '未授权，请登录'
+        Message({
+          type: 'error',
+          message: err.message || '未授权，请登录',
+          onClose(instance) {
+            api.auth.logout()
+          }
+        })
         break
       case 403:
-        error.message = '拒绝访问'
+        err.message = '拒绝访问'
         break
       case 404:
-        error.message = `请求地址出错: ${error.response.config.url}`
+        err.message = `请求地址出错: ${error.response.config.url}`
         break
       case 408:
-        error.message = '请求超时'
+        err.message = '请求超时'
         break
       case 500:
-        error.message = '服务器内部错误'
+        err.message = '服务器内部错误'
         break
       case 501:
-        error.message = '服务未实现'
+        err.message = '服务未实现'
         break
       case 502:
-        error.message = '网关错误'
+        err.message = '网关错误'
         break
       case 503:
-        error.message = '服务不可用'
+        err.message = '服务不可用'
         break
       case 504:
-        error.message = '网关超时'
+        err.message = '网关超时'
         break
       case 505:
-        error.message = 'HTTP版本不受支持'
+        err.message = 'HTTP版本不受支持'
         break
       default:
-      	error.message = '服务器连接失败'
+      	err.message = '服务器连接失败'
     }
-    error.message += `({$error.response.status})`
+    err.message += `(${error.response.status})`
   }
-  return Promise.reject(error)
+  return Promise.reject(err)
 })
 
 const fetch = {
   ajax(url = '', data = {}, method = 'GET', contentType = 'form') {
-    data.sessionId = storage.local.get('sessionId')
     return new Promise((resolve, reject) => {
+      let userinfo = storage.local.get('userinfo')
+      data.uid = userinfo && userinfo.id ? userinfo.id : ''
       service({
         url, method, data
       }).then(resolve).catch(error => {
@@ -113,14 +117,33 @@ const api = {
   baseURL: config.api.baseURL,
   auth: {
     check() {
-      return !!storage.local.get('sessionId')
+      let userinfo = storage.local.get('userinfo')
+      return (userinfo && userinfo.token && userinfo.id)
     },
     login(formData = {}) {
-      formData.userName = (formData.userName || '').trim()
+      formData.type = 'password'
       return fetch.post('/login', formData)
     },
-    logout() {
-      return fetch.post('/loginOut')
+    logout(toLogin = true) {
+      return new Promise((resolve, reject) => {
+        let userinfo = storage.local.get('userinfo')
+        if (this.check()) {
+          fetch.post('/logout').then(resolve, reject)
+        } else {
+          resolve()
+        }
+      }).finally(() => {
+        storage.local.remove('userinfo')
+        storage.local.remove('usermenus')
+        toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
+      })
+    }
+  },
+  business: {
+    getList(filterForm = {}, page = 0, row = 50) {
+      filterForm.per_page = page
+      filterForm.page_number = row
+      return fetch.post('/seller/list', filterForm)
     }
   }
 }

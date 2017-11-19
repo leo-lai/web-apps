@@ -1,12 +1,13 @@
 <template>
   <div class="l-login-container l-flex-vhc">
-    <el-form class="l-login-form" :model="loginForm.data" :rules="loginForm.rules" ref="loginForm" label-position="left" label-width="0px">
-      <h3 class="_tit">传创金融管理系统</h3>
-      <el-form-item prop="userName">
-        <el-input type="text" v-model="loginForm.data.userName" auto-complete="off" placeholder="账号"></el-input>
+    <el-form class="l-login-form" ref="loginForm" label-position="left" label-width="0px"
+      :model="loginForm.data" :rules="loginForm.rules" @keyup.native.enter="submitForm">
+      <h3 class="_tit">新疆瑞曼博尔管理系统</h3>
+      <el-form-item prop="username">
+        <el-input type="text" v-model.trim="loginForm.data.username" auto-complete="off" placeholder="手机号码"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" v-model="loginForm.data.password" auto-complete="off" placeholder="密码" @keyup.native.enter="submitForm"></el-input>
+        <el-input type="password" v-model.trim="loginForm.data.password" auto-complete="off" placeholder="密码"></el-input>
       </el-form-item>
       <!-- <el-checkbox class="_remember" v-model="loginForm.remember" checked>记住密码</el-checkbox> -->
       <el-form-item style="width:100%;">
@@ -14,30 +15,31 @@
         <!-- <el-button @click.native.prevent="resetForm">重置</el-button> -->
       </el-form-item>
     </el-form>
-    <div class="l-copy-right" style="margin-top: 1rem;">©2017-2018 广州传创金融有限公司</div>
+    <div class="l-copy-right" style="margin-top: 1rem;">©2017-2018 新疆瑞曼博尔生物科技有限公司</div>
   </div>
   
 </template>
 
 <script>
 export default {
+  name: 'login',
   data() {
     return {
       loginForm: {
-      	loading: false,	
-      	remember: true,
-      	data: {
-      		userName: '18602029524',
-        	password: '123'
-      	},
-      	rules: {
-      		userName: [
-	          { required: true, message: '请输入账号', trigger: 'blur' },
-	        ],
-	        password: [
-	          { required: true, message: '请输入密码', trigger: 'blur' },
-	        ]
-      	}
+        loading: false, 
+        remember: true,
+        data: {
+          username: 'admin',
+          password: 'admin'
+        },
+        rules: {
+          username: [
+            { required: true, message: '请输入账号', trigger: 'blur' },
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+          ]
+        }
       }
     };
   },
@@ -46,10 +48,10 @@ export default {
       this.$refs.loginForm.resetFields()
     },
     submitForm(ev) {
-      this.$refs.loginForm.validate((valid) => {
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loginForm.loading = true
-          this.$store.dispatch('login', this.loginForm.data).then(data => {
+          this.$store.dispatch('login', this.loginForm.data).then(_ => {
             this.$$href(this.$route.query.to || '/', 'replace')
           }).finally(()=>{
             this.loginForm.loading = false
@@ -59,6 +61,8 @@ export default {
     }
   },
   mounted() {
+    this.$$storage.local.remove('usermenus')
+    this.$$storage.local.remove('userinfo')
   }
 }
 
@@ -66,9 +70,9 @@ export default {
 
 <style scoped lang="less">
 .l-login-container{
-	height: 100%;
-	background: #373d41;
-	padding: 0.75rem;
+  height: 100%;
+  background: #373d41;
+  padding: 0.75rem;
 }
 .l-login-form {
   border-radius: 5px;

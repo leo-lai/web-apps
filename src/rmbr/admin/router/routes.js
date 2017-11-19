@@ -1,18 +1,6 @@
 import layout from '../layout/default'
 
-const routes = [
-  {
-    path: '/',
-    component: layout,
-    meta: { hidden: true },
-    children: [
-      { 
-        path: '', 
-        meta: { title: '首页' },
-        component: resolve => require(['../pages/index'], resolve),
-      }
-    ], 
-  },
+let routes = [
   {
     path: '/login',
     meta: { title: '登录', hidden: true },
@@ -25,79 +13,111 @@ const routes = [
   }
 ]
 
-export const userMenus = [
+export let userMenus = [
   {
-    path: '/base',
+    path: '/',
     component: layout,
-    meta: { title: '基本设置' },
+    meta: { title: '仪表盘' },
     children: [
       { 
-        path: '1-1', 
-        meta: { title: '菜单设置' },
+        path: '', 
+        meta: { title: '仪表盘' },
         component: resolve => require(['../pages/index'], resolve),
-      },
+      }
+    ], 
+  },
+  {
+    path: '/sys',
+    component: layout,
+    meta: { title: '系统管理' },
+    children: [
       { 
-        path: '1-2', 
-        meta: { title: '供应商管理' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/sys'], resolve),
+      }
+    ],
+  },
+  {
+    path: '/device',
+    component: layout,
+    meta: { title: '设备管理' },
+    children: [
       { 
-        path: '1-3', 
-        meta: { title: '车辆资料' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
-      { 
-        path: '1-4', 
-        meta: { title: '权限管理' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
-      { 
-        path: '1-5', 
-        meta: { title: '用户管理' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
-      { 
-        path: '1-6', 
-        meta: { title: '机构设置' },
+        path: '', 
+        meta: { title: '' },
         component: resolve => require(['../pages/index'], resolve),
       }
     ],
   },
   {
-    path: '/stock',
+    path: '/business',
     component: layout,
-    meta: { title: '库存管理' },
+    meta: { title: '商户管理' },
     children: [
       { 
-        path: '2-1', 
-        meta: { title: '车辆库存' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
-      { 
-        path: '2-2', 
-        meta: { title: '车辆入库' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
-      { 
-        path: '2-3', 
-        meta: { title: '车辆出库' },
-        component: resolve => require(['../pages/index'], resolve),
-      },
-      { 
-        path: '2-4', 
-        meta: { title: '订车' },
-        component: resolve => require(['../pages/index'], resolve),
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/business'], resolve),
       }
     ],
   },
   {
     path: '/customer',
     component: layout,
-    meta: { title: '客户管理' },
+    meta: { title: '消费者管理' },
     children: [
       { 
         path: '', 
-        meta: { title: '客户管理' },
+        meta: { title: '' },
+        component: resolve => require(['../pages/index'], resolve),
+      }
+    ],
+  },
+  {
+    path: '/materiel',
+    component: layout,
+    meta: { title: '物料提醒' },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/index'], resolve),
+      }
+    ],
+  },
+  {
+    path: '/finance',
+    component: layout,
+    meta: { title: '财务管理' },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/index'], resolve),
+      }
+    ],
+  },
+  {
+    path: '/recharge',
+    component: layout,
+    meta: { title: '充值设置' },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/index'], resolve),
+      }
+    ],
+  },
+  {
+    path: '/datamap',
+    component: layout,
+    meta: { title: '地图' },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '' },
         component: resolve => require(['../pages/index'], resolve),
       }
     ],
@@ -105,4 +125,5 @@ export const userMenus = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+routes = routes.concat(userMenus)
 export default routes

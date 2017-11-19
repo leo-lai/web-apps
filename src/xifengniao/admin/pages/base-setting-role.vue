@@ -30,7 +30,7 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 新增/编辑用户 -->
+	  <!-- 新增/编辑角色 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="90px" style="width: 432px;"

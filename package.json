@@ -1,5 +1,5 @@
 {
-  "name": "vue2-webpack2-cli-vux2-multe-page",
+  "name": "vue2-webpack2-webapps",
   "version": "2.0.1",
   "description": "leolai",
   "author": "leolai.mail@qq.com",
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",
+    "axios-mock-adapter": "^1.10.0",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.22.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.2",
@@ -75,6 +76,7 @@
     "less-loader": "^2.2.3",
     "lolex": "^1.5.2",
     "mocha": "^3.2.0",
+    "mockjs": "^1.0.1-beta3",
     "nightwatch": "^0.9.12",
     "node-sass": "^4.5.3",
     "opn": "^4.0.2",

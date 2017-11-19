@@ -3,7 +3,7 @@ let config = {
     base: '/admin'
   },
   api: {
-    baseURL: 'http://111.230.170.36/tauto/management/admin/'
+    baseURL: 'http://111.230.170.36/tauto/management/admin'
   },
   viewer: {
     options: {
