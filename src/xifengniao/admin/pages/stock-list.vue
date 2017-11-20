@@ -20,15 +20,20 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="车辆型号" prop="carsName" min-width="150"></el-table-column>
-	    <el-table-column label="车身颜色" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="指导价格" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="门店/公司名称" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="线上展示" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="车辆型号" prop="carsName" min-width="200"></el-table-column>
+	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
+	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
+	    <el-table-column label="指导价格" prop="guidingPrice" align="center"></el-table-column>
+	    <el-table-column label="门店/公司名称" prop="orgName" align="center"></el-table-column>
+	    <el-table-column label="线上展示" prop="isOnLine" align="center">
+	    	<template slot-scope="scope">
+	    		<span v-if="!scope.row.isOnLine" class="l-text-error">否</span>
+	    		<span v-else>是</span>
+	      </template>
+	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">编辑/查看</el-button>
+	    		<el-button class="l-text-link" type="text" size="small">查看 / 编辑</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>

@@ -7,14 +7,8 @@
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
   				<el-form-item>
-  					<el-select v-model="list.filter.stockOrdersState" placeholder="订单状态" @change="search()">
-				      <el-option label="未支付定金" :value="1"></el-option>
-				      <el-option label="已支付定金，待处理" :value="3"></el-option>
-				      <el-option label="已处理，待支付尾款" :value="5"></el-option>
-				      <el-option label="已支付尾款，待资源出库" :value="7"></el-option>
-				      <el-option label="已出库，待签收" :value="9"></el-option>
-				      <el-option label="已签收并自动入库" :value="11"></el-option>
-				      <el-option label="已取消" :value="0"></el-option>
+  					<el-select v-model="list.filter.stockOrderState" placeholder="订单状态" @change="search()">
+				      <el-option v-for="item in list.state" :key="item.value" :label="item.label" :value="item.value"></el-option>
 				    </el-select>
   				</el-form-item>
 				  <el-form-item prop="carsName">
@@ -29,13 +23,13 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="订车单号" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="预定车型" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="车身颜色" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="官方指导价" prop="orderState"></el-table-column>
-	    <el-table-column label="订车数量" prop="expectWayName"></el-table-column>
-	    <el-table-column label="订单状态" prop="stockOrdersState"></el-table-column>
+	    <el-table-column label="订车单号" prop="stockOrderCode"></el-table-column>
+	    <el-table-column label="预定车型" prop="carsName"></el-table-column>
+	    <el-table-column label="车身颜色" prop="colourName"></el-table-column>
+	    <el-table-column label="内饰颜色" prop="interiorName"></el-table-column>
+	    <el-table-column label="官方指导价" prop="guidingPrice"></el-table-column>
+	    <el-table-column label="订车数量" prop="stockOrderNumber"></el-table-column>
+	    <el-table-column label="订单状态" prop="stockOrderState"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small">支付定金</el-button>
@@ -138,12 +132,42 @@ export default {
         }
 			},
 			list: {
+				state: [
+					{
+						value: 1,
+						label: '未支付定金'
+					},
+					{
+						value: 3,
+						label: '已支付定金，待处理'
+					},
+					{
+						value: 5,
+						label: '已处理，待支付尾款'
+					},
+					{
+						value: 7,
+						label: '已支付尾款，待资源出库'
+					},
+					{
+						value: 9,
+						label: '已出库，待签收'
+					},
+					{
+						value: 11,
+						label: '已签收并自动入库'
+					},
+					{
+						value: 0,
+						label: '已取消'
+					}
+				],
 				filter: {
-					stockOrdersState: '',
+					stockOrderState: '',
 					carsName: ''
 				},
 				rules: {
-					stockOrdersState: [],
+					stockOrderState: [],
 					carsName: []
 				},
 				loading: false,
