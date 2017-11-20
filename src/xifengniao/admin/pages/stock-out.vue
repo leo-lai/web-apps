@@ -23,18 +23,20 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="预约车型" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="预约门店" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="客户电话" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="提交时间" prop="orderState"></el-table-column>
-	    <el-table-column label="到店日期" prop="expectWayName"></el-table-column>
-	    <el-table-column label="打算购车时间" prop="expectWayName"></el-table-column>
+	    <el-table-column label="订单号" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="落定客户" prop="customerUsersName"></el-table-column>
+	    <el-table-column label="下单时间" prop="customerUsersName"></el-table-column>
+	    <el-table-column label="预定车辆" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="车身颜色" prop="orderState"></el-table-column>
+	    <el-table-column label="内饰颜色" prop="expectWayName"></el-table-column>
+	    <el-table-column label="订单数量" prop="expectWayName"></el-table-column>
+	    <el-table-column label="订单状态" prop="expectWayName"></el-table-column>
+	    <el-table-column label="出库状态" prop="expectWayName"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">编辑</el-button>
-	        <el-button class="l-text-link" type="text" size="small">标记为已到店</el-button>
-	        <el-button class="l-text-link" type="text" size="small">标记为不购车</el-button>
+	    		<el-button class="l-text-link" type="text" size="small">出库车辆</el-button>
+	        <!-- <el-button class="l-text-link" type="text" size="small">编辑</el-button> -->
+	        <!-- <el-button class="l-text-link" type="text" size="small">打印单据</el-button> -->
 	      </template>
 	    </el-table-column>
 	  </el-table>

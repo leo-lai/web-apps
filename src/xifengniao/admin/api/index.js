@@ -240,6 +240,9 @@ const api = {
     },
     getCarsList(familyId = '') { // 车大类列表
       return fetch.post('/carsListList', { familyId })
+    },
+    getCarsInfo(carId = '') { // 车大类相关信息
+      return fetch.post('/carsInfo', { carId })
     }
   },
   color: { // 车身颜色内饰管理
@@ -294,6 +297,11 @@ const api = {
     }
   },
   stock: { // 库存管理
+    getList(formData = {}, page = 1, rows = 100) { // 车辆库存列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/stockCarList', formData)
+    },
     getInList(formData = {}, page = 1, rows = 100) { // 入库单列表
       formData.page = page
       formData.rows = rows
@@ -312,6 +320,20 @@ const api = {
       formData.page = page
       formData.rows = rows
       return fetch.post('/storageCarList', formData)
+    },
+    addInCar(formData = {}) { // 新增入库车辆
+      return fetch.post('/storageCarEdit', formData)
+    },
+    getOrderList(formData = {}, page = 1, rows = 100) { // 订车列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/stockOrderList', formData)
+    },
+    addOrder(formData = {}) { // 新增订车单
+      return fetch.post('/stockOrderCreate', formData)
+    },
+    cancelOrder(stockOrderId = '') { // 取消订单
+      return fetch.post('/stockOrderCancel', { stockOrderId })
     }
   }
 }

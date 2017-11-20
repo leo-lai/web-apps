@@ -249,7 +249,8 @@ export default {
 						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
 					],
 					logisticsCost: [
-						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式(如：10.24)', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
 					imageUpload: [
 						{ validator: validateUpload, trigger: 'change' },
@@ -412,7 +413,16 @@ export default {
       })
 		},
 		showDialogCar(eventName = 'car-list', row) {
-			this.$$event.$emit('stock:' + eventName, row)
+			let infoPromise = Promise.resolve()
+			let info = Object.assign(row)
+			if(eventName === 'car-list') {
+				infoPromise = this.$$api.stock.getInInfo(row.storageId).then(({data}) => {
+					info = Object.assign(data)
+				})
+			}
+			infoPromise.finally(_ => {
+				this.$$event.$emit('stock:' + eventName, info)	
+			})
 		}
 	},
 	mounted() {

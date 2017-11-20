@@ -10,7 +10,7 @@
 		  <el-tab-pane label="出库记录" name="out">
 		  	<stock-out></stock-out>
 		  </el-tab-pane>
-		  <el-tab-pane label="订车" name="order">
+		  <el-tab-pane label="订车列表" name="order">
 		  	<stock-order></stock-order>
 		  </el-tab-pane>
 		</el-tabs>

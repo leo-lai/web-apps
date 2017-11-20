@@ -21,14 +21,14 @@
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="车辆型号" prop="carsName" min-width="150"></el-table-column>
+	    <el-table-column label="车身颜色" prop="customerUsersName"></el-table-column>
+	    <el-table-column label="内饰颜色" prop="customerUsersName"></el-table-column>
 	    <el-table-column label="指导价格" prop="customerUsersName"></el-table-column>
 	    <el-table-column label="门店/公司名称" prop="customerUsersName"></el-table-column>
 	    <el-table-column label="线上展示" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">编辑</el-button>
-	        <el-button class="l-text-link" type="text" size="small">查看</el-button>
-	        <el-button class="l-text-link" type="text" size="small">购车方案配置</el-button>
+	    		<el-button class="l-text-link" type="text" size="small">编辑/查看</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -101,12 +101,6 @@ export default {
 				rules: {
 					carsName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					phoneNumber: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					orgId: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
 					]
 				},
 				data: {
@@ -133,7 +127,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.customer.getBespeakList(this.list.filter, page, rows)
+			this.$$api.stock.getList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page

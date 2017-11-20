@@ -18,7 +18,7 @@
 			</el-form>
 	  	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
 	  		:data="list.data" v-loading="list.loading" height="400">
-		    <el-table-column label="车辆型号" prop="carsName" min-width="120"></el-table-column>
+		    <el-table-column label="车辆型号" prop="carsName" min-width="140"></el-table-column>
 		    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
 		    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
 		    <el-table-column label="发动机号" prop="engineNumber" align="center"></el-table-column>
@@ -76,7 +76,7 @@
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="单价" prop="unitPrice" >
-			  	<el-input v-model="dialogInfo.data.unitPrice" :maxlength="10"></el-input>
+			  	<el-input v-model.number="dialogInfo.data.unitPrice" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item label="车架号" prop="frameNumber" >
 			  	<el-input v-model="dialogInfo.data.frameNumber" :maxlength="10"></el-input>
@@ -203,6 +203,8 @@ export default {
 					visible: false,
 					previewUrl: ''
 				},
+				colorList: [],
+				neishiList: [],
 				cangList: [],
 				rules: {
 					carsId: [
@@ -219,7 +221,7 @@ export default {
 					],
 					unitPrice: [
 						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '请输入正确格式(如：3500)', trigger: 'blur' }
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
 					frameNumber: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -231,8 +233,6 @@ export default {
 						{ validator: validateUpload, trigger: 'change' },
 					]
 				},
-				colorList: [],
-				neishiList: [],
 				data: {
 					stockCarId: '',
 					storageId: '',
@@ -380,7 +380,7 @@ export default {
 					return {url: this.$$utils.image.thumb(imageUrl, 150), src: imageUrl, name: imageUrl}
 				}) : []
 				this.$parent.viewer.images = this.dialogInfo.upload.list
-				
+
 				if(row.brandId) {
 					brandPromise.then(data => {
 						this.cascaderItemChange([row.brandId]).then(_ => {
@@ -418,11 +418,11 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.stock.addIn(this.dialogInfo.data).then(_ => {
+          this.$$api.stock.addInCar(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '客户成功'
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '车辆信息成功'
 						})
             this.refreshList()
           }).finally(()=>{
