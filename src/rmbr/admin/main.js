@@ -6,17 +6,26 @@ import Vue from 'vue'
 import ElementUI from 'element-ui'
 import NProgress from 'nprogress'
 
+import VueAMap from 'vue-amap'
+
 import router from './router'
 import store from './store'
 import api from './api'
 
 import app from './app'
 
-// import Mock from './mock'
-// Mock.bootstrap()
+import Mock from './mock'
+Mock.bootstrap()
 
 
 Vue.use(ElementUI)
+
+// 高德地图
+Vue.use(VueAMap)
+VueAMap.initAMapApiLoader({
+  key: '976fe9a654ec6d6127bdb1eb1db56c3e',
+  plugin: ['Scale', 'Geocoder']
+})
 
 Vue.mixin({
   created() {

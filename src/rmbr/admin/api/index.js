@@ -2,10 +2,10 @@ import config from '../config'
 import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
-
+import { mockFetch } from '../mock'
 
 // 创建axios实例
-const service = axios.create({
+export const service = axios.create({
   baseURL: config.api.baseURL,
   timeout: 60000
 })
@@ -140,10 +140,27 @@ const api = {
     }
   },
   business: {
-    getList(filterForm = {}, page = 1, row = 50) {
-      filterForm.per_page = page - 1
-      filterForm.page_number = row
-      return fetch.post('/seller/list', filterForm)
+    getList(formData = {}, page = 1, row = 50) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/seller/list', formData)
+    },
+    add(formData = {}) {
+      if(!formData.seller_id) {
+        return fetch.post('/seller/add', formData)  
+      }else {
+        return fetch.post('/seller/update', formData)
+      }
+    }
+  },
+  sys: {
+    getList(formData = {}, page = 1, row = 50) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return mockFetch.post('/user/list', formData)
+    },
+    add(formData = {}) {
+      return mockFetch.post('/user/add', formData)
     }
   }
 }

@@ -1,16 +1,6 @@
 import Mock from 'mockjs';
 
-const LoginUsers = [
-  {
-    id: 1,
-    username: 'admin',
-    password: 'admin',
-    avatar: 'http://wx.qlogo.cn/mmopen/dH8QVxmk2IXng0nWB8nL5J6Zwjc9bwssPvNVSaVoiasImTl8y5hGeAqzaDluCmICf0vlgiaFEicH9wSupsfXM2LfGIibpshjxnde/64',
-    name: '赖国聪'
-  }
-];
-
-const Users = [];
+export let Users = []
 
 for (let i = 0; i < 86; i++) {
   Users.push(Mock.mock({
@@ -23,4 +13,34 @@ for (let i = 0; i < 86; i++) {
   }));
 }
 
-export { LoginUsers, Users };
+let UserApi = {
+  '/user/list': config => {
+    let { per_page, page_number } = config.params
+
+    per_page = Number(per_page)
+    page_number = Number(page_number)
+
+    let total = Users.length
+    let returnList = []
+    // 列表筛选
+    returnList = Users.filter(user => { 
+      return true
+    })
+    // 分页
+    // returnList = returnList.filter((user, index) => {
+    //   return index < per_page * page_number && index >= per_page * (page_number - 1)
+    // })
+
+    return {
+      count: total,
+      per_page,
+      page_number,
+      list: returnList
+    }
+  },
+  '/user/add': config => {
+    
+  }
+}
+
+export default UserApi

@@ -67,12 +67,8 @@ export default {
 		return {
 			list: {
 				filter: {
-					phoneNumber: '',
-					orgId: ''
 				},
 				rules: {
-					phoneNumber: [],
-					orgId: []
 				},
 				loading: false,
 				page: 1,
@@ -107,13 +103,13 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.business.getList(this.list.filter, page, rows)
+			this.$$api.sys.getList(this.list.filter, page, rows)
 			.then(({data}) => {
-				this.list.total = data.total
-        this.list.page = data.page
-        this.list.rows = data.rows
+				this.list.total = data.count
+        this.list.page = data.page_number
+        this.list.rows = data.per_page
         this.list.data = data.list.map(item => {
-        	item.deling = false
+        	item.dong = false
         	return item
         })
 			}).finally(_ => {
@@ -167,9 +163,9 @@ export default {
         }
       })
 		}
+	},
+	mounted() {
+		this.getList()
 	}
 }
 </script>
-
-<style lang="less">
-</style>

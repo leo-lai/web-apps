@@ -33,7 +33,7 @@
 	    <el-table-column label="手机号码" prop="systemUserName"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">编辑</el-button>
+	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -48,25 +48,31 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 新增/编辑角色 -->
+	  <!-- 录入/编辑角色 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
-  		<el-form ref="infoForm" label-width="70px" style="width: 432px;"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
+  		<el-form inline ref="infoForm" class="l-form1" label-width="90px"
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item label="姓名" prop="roleName">
+			  <el-form-item label="账号" prop="username">
+			    <el-input v-model="dialogInfo.data.username" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="密码" prop="password">
+			    <el-input v-model="dialogInfo.data.password" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="姓名" prop="name">
+			    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="手机号码" prop="tel">
+			    <el-input v-model="dialogInfo.data.tel" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="店铺名称" prop="store_name">
+			    <el-input v-model="dialogInfo.data.store_name" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="身份证号" prop="id_number">
 			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
 			  </el-form-item>
-			  <el-form-item label="账号" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="密码" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="地区" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="权限" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  <el-form-item class="_flex" label="店铺地址" prop="region" @click.native="amapOpts.visible = true">
+			  	<el-input readonly placeholder="请选择" :value="amapAddress"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -74,12 +80,56 @@
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
+
+		<!-- 地图选择 -->
+		<amap-selector :visible.sync="amapOpts.visible" :options="amapOpts"></amap-selector>
 	</div>
 </template>
 <script>
+import AmapSelector from 'components/amap-selector'
+import { getValueByText } from 'assets/js/region.data'
+
 export default {
+	name: 'business',
+	components: {
+		AmapSelector
+	},
 	data() {
+		let that = this
+		let validateRegion = function(rule, value, callback) {
+      if (!(that.dialogInfo.data.region_id1 && that.dialogInfo.data.region_id2 
+      	&& that.dialogInfo.data.region_id3 && that.dialogInfo.data.address)){
+        callback(new Error('请选择地址'))
+      } else if(!that.dialogInfo.data.longitude || !that.dialogInfo.data.latitude){
+        callback(new Error('经纬度不正确'))
+      }else{
+        callback()
+      }
+		}
+
 		return {
+			amapOpts: {
+				visible: false,
+				province: '',
+        city: '',
+        area: '',
+        address: '',
+        longitude: '',
+        latitude: '',
+				onSelected(addressObj) {
+					let regionValue = getValueByText(addressObj.province, addressObj.city, addressObj.area)
+					that.dialogInfo.data.region_id1 = regionValue[0] || ''
+					that.dialogInfo.data.region_id2 = regionValue[1] || ''
+					that.dialogInfo.data.region_id3 = regionValue[2] || ''
+					
+					that.dialogInfo.data.province = addressObj.province
+					that.dialogInfo.data.city = addressObj.city
+					that.dialogInfo.data.area = addressObj.area
+					that.dialogInfo.data.address = addressObj.address
+					that.dialogInfo.data.longitude = addressObj.longitude
+					that.dialogInfo.data.latitude = addressObj.latitude
+				}
+			},
 			list: {
 				filter: {
 					tel: '',
@@ -99,20 +149,60 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增用户',
+				title: '录入商家',
 				visible: false,
 				loading: false,
 				rules: {
-					roleName: [
+					username: [
 						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					password: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					name: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					tel: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					id_number: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					store_name: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					region: [
+						{ required: true, validator: validateRegion, trigger: 'change' },
 					]
 				},
 				data: {
-					roleId: '',
-					roleName: '',
-					remark: ''
+					seller_id: '',
+					username: '',
+					password: '',
+					name: '',
+					tel: '',
+					id_number: '',
+					store_name: '',
+					region_id1: '',
+					region_id2: '',
+					region_id3: '',
+					province: '',
+					city: '',
+					area: '',
+					longitude: '',
+					latitude: '',
+					address: ''
 				}
 			}
+		}
+	},
+	computed: {
+		amapAddress() {
+			let address = this.dialogInfo.data.city + this.dialogInfo.data.area + this.dialogInfo.data.address
+			if(this.dialogInfo.data.province !== this.dialogInfo.data.city) {
+				address = this.dialogInfo.data.province + address 
+			}
+			return address || ''
 		}
 	},
 	methods: {
@@ -127,8 +217,8 @@ export default {
 			this.$$api.business.getList(this.list.filter, page, row)
 			.then(({data}) => {
 				this.list.total = data.count
-        this.list.page = Number(data.per_page)
-        this.list.row = Number(data.page_number)
+        this.list.page = Number(data.page_number)
+        this.list.row = Number(data.per_page)
         this.list.data = data.list
 			}).finally(_ => {
 				this.list.loading = false
@@ -144,13 +234,13 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', row) { // 新增/修改角色弹出信息
+		showDialogInfo(type = 'new', row) { // 录入/更新商家
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改用户'
+				this.dialogInfo.title = '更新商家'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
-				this.dialogInfo.title = '新增用户'
+				this.dialogInfo.title = '录入商家'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
 			this.dialogInfo.visible = true	
@@ -164,15 +254,15 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()	
 		},
-		submitInfo() { // 提交角色信息
+		submitInfo() { // 提交商家信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.role.add(this.dialogInfo.data).then(_ => {
+          this.$$api.business.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '用户信息成功'
+							message: (this.dialogInfo.type === 'new' ? '录入' : '更新') + '商家信息成功'
 						})
             this.refreshList()
           }).finally(()=>{
