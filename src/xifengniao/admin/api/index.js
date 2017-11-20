@@ -156,6 +156,9 @@ const api = {
     },
     add(formData = {}) {
       return fetch.post('/organizationEdit', formData)
+    },
+    getCangList() { // 仓库列表
+      return fetch.post('/organizationWarehouseList')
     }
   },
   user: { // 系统用户管理
@@ -209,6 +212,9 @@ const api = {
     },
     del(supplierId = '') {
       return fetch.post('/supplierDelete', { supplierId })
+    },
+    getListDown() {
+      return fetch.post('/supplierListList')
     }
   },
   car: { // 车型管理
@@ -229,8 +235,8 @@ const api = {
     getFamilyList(brandId = '') { // 车系列表
       return fetch.post('/carsFamilyList', { brandId })
     },
-    getStyleList(brandId = '') { // 车等级列表
-      return fetch.post('/carsStyleList', { brandId })
+    getStyleList(familyId = '') { // 车等级列表
+      return fetch.post('/carsStyleList', { familyId })
     },
     getCarsList(familyId = '') { // 车大类列表
       return fetch.post('/carsListList', { familyId })
@@ -288,10 +294,24 @@ const api = {
     }
   },
   stock: { // 库存管理
-    getInList(formData = {}, page = 1, rows = 100) { // 入库列表
+    getInList(formData = {}, page = 1, rows = 100) { // 入库单列表
       formData.page = page
       formData.rows = rows
       return fetch.post('/storageList', formData)
+    },
+    addIn(formData = {}) { // 新增入库单
+      return fetch.post('/storageEdit', formData)
+    },
+    delIn(stockCarId = '') {
+      return fetch.post('/storageCarDelete', { stockCarId })
+    },
+    getInInfo(storageId = '') { // 入库单详情
+      return fetch.post('/storageInfo', { storageId })
+    },
+    getInCarList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/storageCarList', formData)
     }
   }
 }

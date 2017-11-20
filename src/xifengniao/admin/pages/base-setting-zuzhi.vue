@@ -113,9 +113,9 @@
 			  <el-form-item class="_flex" prop="imageUpload">
 			  	<div slot="label" style="display:inline;">
 			  		显示照片<p style="font-size:12px;" class="l-text-gray">(最多上传9张)</p></div>
-			  	<el-upload accept="image/*" list-type="picture-card" multiple :limit="9"
-			  		:file-list="upload.list"
-			  		:action="$$api.baseURL + 'uploadImage'" name="img_file"
+			  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
+			  		:file-list="dialogInfo.upload.list"
+			  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
 			  		:on-success="uploadSuccess"
 			  		:on-remove="uploadRemove"
 			  		:on-preview="uploadPreview" 
@@ -136,14 +136,15 @@
 		<amap-selector :visible.sync="amapOpts.visible" :options="amapOpts"></amap-selector>
 
 		<!-- 预览图片 -->
-		<el-dialog :visible.sync="upload.visible">
-		  <div class="l-text-center">
-		  	<img :src="upload.previewUrl" alt="">
-		  </div>
-		</el-dialog>
+		<viewer ref="viewer" class="l-viewer" :options="$$config.viewer.options" :images="viewer.images" @inited="viewerInited">
+      <template slot-scope="scope">
+      	<img v-for="{url, src} in scope.images" :key="src" :src="url" :data-source="src" >
+      </template>
+    </viewer>
   </div>
 </template>
 <script>
+import viewer from 'v-viewer/src/component.vue'
 import AmapSelector from 'components/amap-selector'
 import { getValueByText } from 'assets/js/region.data'
 import { mapGetters } from 'vuex'
@@ -151,7 +152,7 @@ import { mapGetters } from 'vuex'
 export default {
 	name: 'base-setting-zuzhi',
 	components: {
-		AmapSelector
+		AmapSelector, viewer
 	},
 	data() {
 		let that = this
@@ -167,14 +168,14 @@ export default {
 		}
 
 		let validateUpload = function(rule, value, callback) {
-			if(that.upload.loading) {
+			if(that.dialogInfo.upload.loading) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.upload.list.length === 0) {
+			}else if(that.dialogInfo.upload.list.length === 0) {
 				callback(new Error('请上传照片'))
-			}else if(that.upload.list.length > 9) {
+			}else if(that.dialogInfo.upload.list.length > 9) {
 				callback(new Error('最多上传9张照片'))
 			}else {
-				that.dialogInfo.data.imageUrl = that.upload.list.map(item => item.src || item.url).join(',')
+				that.dialogInfo.data.imageUrl = that.dialogInfo.upload.list.map(item => item.src || item.url).join(',')
 				callback()
 			}
 		}
@@ -188,11 +189,10 @@ export default {
 		}
 
 		return {
-			upload: {
-				list: [],
-				loading: false,
-				visible: false,
-				previewUrl: ''
+			viewer: {
+				options: {},
+				visible: true,
+				images: []
 			},
 			amapOpts: {
 				visible: false,
@@ -233,6 +233,12 @@ export default {
 				title: '新增公司/门店',
 				visible: false,
 				isParent: true,
+				upload: {
+					list: [],
+					loading: false,
+					visible: false,
+					previewUrl: ''
+				},
 				rules: {
 					shortName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -318,21 +324,24 @@ export default {
 				this.dialogInfo.isParent = true
 			}
 		},
+		viewerInited(viewer) {
+			this.$$viewer = viewer
+		},
 		uploadSuccess(response, file, fileList) {
-			this.upload.loading = false
-			this.upload.list.push({
+			this.dialogInfo.upload.loading = false
+			this.dialogInfo.upload.list.push({
 				name: file.name,
 				url: response.data,
 				src: response.data
 			})
 		},
 		uploadPreview(file) {
-			this.upload.visible = true
-			this.upload.previewUrl = file.src || file.url
+			this.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
+			this.$$viewer.show()
 		},
 		uploadRemove(file, fileList) {
 			if(file.status === 'success') {
-				this.upload.list = this.upload.list.filter(item =>  {
+				this.dialogInfo.upload.list = this.dialogInfo.upload.list.filter(item =>  {
 					if(file.response) {
 						return item.src !== file.response.data
 					}else {
@@ -342,10 +351,10 @@ export default {
 			}
 		},
 		uploadProgress(event, file, fileList) {
-			this.upload.loading = true
+			this.dialogInfo.upload.loading = true
 		},
 		uploadError(error, file, fileList) {
-			this.upload.loading = false
+			this.dialogInfo.upload.loading = false
 		},
 		uploadExceed(files, fileList) {
 			this.$message({
@@ -392,9 +401,10 @@ export default {
 				let zuzhiInfo = this.$$api.zuzhi.getInfo(row.orgId).then(({data}) => {
 					this.$$utils.copyObj(this.amapOpts, data)
 					this.$$utils.copyObj(this.dialogInfo.data, data)
-					this.upload.list = this.dialogInfo.data.imageUrl.split(',').map(imageUrl => {
+					this.dialogInfo.upload.list = this.dialogInfo.data.imageUrl ? this.dialogInfo.data.imageUrl.split(',').map(imageUrl => {
 						return {url: this.$$utils.image.thumb(imageUrl, 150), src: imageUrl, name: imageUrl}
-					})
+					}) : []
+					this.viewer.images = this.dialogInfo.upload.list
 					return data
 				})
 				promises.push(zuzhiInfo)
@@ -405,7 +415,7 @@ export default {
 
 			const loading = this.$loading()
 			Promise.all(promises).then(dataArr =>　{
-				this.dialogInfo.visible = true	
+				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
 			})

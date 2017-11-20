@@ -48,7 +48,7 @@
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
   		<el-form class="l-form1" ref="infoForm" label-width="100px" inline
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-  			<el-form-item class="_flex" label="品牌型号" prop="carModel" style="width: 622px;">
+  			<el-form-item class="_flex" label="品牌车型" prop="carModel" style="width: 622px;">
 			    <el-cascader style="width: 100%;" @active-item-change="cascaderChange"
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 			  </el-form-item>
@@ -125,7 +125,7 @@
 				  <el-form-item class="_flex" label="车身照片" prop="imageUpload">
 				  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
 				  		:file-list="dialogCheshen.upload.list"
-				  		:action="$$api.baseURL + 'uploadImage'" name="img_file"
+				  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
 				  		:on-success="uploadSuccess"
 				  		:on-remove="uploadRemove"
 				  		:on-preview="uploadPreview" 
@@ -342,6 +342,7 @@ export default {
 			})
 		},
 		cascaderChange(valArr) {
+			console.log(valArr)
 			let promise = null
 			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
       if(valArr.length === 1) { // 获取车系(by brandId)
@@ -355,10 +356,10 @@ export default {
 	      		return data
 	      	})	
       	}
-      }else if(valArr.length === 2) { // 获取车等级(by brandId)
+      }else if(valArr.length === 2) { // 获取车等级(by familyId)
       	let currentFamily = currentBrand.children.filter(family => family.id === valArr[1])[0]
       	if(currentFamily && currentFamily.children && currentFamily.children.length === 0) {
-	      	promise = this.$$api.car.getStyleList(valArr[0]).then(({data}) => {
+	      	promise = this.$$api.car.getStyleList(valArr[1]).then(({data}) => {
 	      		currentFamily.children = data
 	      		return data
 	      	})	
