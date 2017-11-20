@@ -6,11 +6,11 @@
   		</el-col>
   		<el-col :span="16" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
-  				<el-form-item prop="phoneNumber">
-				    <el-input placeholder="手机号码" v-model="list.filter.phoneNumber"></el-input>
+  				<el-form-item prop="phoneNumber" lalel="">
+				    <el-input placeholder="商家姓名或手机号码" v-model="list.filter.phoneNumber"></el-input>
 				  </el-form-item>
-				  <el-form-item prop="brandId" label="关联">
-				  	<el-select v-model="list.filter.guanlian" placeholder="请选择" @change="search()">
+				  <el-form-item prop="brandId" label="">
+				  	<el-select v-model="list.filter.guanlian" placeholder="是否有设备" @change="search()">
 				      <el-option label="是" :value="1"></el-option>
 				      <el-option label="否" :value="0"></el-option>
 				    </el-select>
@@ -39,7 +39,7 @@
 	  	 	@size-change="sizeChange" 
 	  	 	@current-change="pageChange" 
 	  	 	:page-sizes="$$api.pageSizes"
-	  	 	:page-size="list.rows"
+	  	 	:page-size="list.row"
 	  	 	:current-page="list.page"
 	  	 	:total="list.total">
 			</el-pagination>
@@ -88,7 +88,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				row: 100,
 				total: 0,
 				data: []
 			},
@@ -117,17 +117,14 @@ export default {
 		pageChange(page = 1) {
 			this.getList(page)
 		},
-		getList(page = 1, rows) {
+		getList(page = 1, row) {
 			this.list.loading = true
-			this.$$api.business.getList(this.list.filter, page, rows)
+			this.$$api.business.getList(this.list.filter, page, row)
 			.then(({data}) => {
-				this.list.total = data.total
-        this.list.page = data.page
-        this.list.rows = data.rows
-        this.list.data = data.list.map(item => {
-        	item.deling = false
-        	return item
-        })
+				this.list.total = data.count
+        this.list.page = Number(data.per_page)
+        this.list.row = Number(data.page_number)
+        this.list.data = data.list
 			}).finally(_ => {
 				this.list.loading = false
 			})

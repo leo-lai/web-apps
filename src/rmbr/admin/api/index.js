@@ -15,7 +15,7 @@ service.interceptors.request.use(config => {
   let userinfo = storage.local.get('userinfo')
   config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
   config.headers['token'] = userinfo && userinfo.token ? userinfo.token : ''
-  // config.headers['uid'] = userinfo && userinfo.id ? userinfo.id : ''
+  config.headers['uid'] = userinfo && userinfo.id ? userinfo.id : ''
   config.transformRequest = [function(data) {
     let ret = []
     for (let key in data) {
@@ -92,8 +92,8 @@ service.interceptors.response.use(response => {
 const fetch = {
   ajax(url = '', data = {}, method = 'GET', contentType = 'form') {
     return new Promise((resolve, reject) => {
-      let userinfo = storage.local.get('userinfo')
-      data.uid = userinfo && userinfo.id ? userinfo.id : ''
+      // let userinfo = storage.local.get('userinfo')
+      // data.uid = userinfo && userinfo.id ? userinfo.id : ''
       service({
         url, method, data
       }).then(resolve).catch(error => {
