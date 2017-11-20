@@ -1,13 +1,16 @@
 <template>
 	<div class="l-main-body">
 		<el-row class="l-margin-b">
-  		<el-col :span="8">
+  		<el-col :span="4">
   			<el-button type="primary" @click="showDialogInfo('new')">录入商户</el-button>
   		</el-col>
-  		<el-col :span="16" class="l-text-right">
+  		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
   				<el-form-item prop="phoneNumber" lalel="">
-				    <el-input placeholder="商家姓名或手机号码" v-model="list.filter.phoneNumber"></el-input>
+				    <el-input placeholder="商家姓名" v-model="list.filter.name"></el-input>
+				  </el-form-item>
+				  <el-form-item prop="phoneNumber" lalel="">
+				    <el-input placeholder="手机号码" v-model="list.filter.tel"></el-input>
 				  </el-form-item>
 				  <el-form-item prop="brandId" label="">
 				  	<el-select v-model="list.filter.guanlian" placeholder="是否有设备" @change="search()">
@@ -79,12 +82,14 @@ export default {
 		return {
 			list: {
 				filter: {
-					phoneNumber: '',
-					orgId: ''
+					tel: '',
+					name: '',
+					guanlian: ''
 				},
 				rules: {
-					phoneNumber: [],
-					orgId: []
+					tel: [],
+					name: [],
+					guanlian: []
 				},
 				loading: false,
 				page: 1,

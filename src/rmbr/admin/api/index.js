@@ -140,8 +140,8 @@ const api = {
     }
   },
   business: {
-    getList(filterForm = {}, page = 0, row = 50) {
-      filterForm.per_page = page
+    getList(filterForm = {}, page = 1, row = 50) {
+      filterForm.per_page = page - 1
       filterForm.page_number = row
       return fetch.post('/seller/list', filterForm)
     }
