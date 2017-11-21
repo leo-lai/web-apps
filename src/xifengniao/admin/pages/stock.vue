@@ -13,6 +13,9 @@
 		  <el-tab-pane label="订车列表" name="order">
 		  	<stock-order></stock-order>
 		  </el-tab-pane>
+		  <el-tab-pane label="批发出库" name="out-order">
+		  	<stock-out-order></stock-out-order>
+		  </el-tab-pane>
 		</el-tabs>
 	</div>
 </template>
@@ -21,13 +24,15 @@ import stockList from './stock-list'
 import stockIn from './stock-in'
 import stockOut from './stock-out'
 import stockOrder from './stock-order'
+import stockOutOrder from './stock-out-order'
 export default {
 	name: 'stock',
 	components: {
 		stockList,
 		stockIn,
 		stockOut,
-		stockOrder
+		stockOrder,
+		stockOutOrder
 	},
 	data() {
 		return {

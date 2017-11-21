@@ -8,7 +8,7 @@
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="dateRange" style="width:360px;">
 				  	<el-date-picker style="width: 100%;" type="datetimerange" value-format="yyyy-MM-dd hh-mm-ss"
-				  		range-separator="到" start-placeholder="入库时间" end-placeholder="入库时间"
+				  		range-separator="到" start-placeholder="从入库时间" end-placeholder="入库时间"
 				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
 				  </el-form-item>
 				  <el-form-item style="width: 140px;" prop="supplierId">
@@ -27,7 +27,7 @@
   				</el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -106,7 +106,7 @@
 			  	<el-input v-model="dialogInfo.data.contractNumber" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="物流费用" prop="logisticsCost" >
-			  	<el-input v-model="dialogInfo.data.logisticsCost" :maxlength="10"></el-input>
+			  	<el-input v-model.number="dialogInfo.data.logisticsCost" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="合同扫描件" prop="imageUpload">
 			  	<!-- <div style="line-height: 1.6; width: 50%; margin-top: 4px;">
@@ -310,7 +310,7 @@ export default {
 			})
 		},
 		filterDateChange(value) {
-			if(value.length >= 2) {
+			if(value && value.length >= 2) {
 				this.list.filter.startDate = value[0]
 				this.list.filter.endDate = value[1]
 				this.search()	

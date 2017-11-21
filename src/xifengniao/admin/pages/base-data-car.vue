@@ -11,7 +11,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除查询条件</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -48,7 +48,7 @@
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
   		<el-form class="l-form1" ref="infoForm" label-width="100px" inline
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-  			<el-form-item class="_flex" label="品牌车型" prop="carModel" style="width: 622px;">
+  			<el-form-item class="_flex" label="车辆型号" prop="carModel" style="width: 622px;">
 			    <el-cascader style="width: 100%;" @active-item-change="cascaderChange"
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 			  </el-form-item>

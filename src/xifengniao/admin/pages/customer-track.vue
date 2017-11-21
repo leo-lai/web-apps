@@ -16,7 +16,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除查询条件</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -31,8 +31,7 @@
 	    <el-table-column label="购车方案" prop="expectWayName" min-width="150"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link" type="text" size="small">查看</el-button>
-	        <el-button class="l-text-link" type="text" size="small">编辑</el-button>
+	        <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo(scope.row)">查看</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -88,6 +87,20 @@
 				<el-button @click="closeDialogAdd()">取消</el-button>
 		    <el-button type="primary" :loading="dialogAdd.loading" @click="submitAdd">确定提交</el-button>
 		  </span>
+		</el-dialog>
+
+		<!-- 查看信息 -->
+		<el-dialog class="l-customer-view" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogInfo.visible">
+  		<div class="l-flex-h">
+  			<div class="_info"></div>
+  			<div class="l-rest _tab">
+  				<el-tabs type="border-card">
+					  <el-tab-pane label="购车进度">购车进度</el-tab-pane>
+					  <el-tab-pane label="个人资料">个人资料</el-tab-pane>
+					  <el-tab-pane label="车辆资料">车辆资料</el-tab-pane>
+					</el-tabs>
+  			</div>
+  		</div>
 		</el-dialog>
 	</div>
 </template>
@@ -165,6 +178,9 @@ export default {
 					remarks: '',
 					systemUserId: ''
 				}
+			},
+			dialogInfo: {
+				visible: false
 			}
 		}
 	},
@@ -264,6 +280,9 @@ export default {
 			this.$$utils.copyObj(this.dialogAdd.data, '')
 			this.$refs.addForm.resetFields()
 		},
+		showDialogInfo() {
+			this.dialogInfo.visible = true
+		},
 		submitAdd() { // 提交客户
 			this.$refs.addForm.validate(valid => {
         if (valid) {
@@ -297,3 +316,9 @@ export default {
 	}
 }
 </script>
+<style scoped lang="less">
+.l-customer-view{
+
+
+}
+</style>

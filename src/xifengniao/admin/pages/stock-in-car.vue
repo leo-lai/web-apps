@@ -55,7 +55,7 @@
   		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
   			<div class="l-flex-hc">
-				  <el-form-item class="_flex" label="品牌车型" prop="carsId" style="width: 622px;">
+				  <el-form-item class="_flex" label="车辆型号" prop="carsId" style="width: 622px;">
 				    <el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderItemChange" @change="cascaderChange"
 				    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 				  </el-form-item>

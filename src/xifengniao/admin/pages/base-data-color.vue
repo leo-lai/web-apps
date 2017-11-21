@@ -10,7 +10,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除查询条件</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>

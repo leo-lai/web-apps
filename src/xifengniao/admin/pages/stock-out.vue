@@ -9,29 +9,26 @@
 				    </el-select>
   				</el-form-item>
 				  <el-form-item prop="dateRange">
-				  	<el-date-picker type="daterange" unlink-panels range-separator="至" 
-				  		start-placeholder="预约开始日期" end-placeholder="预约结束日期"
-					  	:picker-options="dateOptions" v-model="list.filter.dateRange">
-				    </el-date-picker>
+				  	<el-input placeholder="请输入订单号" v-model="list.filter.stockOrderCode"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除查询条件</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="订单号" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="订单号" prop="stockOrderCode"></el-table-column>
 	    <el-table-column label="落定客户" prop="customerUsersName"></el-table-column>
 	    <el-table-column label="下单时间" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="预定车辆" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="车身颜色" prop="orderState"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="expectWayName"></el-table-column>
-	    <el-table-column label="订单数量" prop="expectWayName"></el-table-column>
-	    <el-table-column label="订单状态" prop="expectWayName"></el-table-column>
-	    <el-table-column label="出库状态" prop="expectWayName"></el-table-column>
+	    <el-table-column label="预定车辆" prop="carsName"></el-table-column>
+	    <el-table-column label="车身颜色" prop="colourName"></el-table-column>
+	    <el-table-column label="内饰颜色" prop="interiorName"></el-table-column>
+	    <el-table-column label="订单数量" prop="stockOrderNumber"></el-table-column>
+	    <el-table-column label="订单状态" prop="stockOrderState"></el-table-column>
+	    <el-table-column label="出库状态" prop="stockOrderState"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small">出库车辆</el-button>

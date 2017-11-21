@@ -13,7 +13,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除查询条件</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -33,7 +33,7 @@
 	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">查看 / 编辑</el-button>
+	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">查看 / 编辑</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -48,6 +48,50 @@
 			</el-pagination>
 	  </el-row>
 
+	  <!-- 车辆库存详情 -->
+		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="673px">
+  		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+			  <el-form-item class="_flex" label="车辆型号" style="width: 622px;">
+			    <el-input disabled v-model="dialogInfo.data.carsName"></el-input>
+			  </el-form-item>
+			  <el-form-item label="指导价" >
+			  	<el-input disabled v-model="dialogInfo.data.guidingPrice"></el-input>
+			  </el-form-item>
+			  <el-form-item label="发票金额" >
+			  	<el-input v-model.number="dialogInfo.data.invoicePrice" :maxlength="10"></el-input>
+			  </el-form-item>
+			  <el-form-item label="定金/辆" >
+			  	<el-input v-model.number="dialogInfo.data.depositPrice" :maxlength="10"></el-input>
+			  </el-form-item>
+			  <el-form-item label="优惠" >
+			  	<el-input v-model.number="dialogInfo.data.discountPrice" :maxlength="10"></el-input>
+			  </el-form-item>
+			  <el-form-item class="_flex" label="是否线上展示">
+			  	<el-switch v-model="dialogInfo.data.isOnLine" active-text="是" inactive-text="否"></el-switch>
+			  	<el-tooltip content="关闭线上展示则客户预定该车型时，不推荐客户来您门店了解和试驾" placement="right">
+            <i style="vertical-align: middle;" class="el-icon-question"></i>
+          </el-tooltip>
+			  </el-form-item>
+			  <el-table class="l-table-hdbg" stripe :data="dialogInfo.data.list">
+			    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
+			    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
+			    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
+			    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
+			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
+			    <el-table-column label="操作">
+			    	<template slot-scope="scope">
+			        <el-button class="l-text-link" type="text" size="small">查看验车照片</el-button>
+			      </template>
+			    </el-table-column>
+			  </el-table>
+			</el-form>
+			<span slot="footer" class="l-margin-r-m">
+				<el-button @click="closeDialogInfo()">取消</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		  </span>
+		</el-dialog>
 	</div>
 </template>
 <script>
@@ -100,20 +144,31 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增客户',
+				title: '查看/编辑库存信息',
 				visible: false,
 				loading: false,
 				rules: {
-					carsName: [
-						{ required: true, message: '必填项', trigger: 'blur' }
+					depositPrice: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					],
+					discountPrice: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					],
+					invoicePrice: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					]
 				},
 				data: {
-					supplierId: '',
+					stockCarId: '',
 					carsName: '',
-					phoneNumber: '',
-					orgId: '',
-					remark: ''
+					guidingPrice: '',
+					isOnLine: true,
+					depositPrice: '',
+					discountPrice: '',
+					invoicePrice: ''
 				}
 			}
 		}
@@ -155,21 +210,13 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', row) { // 新增/修改车型弹出信息
+		showDialogInfo(type = 'edit', row) { // 查看/编辑库存详情
 			this.dialogInfo.type = type
-			if(type === 'edit') {
-				this.dialogInfo.title = '修改客户'
-				this.$$utils.copyObj(this.dialogInfo.data, row)
-			} else {
-				this.dialogInfo.title = '新增客户'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
-			}
-
+			let { carsId, colourId, interiorId } = row
 			const loading = this.$loading()
-			Promise.all([
-				this.$store.dispatch('getZuzhiList')
-			]).then(dataArr =>　{
-				this.dialogInfo.visible = true	
+			this.$$api.stock.getInfo({ carsId, colourId, interiorId }).then(({data}) => {
+				this.$$utils.copyObj(this.dialogInfo.data, data)
+				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
 			})
@@ -183,7 +230,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交客户
+		submitInfo() { // 提交库存信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -191,7 +238,7 @@ export default {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '客户成功'
+							message: '编辑库存信息成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -203,24 +250,6 @@ export default {
 						message: '请完善表单信息'
 					})
         }
-      })
-		},
-		deleteInfo(row) { // 禁用/启用车型
-			this.$confirm('是否确定删除该客户?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(_ => {
-      	row.deling = true
-				this.$$api.supplier.del(row.supplierId).then(_ => {
-					this.$message({
-						type: 'success',
-						message: '删除客户成功'
-					})
-					this.refreshList()
-				}).finally(_ => {
-					row.deling = false
-				})
       })
 		}
 	},

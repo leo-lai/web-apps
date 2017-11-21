@@ -8,15 +8,14 @@
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
   				</el-form-item>
-				  <el-form-item prop="dateRange">
-				  	<el-date-picker type="daterange" unlink-panels range-separator="至" 
-				  		start-placeholder="预约开始日期" end-placeholder="预约结束日期"
-					  	:picker-options="dateOptions" v-model="list.filter.dateRange">
-				    </el-date-picker>
+				  <el-form-item prop="dateRange" style="width:360px;">
+				  	<el-date-picker style="width: 100%;" type="datetimerange" value-format="yyyy-MM-dd hh-mm-ss"
+				  		range-separator="到" start-placeholder="从预约时间" end-placeholder="预约时间"
+				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">清除查询条件</el-button>
+				    <el-button @click="clear">重置</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -86,11 +85,15 @@ export default {
 			},
 			list: {
 				filter: {
-					dateRange: '',
+					dateRange: [],
+					startDate: '',
+					endDate: '',
 					orgId: ''
 				},
 				rules: {
-					phoneNumber: [],
+					dateRange: [],
+					startDate: [],
+					endDate: [],
 					orgId: []
 				},
 				loading: false,
@@ -131,6 +134,13 @@ export default {
     ])
 	},
 	methods: {
+		filterDateChange(value) {
+			if(value && value.length >= 2) {
+				this.list.filter.startDate = value[0]
+				this.list.filter.endDate = value[1]
+				this.search()	
+			}
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},

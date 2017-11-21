@@ -2,16 +2,23 @@
 	<div>
 		<el-row>
 			<el-col :span="4">
-				<el-button type="primary" @click="showDialogInfo('new')">新增订车单</el-button>
+				<el-button type="primary">新增出库订单</el-button>
 			</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+  				<el-form-item style="width: 120px;">
+  					<el-select v-model="list.filter.stockOrderState" placeholder="出库状态" @change="search()">
+				      <el-option label="未处理" :value="0"></el-option>
+				      <el-option label="已处理" :value="1"></el-option>
+				      <el-option label="已出库" :value="2"></el-option>
+				    </el-select>
+  				</el-form-item>
   				<el-form-item>
   					<el-select v-model="list.filter.stockOrderState" placeholder="订单状态" @change="search()">
 				      <el-option v-for="item in list.state" :key="item.value" :label="item.label" :value="item.value"></el-option>
 				    </el-select>
   				</el-form-item>
-  				<el-form-item style="width: 160px;" prop="carsName">
+				  <el-form-item style="width: 160px;" prop="carsName">
 				  	<el-input v-model="list.filter.carsName" placeholder="车辆型号"></el-input>
 				  </el-form-item>
 				  <el-form-item style="width: 160px;" prop="stockOrderCode">
@@ -220,7 +227,7 @@
 import viewer from 'v-viewer/src/component.vue'
 
 export default {
-	name: 'stock-order',
+	name: 'stock-out-order',
 	components: {
     viewer
   },
@@ -399,6 +406,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
+			this.list.filter.isSellList = 1
 			this.$$api.stock.getOrderList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
@@ -532,7 +540,7 @@ export default {
 	},
 	mounted() {
 		this.$$event.$on('stock:tab', activeName => {
-			if(activeName === 'order' && this.list.data.length === 0) {
+			if(activeName === 'out-order' && this.list.data.length === 0) {
 				this.getList()
 			}
 		})

@@ -302,6 +302,12 @@ const api = {
       formData.rows = rows
       return fetch.post('/stockCarList', formData)
     },
+    getInfo(formData = {}){ // 车辆库存详情
+      return fetch.post('/stockCarInfo', formData)
+    },
+    editInfo(formData = {}) { // 编辑车辆库存详情
+      return fetch.post('/stockCarEdit', formData)
+    },
     getInList(formData = {}, page = 1, rows = 100) { // 入库单列表
       formData.page = page
       formData.rows = rows
@@ -332,8 +338,14 @@ const api = {
     addOrder(formData = {}) { // 新增订车单
       return fetch.post('/stockOrderCreate', formData)
     },
-    cancelOrder(stockOrderId = '') { // 取消订单
+    cancelOrder(stockOrderId = '') { // 取消订车单
       return fetch.post('/stockOrderCancel', { stockOrderId })
+    },
+    getOrderInfo(stockOrderId = '', isSellList = 0) { // 获取订车单详情
+      return fetch.post('/stockOrderInfo', { stockOrderId, isSellList })
+    },
+    signOrder(stockOrderId = '') {
+      return fetch.post('/stockOrderSign', { stockOrderId })
     }
   }
 }
