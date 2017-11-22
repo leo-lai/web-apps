@@ -34,7 +34,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="90px" style="width: 432px;"
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="系统角色" prop="roleName">
 			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
 			  </el-form-item>
@@ -44,7 +44,7 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 
@@ -58,7 +58,7 @@
 			</div>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogMenu()">取消</el-button>
-		    <el-button type="primary" :loading="dialogMenu.loading" @click="submitMenu">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogMenu.loading" @click="submitDialogMenu">确定提交</el-button>
 		  </span>
 		</el-dialog>
 	</div>
@@ -173,7 +173,7 @@ export default {
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
 				this.dialogInfo.title = '新增系统角色'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 			}
 			this.dialogInfo.visible = true	
 		},
@@ -183,10 +183,13 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
-			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()	
+			this.resetDialogInfo()
 		},
-		submitInfo() { // 提交角色信息
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+		},
+		submitDialogInfo() { // 提交角色信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -194,7 +197,7 @@ export default {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '用户信息成功'
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '角色成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -242,7 +245,7 @@ export default {
 			}
 			this.$refs.menuTree.setCheckedKeys([])
 		},
-		submitMenu() {
+		submitDialogMenu() {
 			this.dialogMenu.data.menuIds = getCheckedKeys(this.$refs.menuTree.root.childNodes).join(',')
 			if(!this.dialogMenu.data.menuIds) {
 				this.$message({

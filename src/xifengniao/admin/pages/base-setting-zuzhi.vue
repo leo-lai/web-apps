@@ -20,7 +20,7 @@
   		:data="list.data" v-loading="list.loading" >
 	    <el-table-column label="公司/门店名称" prop="shortName"></el-table-column>
 	    <el-table-column label="上级机构" prop="parentName"></el-table-column>
-	    <el-table-column label="标签" prop="orgLevel" >
+	    <el-table-column label="标签" prop="orgLevel" align="center">
 	    	<template slot-scope="scope">
 	    		<el-tag v-if="scope.row.orgLevel === 1" type="success">公司</el-tag>
 	    		<el-tag v-else-if="scope.row.orgLevel === 2" type="warning">分公司</el-tag>
@@ -28,17 +28,17 @@
 	      </template>
 	    </el-table-column>
 	    <el-table-column label="地址" prop="address" min-width="200"></el-table-column>
-	    <el-table-column label="状态" prop="status">
+	    <el-table-column label="状态" prop="status" align="center">
 	    	<template slot-scope="scope">
 	    		<span v-if="scope.row.status === 1" class="l-text-ok">运营中</span>
 	    		<span v-else class="l-text-error">已禁用</span>
 	      </template>
 	    </el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-	        <span v-show="scope.row.enabling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
-	        <span v-show="!scope.row.enabling">
+	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        	<el-button v-if="scope.row.status === 1" class="l-text-error" type="text" size="small" @click="enableAsk(scope.row, 0)">禁用</el-button>
 	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enableAsk(scope.row, 1)">启用</el-button>	
 	        </span>
@@ -60,12 +60,12 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" 
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
   		<el-form class="l-form1" ref="infoForm" label-width="100px"  inline
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="名称" prop="shortName">
 			    <el-input v-model="dialogInfo.data.shortName" placeholder="请输入公司/门店名称" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="级别" prop="orgLevel">
-			    <el-select v-model="dialogInfo.data.orgLevel" placeholder="请选择公司/分公司/门店" @change="orgLevelChange">
+			    <el-select v-model="dialogInfo.data.orgLevel" placeholder="请选择" @change="orgLevelChange">
 			      <el-option label="公司" :value="1"></el-option>
 			      <el-option label="分公司" :value="2"></el-option>
 			      <el-option label="门店" :value="3"></el-option>
@@ -79,7 +79,7 @@
 			  </el-form-item>
 			  <el-form-item label="上级组织" prop="parentId">
 			  	<el-select v-model="dialogInfo.data.parentId" placeholder="请选择" :disabled="!dialogInfo.isParent">
-			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
+			      <el-option v-for="item in dialogInfo.zuzhiParents" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="联系电话" prop="telePhone">
@@ -90,9 +90,9 @@
 			  	<el-input readonly style="width: 526px;" placeholder="如：广东省广州市海珠区东晓南路548号"
 				  	:value="amapAddress"></el-input>
 			  	<span class="l-margin-lr-s">经度</span>
-			  	<el-input readonly style="width: 109px;" v-model="dialogInfo.data.longitude"></el-input>
+			  	<el-input readonly style="width: 109px;" :value="dialogInfo.data.longitude"></el-input>
 			  	<span class="l-margin-lr-s">纬度</span>
-			  	<el-input readonly style="width: 109px;" v-model="dialogInfo.data.latitude"></el-input>
+			  	<el-input readonly style="width: 109px;" :value="dialogInfo.data.latitude"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="简要介绍" prop="introduce">
 			  	<el-input type="textarea" placeholder="" :maxlength="500" v-model="dialogInfo.data.introduce"></el-input>
@@ -110,7 +110,7 @@
 			  <el-form-item label="开户支行" prop="openingBranch">
 			  	<el-input :maxlength="50" v-model="dialogInfo.data.openingBranch"></el-input>
 			  </el-form-item>
-			  <el-form-item class="_flex" prop="imageUpload">
+			  <el-form-item class="_flex" prop="upload">
 			  	<div slot="label" style="display:inline;">
 			  		显示照片<p style="font-size:12px;" class="l-text-gray">(最多上传9张)</p></div>
 			  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
@@ -128,23 +128,15 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 
 		<!-- 地图选择 -->
 		<amap-selector :visible.sync="amapOpts.visible" :options="amapOpts"></amap-selector>
-
-		<!-- 预览图片 -->
-		<viewer ref="viewer" class="l-viewer" :options="$$config.viewer.options" :images="viewer.images" @inited="viewerInited">
-      <template slot-scope="scope">
-      	<img v-for="{url, src} in scope.images" :key="src" :src="url" :data-source="src" >
-      </template>
-    </viewer>
   </div>
 </template>
 <script>
-import viewer from 'v-viewer/src/component.vue'
 import AmapSelector from 'components/amap-selector'
 import { getValueByText } from 'assets/js/region.data'
 import { mapGetters } from 'vuex'
@@ -152,7 +144,7 @@ import { mapGetters } from 'vuex'
 export default {
 	name: 'base-setting-zuzhi',
 	components: {
-		AmapSelector, viewer
+		AmapSelector
 	},
 	data() {
 		let that = this
@@ -189,11 +181,6 @@ export default {
 		}
 
 		return {
-			viewer: {
-				options: {},
-				visible: true,
-				images: []
-			},
 			amapOpts: {
 				visible: false,
 				province: '',
@@ -236,9 +223,9 @@ export default {
 				upload: {
 					list: [],
 					loading: false,
-					visible: false,
-					previewUrl: ''
+					visible: false
 				},
+				zuzhiParents: [],
 				rules: {
 					shortName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -273,7 +260,7 @@ export default {
 					region: [
 						{ required: true, validator: validateRegion, trigger: 'change' },
 					],
-					imageUpload: [
+					upload: [
 						{ required: true, validator: validateUpload, trigger: 'change' },
 					]
 				},
@@ -316,28 +303,19 @@ export default {
     ])
 	},
 	methods: {
-		orgLevelChange(value) {
-			if(value == 1){
-				this.dialogInfo.data.parentId = ''
-				this.dialogInfo.isParent = false
-			}else{
-				this.dialogInfo.isParent = true
-			}
-		},
-		viewerInited(viewer) {
-			this.$$viewer = viewer
-		},
 		uploadSuccess(response, file, fileList) {
 			this.dialogInfo.upload.loading = false
 			this.dialogInfo.upload.list.push({
 				name: file.name,
-				url: response.data,
-				src: response.data
+				url: this.$$utils.image.thumb(response.data, 150),
+				thumb: this.$$utils.image.thumb(response.data, 150),
+				src: response.data,
+				status: 'success'
 			})
 		},
 		uploadPreview(file) {
-			this.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
-			this.$$viewer.show()
+			this.$$parent.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
+			this.$$parent.$$viewer.show()
 		},
 		uploadRemove(file, fileList) {
 			if(file.status === 'success') {
@@ -362,6 +340,17 @@ export default {
 				message: '最多上传9张照片'
 			})
 		},
+		orgLevelChange(value = 1) {
+			this.dialogInfo.isParent = value === 1 ? false : true
+			this.$$api.zuzhi.getParent(value).then(({data}) => {
+				this.dialogInfo.zuzhiParents = data
+				if(value === this.dialogInfo._orgLevel) {
+					this.dialogInfo.data.parentId = this.dialogInfo._parentId
+				}else{
+					this.dialogInfo.data.parentId = ''
+				}
+			})
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},
@@ -376,7 +365,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.enabling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -394,23 +383,39 @@ export default {
 			this.getList()
 		},
 		showDialogInfo(type = 'new', row) {
-			this.dialogInfo.type = type
 			let promises = [this.$store.dispatch('getZuzhiList')]
+			
+			this.dialogInfo.type = type
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改公司/门店'
-				let zuzhiInfo = this.$$api.zuzhi.getInfo(row.orgId).then(({data}) => {
+				let zuzhiInfoPromise = this.$$api.zuzhi.getInfo(row.orgId)
+				promises.push(zuzhiInfoPromise)
+
+				zuzhiInfoPromise.then(({data}) => {
 					this.$$utils.copyObj(this.amapOpts, data)
 					this.$$utils.copyObj(this.dialogInfo.data, data)
-					this.dialogInfo.upload.list = this.dialogInfo.data.imageUrl ? this.dialogInfo.data.imageUrl.split(',').map(imageUrl => {
-						return {url: this.$$utils.image.thumb(imageUrl, 150), src: imageUrl, name: imageUrl}
+
+					this.dialogInfo._orgLevel = data.orgLevel
+					this.dialogInfo._parentId = data.parentId
+					this.orgLevelChange(data.orgLevel)
+
+					this.dialogInfo.upload.list = this.dialogInfo.data.imageUrl ? 
+					this.dialogInfo.data.imageUrl.split(',').map(img => {
+						return {
+							url: this.$$utils.image.thumb(img, 150), 
+							thumb: this.$$utils.image.thumb(img, 150), 
+							src: img, 
+							name: img, 
+							status: 'success'
+						}
 					}) : []
-					this.viewer.images = this.dialogInfo.upload.list
-					return data
+
+
+					this.$$parent.viewer.images = this.dialogInfo.upload.list
 				})
-				promises.push(zuzhiInfo)
 			} else {
 				this.dialogInfo.title = '新增公司/门店'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 			}
 
 			const loading = this.$loading()
@@ -426,19 +431,23 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
-			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
+			this.resetDialogInfo()
 		},
-		submitInfo() { // 提交组织信息
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.dialogInfo.upload.list = []
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+		},
+		submitDialogInfo() { // 提交组织信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
           this.$$api.zuzhi.add(this.dialogInfo.data).then(_ => {
-            this.closeDialogInfo()
             this.$message({
 							type: 'success',
 							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '公司/门店成功'
 						})
+						this.closeDialogInfo()
             this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
@@ -465,7 +474,7 @@ export default {
 			}
 		},
 		enable(row, status = 1) { // 禁用/启用组织
-			row.enabling = true
+			row.doing = true
 			this.$$api.zuzhi.enable(row.orgId, status).then(_ => {
 				row.status = status
 				this.$message({
@@ -473,12 +482,13 @@ export default {
 					message: status === 1 ? '启用成功' : '禁用成功'
 				})
 			}).finally(_ => {
-				row.enabling = false
+				row.doing = false
 			})
 		}
 	},
 	mounted() {
-		this.$$event.$on('base-setting:tab', activeName => {
+		this.$$event.$on('base-setting:tab', (activeName, that) => {
+			this.$$parent = that
 			if(activeName === 'zuzhi' && this.list.data.length === 0) {
 				this.getList()
 			}

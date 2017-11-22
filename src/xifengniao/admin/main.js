@@ -4,17 +4,15 @@ import { storage, utils } from 'assets/js/utils'
 
 import Vue from 'vue'
 import ElementUI from 'element-ui'
-import NProgress from 'nprogress'
-
 import VueAMap from 'vue-amap'
 
-import router from './router'
 import store from './store'
+import router from './router'
 import api from './api'
 
 import app from './app'
 
-
+// element-ui
 Vue.use(ElementUI)
 
 // 高德地图
@@ -27,6 +25,7 @@ VueAMap.initAMapApiLoader({
 // 事件控制中枢
 const eventHub = new Vue()
 
+// 添加一些组件对象
 Vue.mixin({
   created() {
     this.$$config = config
@@ -50,37 +49,6 @@ Vue.mixin({
     // 组件间事件通信
     this.$$event = eventHub
   }
-})
-
-router.beforeEach((to, from, next) => {
-  NProgress.start()
-  if(api.auth.check()) {
-    if(to.path === '/login') {
-      next({path: '/'})
-    }else {
-      if(!store.getters.userMenus){
-        store.dispatch('getUserMenus')
-        next(to)
-      } else {
-        next()  
-      }
-    }
-  } else if(to.path !== '/login'){
-    store.dispatch('logout').finally(() => {
-      NProgress.done()
-      next(false)
-    })
-  } else {
-    next()
-  }
-})
-
-router.afterEach((to, from) => {
-  NProgress.done()
-})
-
-router.onReady(() => {
-  // store.dispatch('autoLogin')
 })
 
 new Vue({

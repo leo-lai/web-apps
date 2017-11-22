@@ -4,19 +4,19 @@
       <div class="amap-address">
         <el-form size="small" label-position="left" label-width="40px">
           <el-form-item label="省份">
-            <el-input v-model="options.province" readonly></el-input>
+            <el-input v-model="options.province" disabled></el-input>
           </el-form-item>
           <el-form-item label="城市">
-            <el-input v-model="options.city" readonly></el-input>
+            <el-input v-model="options.city" disabled></el-input>
           </el-form-item>
           <el-form-item label="地区">
-            <el-input v-model="options.area" readonly></el-input>
+            <el-input v-model="options.area" disabled></el-input>
           </el-form-item>
           <el-form-item label="经度">
-            <el-input v-model="options.longitude" readonly></el-input>
+            <el-input v-model="options.longitude" disabled></el-input>
           </el-form-item>
           <el-form-item label="纬度">
-            <el-input v-model="options.latitude" readonly></el-input>
+            <el-input v-model="options.latitude" disabled></el-input>
           </el-form-item>
           <el-form-item label="地址">
             <div class="l-flex-h">
@@ -37,7 +37,8 @@
       <div class="amap-view">
         <el-amap-search-box class="amap-search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap vid="amapSeletor" :center="mapCenter" :zoom="15" :plugin="plugin">
-          <el-amap-marker title="拖动此选择地点" :position="marker.position" :events="marker.events" :visible="marker.visible" :draggable="marker.draggable"></el-amap-marker>
+          <el-amap-marker title="拖动此点选择地址" :position="marker.position" :events="marker.events" :visible="marker.visible" :draggable="marker.draggable" ></el-amap-marker>
+          <el-amap-info-window :position="marker.position" content="拖动此点选择地址" :visible="win.visible" :offset="win.offset"></el-amap-info-window>
         </el-amap>  
       </div>
     </div>
@@ -73,12 +74,19 @@ export default {
     return {
       show: false,
       mapCenter: [113.289201, 23.081646],
+      win: {
+        offset: [0, -10],
+        visible: true
+      },
       marker: {
-        icon: 'http://webapi.amap.com/theme/v1.3/markers/b/mark_r.png',
+        icon: '/static/marker.png',
         position: [113.289201, 23.081646],
         events: {
           dragend: (e) => {
             that.getAddress(e.lnglat.lng, e.lnglat.lat)
+          },
+          mouseover: () => {
+            that.win.visible = false
           }
         },
         visible: true,
@@ -160,8 +168,12 @@ export default {
       }
     },
     selected() {
-      this.options.onSelected(this.options)
-      this.closeMap()
+      if(this.options.longitude && this.options.latitude) {
+        this.options.onSelected(this.options)
+        this.closeMap()  
+      }else{
+        this.$message.warning('请搜索地址或拖动地图蓝色标点选择地址')
+      }
     }
   }
 }

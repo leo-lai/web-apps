@@ -67,8 +67,4 @@ const routes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-export const userMenus = [
-  { path: '*', redirect: '/404', hidden: true }
-]
-
 export default routes

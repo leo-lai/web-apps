@@ -48,7 +48,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="100px" style="width: 432px;"
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item class="_flex" label="客户名称" prop="carsName" >
 			    <el-input v-model="dialogInfo.data.carsName" :maxlength="50"></el-input>
 			  </el-form-item>
@@ -67,7 +67,7 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 	</div>
@@ -184,7 +184,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交客户
+		submitDialogInfo() { // 提交客户
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true

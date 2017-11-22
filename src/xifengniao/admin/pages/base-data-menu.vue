@@ -12,7 +12,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="90px" style="width: 432px;"
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="菜单名称" prop="menuName">
 			    <el-input v-model="dialogInfo.data.menuName" :maxlength="50"></el-input>
 			  </el-form-item>
@@ -22,7 +22,7 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
   </div>
@@ -77,7 +77,7 @@ export default {
 				this.$$utils.copyObj(this.dialogInfo.data, data)
 			} else {
 				this.dialogInfo.title = '新增菜单'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 				this.dialogInfo.data.parentId = data ? data.menuId : 0
 			}
 			this.dialogInfo.visible = true
@@ -88,9 +88,13 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
-			this.$refs.infoForm.resetFields()
+			this.resetDialogInfo()
 		},
-		submitInfo() { // 提交菜单信息
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+		},
+		submitDialogInfo() { // 提交菜单信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true

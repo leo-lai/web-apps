@@ -7,7 +7,7 @@
   		<el-col :span="16" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="carsName">
-				    <el-input placeholder="请输入车型名称" v-model="list.filter.carsName"></el-input>
+				    <el-input placeholder="请输入车型名称" auto-complete="on" v-model="list.filter.carsName"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -23,10 +23,10 @@
 	    <el-table-column label="官方指导价" prop="price"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-	        <el-button class="l-text-ok l-margin-r-s" type="text" size="small" @click="showDialogCheshen(scope.row)">图片配置</el-button>
-	        <span v-show="scope.row.deling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
-	        <span v-show="!scope.row.deling">
+	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        	<el-button class="l-text-ok" type="text" size="small" @click="showDialogCheshen(scope.row)">图片配置</el-button>
 	        	<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
 	        </span>
 	      </template>
@@ -47,7 +47,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
   		<el-form class="l-form1" ref="infoForm" label-width="100px" inline
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
   			<el-form-item class="_flex" label="车辆型号" prop="carModel" style="width: 622px;">
 			    <el-cascader style="width: 100%;" @active-item-change="cascaderChange"
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
@@ -68,10 +68,10 @@
 			    <el-input placeholder="如：1.8L" class="l-text-upper" v-model="dialogInfo.data.pl" :maxlength="20"></el-input>
 			  </el-form-item>
 			  <el-form-item label="综合油耗" prop="oilConsumption" >
-			    <el-input placeholder="单位：L/100km" v-model.number="dialogInfo.data.oilConsumption" :maxlength="50"></el-input>
+			    <el-input placeholder="单位：L/100km" v-model="dialogInfo.data.oilConsumption" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="座位数" prop="seat" >
-			    <el-input v-model.number="dialogInfo.data.seat" :maxlength="50"></el-input>
+			    <el-input v-model="dialogInfo.data.seat" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="年款" prop="yearPattern" >
 			  	<el-select v-model="dialogInfo.data.yearPattern" placeholder="请选择">
@@ -82,10 +82,10 @@
 			  	<el-date-picker type="date" value-format="yyyy-MM-dd" :editable="false" v-model="dialogInfo.data.marketDate" :picker-options="dateOptions"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="裸车价" prop="bareCarPrice" >
-			    <el-input v-model.number="dialogInfo.data.bareCarPrice" :maxlength="50"></el-input>
+			    <el-input v-model="dialogInfo.data.bareCarPrice" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="指导价" prop="price" >
-			    <el-input v-model.number="dialogInfo.data.price" :maxlength="50"></el-input>
+			    <el-input v-model="dialogInfo.data.price" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="车辆介绍" prop="introduce" >
 			    <el-input type="textarea" :rows="5" v-model="dialogInfo.data.introduce"></el-input>
@@ -93,7 +93,7 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 
@@ -142,22 +142,11 @@
 			  </span>
 		  </el-dialog>
 		</el-dialog>
-
-		<!-- 预览图片 -->
-		<viewer ref="viewer" class="l-viewer" :options="$$config.viewer.options" :images="viewer.images" @inited="viewerInited">
-      <template slot-scope="scope">
-      	<img v-for="{url, src} in scope.images" :key="src" :src="url" :data-source="src" >
-      </template>
-    </viewer>
 	</div>
 </template>
 <script>
-import viewer from 'v-viewer/src/component.vue'
 export default {
 	name: 'base-data-car',
-	components: {
-    viewer
-  },
 	data() {
 		let that = this
 		let validateCarModel = function(rule, value, callback) {
@@ -183,11 +172,6 @@ export default {
 		}
 		return {
 			yearList: [],
-			viewer: {
-				options: {},
-				visible: true,
-				images: []
-			},
 			dateOptions: {
         disabledDate(time) {
           return time.getTime() > Date.now();
@@ -234,12 +218,10 @@ export default {
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
 					oilConsumption: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
 					seat: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d+$/, message: '请输入正确格式', trigger: 'blur' }
+						{ required: true, pattern: /^\d{1,9}$/, message: '请输入正确数字', trigger: 'blur' }
 					],
 					yearPattern: [
 						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
@@ -248,12 +230,10 @@ export default {
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
 					bareCarPrice: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
 					price: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					]
 				},
 				data: {
@@ -303,20 +283,19 @@ export default {
 		}
 	},
 	methods: {
-		viewerInited(viewer) {
-			this.$$viewer = viewer
-		},
 		uploadSuccess(response, file, fileList) {
 			this.dialogCheshen.upload.loading = false
 			this.dialogCheshen.upload.list.push({
 				name: file.name,
-				url: response.data,
-				src: response.data
+				url: this.$$utils.image.thumb(response.data, 150),
+				thumb: this.$$utils.image.thumb(response.data, 150),
+				src: response.data,
+				status: 'success'
 			})
 		},
 		uploadPreview(file) {
-			this.$$viewer.index = this.dialogCheshen.upload.list.findIndex(item => item.url === file.url) || 0
-			this.$$viewer.show()
+			this.$$parent.$$viewer.index = this.dialogCheshen.upload.list.findIndex(item => item.url === file.url) || 0
+			this.$$parent.$$viewer.show()
 		},
 		uploadRemove(file, fileList) {
 			if(file.status === 'success') {
@@ -342,7 +321,6 @@ export default {
 			})
 		},
 		cascaderChange(valArr) {
-			console.log(valArr)
 			let promise = null
 			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
       if(valArr.length === 1) { // 获取车系(by brandId)
@@ -383,7 +361,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.deling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -406,7 +384,6 @@ export default {
 					item.children = []
 					return item
 				})
-				return data
 			})
 			this.dialogInfo.type = type
 			if(type === 'edit') {
@@ -421,13 +398,11 @@ export default {
 								this.cascaderChange([row.brandId, row.familyId])
 							}		
 						})
-						return data
 					})
 				}
 			} else {
 				this.dialogInfo.title = '新增车型资料'
-				this.cascader.value = []
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 			}
 
 			const loading = this.$loading()
@@ -443,10 +418,14 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
-			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
+			this.resetDialogInfo()
 		},
-		submitInfo() { // 提交车型资料
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.cascader.value = []
+			this.$$utils.copyObj(this.dialogInfo.data, '')
+		},
+		submitDialogInfo() { // 提交车型资料
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -475,7 +454,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(_ => {
-      	row.deling = true
+      	row.doing = true
 				this.$$api.car.del(row.carId).then(_ => {
 					this.$message({
 						type: 'success',
@@ -483,7 +462,7 @@ export default {
 					})
 					this.refreshList()
 				}).finally(_ => {
-					row.deling = false
+					row.doing = false
 				})
       })
 		},
@@ -518,14 +497,20 @@ export default {
 			.then(({data}) => {
 				if(data) {
 					this.dialogCheshen.data.carColourImageId = data.carColourImageId
-					this.dialogCheshen.upload.list = data.imagePath.split(',').map(imageUrl => {
-						return {url: this.$$utils.image.thumb(imageUrl, 150), name: imageUrl, src: imageUrl}
-					})
+					this.dialogCheshen.upload.list = data.imagePath ? data.imagePath.split(',').map(img => {
+						return {
+							url: this.$$utils.image.thumb(img, 150), 
+							thumb: this.$$utils.image.thumb(img, 150), 
+							src: img, 
+							name: img, 
+							status: 'success'
+						}
+					}) : []
 				}else {
 					this.dialogCheshen.data.carColourImageId = ''
 					this.dialogCheshen.upload.list = []
 				}
-				this.viewer.images = this.dialogCheshen.upload.list
+				this.$$parent.viewer.images = this.dialogCheshen.upload.list
 			}).finally(_ => {
 				loading.close()
 				this.dialogCheshen.innerVisible = true
@@ -554,7 +539,8 @@ export default {
 			this.yearList.push(year++)
 		}
 
-		this.$$event.$on('base-data:tab', activeName => {
+		this.$$event.$on('base-data:tab', (activeName, that) => {
+			this.$$parent = that
 			if(activeName === 'car' && this.list.data.length === 0) {
 				this.getList()
 			}

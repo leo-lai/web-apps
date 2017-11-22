@@ -3,7 +3,6 @@ import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
 
-
 // 创建axios实例
 const service = axios.create({
   baseURL: config.api.baseURL,
@@ -102,9 +101,6 @@ const fetch = {
       })
     })
   },
-  get(url, data) {
-    return this.ajax(url, data)
-  },
   post(url, data) {
     return this.ajax(url, data, 'POST')
   }
@@ -128,12 +124,15 @@ const api = {
         } else {
           resolve()
         }
-      }).finally(() => {
+      }).finally(_ => {
         storage.local.remove('sessionId')
         storage.local.remove('usermenus')
         storage.local.remove('userinfo')
         toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
       })
+    },
+    changePwd(formData = {}) {
+      return fetch.post('/changePassword', formData)
     },
     getZuzhiList() {
       return fetch.post('/organizationLevelList')
@@ -147,6 +146,9 @@ const api = {
       formData.page = page
       formData.rows = rows
       return fetch.post('/organizationList', formData)
+    },
+    getParent(orgLevel = 0) {
+      return fetch.post('/organizationLevelListByLevel', { orgLevel })
     },
     getInfo(orgId = '') {
       return fetch.post('/organizationInfo', { orgId })

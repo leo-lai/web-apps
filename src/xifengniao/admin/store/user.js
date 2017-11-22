@@ -1,7 +1,8 @@
 import { storage, utils } from 'assets/js/utils'
-import { userMenus } from '../router/routes'
-import api from '../api'
 import router from '../router'
+import routes from '../router/routes'
+import api from '../api'
+
 
 let _cache = {
 	userMenus: storage.local.get('usermenus')
@@ -36,12 +37,21 @@ const user = {
 		}
 	},
 	actions: {
+		checkLogin() {
+			return new Promise((resolve, reject) => {
+				if(!!storage.local.get('sessionId')) {
+					resolve(storage.local.get('userinfo'))
+				}else{
+					reject()
+				}
+			})
+		},
 		login({ commit }, formData) {
 			return api.auth.login(formData).then(({data}) => {
-				let { roleId, roleName, userName, realName, sessionId } = data
-				_cache.userMenus = data.menus
+				let { roleId, roleName, userName, realName, sessionId, menus } = data
+				_cache.userMenus = menus
 				commit('USER_SESSIONID', sessionId)
-				commit('USER_INFO', { roleId, roleName, userName, realName })
+				commit('USER_INFO', { roleId, roleName, userName, realName, sessionId })
 				return data
 			})
 		},
@@ -49,7 +59,9 @@ const user = {
 			return api.auth.logout(toLogin)
 		},
 		getUserMenus({ commit }) {
-			// router.addRoutes(userMenus)
+			// 筛选出有权限的菜单
+			// routes.forEach()
+			// router.addRoutes(_cache.userMenus)
 			commit('USER_MENUS', _cache.userMenus)
 		},
 		getZuzhiList({ commit }) { // 获取登录账号的组织列表

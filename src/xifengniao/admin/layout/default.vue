@@ -49,7 +49,7 @@
       </el-main>
 	  </el-container>
 		<el-dialog title="修改密码" :visible.sync="pwdForm.visible" width="480px">
-  		<el-form :model="pwdForm.data" :rules="pwdForm.rules" ref="pwdForm" label-width="100px" style="width: 432px;">
+  		<el-form ref="pwdForm" :model="pwdForm.data" :rules="pwdForm.rules" label-width="100px" style="width: 432px;">
 			  <el-form-item label="旧密码" prop="passwordOld">
 			    <el-input type="password" v-model="pwdForm.data.passwordOld" auto-complete="off"></el-input>
 			  </el-form-item>
@@ -58,8 +58,8 @@
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
-				<el-button @click="pwdForm.visible = false">取消</el-button>
-		    <el-button type="primary" :loading="pwdForm.submiting" @click="submitPwdForm">确定修改</el-button>
+				<el-button :disabled="pwdForm.loading" @click="pwdForm.visible = false">取消</el-button>
+		    <el-button type="primary" :loading="pwdForm.loading" @click="submitPwd">确定修改</el-button>
 		  </span>
 		</el-dialog>
 	</div>
@@ -74,7 +74,7 @@ export default {
     return {
     	pwdForm: {
     		visible: false,
-				submiting: false,
+				loading: false,
 				data: {
 					passwordOld: '',
 					password: '',
@@ -133,12 +133,32 @@ export default {
   	},
   	logout() {
   		const loading = this.$loading()
-  		this.$store.dispatch('logout').finally(() => {
+  		this.$store.dispatch('logout').finally(_ => {
   			loading.close()
   		})
   	},
-  	submitPwdForm() {
-
+  	submitPwd() {
+  		let that = this
+  		that.$refs.pwdForm.validate(valid => {
+        if (valid) {
+          that.pwdForm.loading = true
+          that.$$api.auth.changePwd(that.pwdForm.data).then(_ => {
+            that.$message({
+							type: 'success',
+							message: '修改密码成功'
+						})
+						that.$refs.pwdForm.resetFields()
+						that.pwdForm.visible = false
+          }).finally(_ => {
+            that.pwdForm.loading = false
+          })
+        }else {
+        	that.$message({
+						type: 'error',
+						message: '请完善表单信息'
+					})
+        }
+      })
   	}
   },
   mounted() {

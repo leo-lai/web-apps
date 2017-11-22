@@ -14,9 +14,13 @@
 		  	<base-data-supplier></base-data-supplier>
 		  </el-tab-pane>
 		</el-tabs>
+
+		<!-- 预览图片 -->
+		<viewer-images :images="viewer.images"></viewer-images>
 	</div>
 </template>
 <script>
+import viewerImages from 'components/viewer-images'
 import baseDataMenu from './base-data-menu'
 import baseDataCar from './base-data-car'
 import baseDataColor from './base-data-color'
@@ -24,6 +28,7 @@ import baseDataSupplier from './base-data-supplier'
 export default {
 	name: 'base-data',
 	components: {
+		viewerImages,
 		baseDataMenu,
 		baseDataCar,
 		baseDataColor,
@@ -31,13 +36,17 @@ export default {
 	},
 	data() {
 		return {
+			viewer: {
+				images: [],
+				index: 0
+			},
 			tabActive: ''
 		}
 	},
 	methods: {
 		tabClick() {
 			this.$$utils.history.replace('?tab=' + this.tabActive)
-			this.$$event.$emit('base-data:tab', this.tabActive)
+			this.$$event.$emit('base-data:tab', this.tabActive, this)
 		}
 	},
 	mounted() {

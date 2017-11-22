@@ -20,10 +20,12 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="车辆型号" prop="carsName" min-width="200"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="车辆型号" prop="carsName" min-width="200"></el-table-column>
 	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
 	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
 	    <el-table-column label="指导价格" prop="guidingPrice" align="center"></el-table-column>
+	    <el-table-column label="库存数量" prop="number" align="center"></el-table-column>
+	    <el-table-column label="优惠金额" prop="discountPrice" align="center"></el-table-column>
 	    <el-table-column label="门店/公司名称" prop="orgName" align="center"></el-table-column>
 	    <el-table-column label="线上展示" prop="isOnLine" align="center">
 	    	<template slot-scope="scope">
@@ -52,7 +54,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="673px">
   		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item class="_flex" label="车辆型号" style="width: 622px;">
 			    <el-input disabled v-model="dialogInfo.data.carsName"></el-input>
 			  </el-form-item>
@@ -89,7 +91,7 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 	</div>
@@ -229,7 +231,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交库存信息
+		submitDialogInfo() { // 提交库存信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true

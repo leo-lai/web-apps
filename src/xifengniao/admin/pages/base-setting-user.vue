@@ -19,7 +19,7 @@
 				</el-form>
   		</el-col>
   	</el-row>
-  	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
+  	<el-table class="l-table-hdbg" stripe highlight-current-row element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="账号/手机号" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="真实姓名" prop="realName"></el-table-column>
@@ -33,9 +33,9 @@
 	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-	        <span v-show="scope.row.enabling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
-	        <span v-show="!scope.row.enabling">
+	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        	<el-button v-if="scope.row.isEnable === 1" class="l-text-error" type="text" size="small" @click="enableAsk(scope.row, 0)">禁用</el-button>
 	        	<el-button v-else class="l-text-ok" type="text" size="small" @click="enableAsk(scope.row, 1)">启用</el-button>	
 	        </span>
@@ -57,10 +57,11 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
   		<el-form class="l-form1" ref="infoForm" label-width="90px" inline 
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item class="_flex" label="登录账号" prop="phoneNumber" >
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
+			  <el-form-item label="登录账号" prop="phoneNumber" >
 			    <el-input v-model="dialogInfo.data.phoneNumber" placeholder="请输入手机号码" :maxlength="11"></el-input>
 			  </el-form-item>
+			  <el-form-item></el-form-item>
 			  <el-form-item label="所属组织" prop="orgId">
 			    <el-select v-model="dialogInfo.data.orgId" placeholder="请选择">
 			      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
@@ -90,12 +91,12 @@
 			  	<el-date-picker type="date" value-format="yyyy-MM-dd" :editable="false" v-model="dialogInfo.data.entryTime"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="基本工资" prop="basePay">
-			  	<el-input v-model.number="dialogInfo.data.basePay" :maxlength="10"></el-input>
+			  	<el-input v-model="dialogInfo.data.basePay" :maxlength="10"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 	</div>
@@ -169,7 +170,7 @@ export default {
 					birthday: [],
 					entryTime: [],
 					basePay: [
-						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					]
 				},
 				data: {
@@ -208,7 +209,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.enabling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -232,7 +233,7 @@ export default {
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
 				this.dialogInfo.title = '新增系统用户'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 			}
 
 			const loading = this.$loading()
@@ -251,9 +252,13 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.resetDialogInfo()
+		},
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
-		submitInfo() { // 提交用户信息
+		submitDialogInfo() { // 提交用户信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -289,7 +294,7 @@ export default {
 			}
 		},
 		enable(row, status = 1) { // 禁用/启用用户
-			row.enabling = true
+			row.doing = true
 			this.$$api.user.enable(row.userId, status).then(_ => {
 				row.isEnable = status
 				this.$message({
@@ -297,7 +302,7 @@ export default {
 					message: status === 1 ? '该用户启用成功' : '该用户禁用成功'
 				})
 			}).finally(_ => {
-				row.enabling = false
+				row.doing = false
 			})
 		}
 	},

@@ -53,7 +53,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
   		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
   			<div class="l-flex-hc">
 				  <el-form-item class="_flex" label="车辆型号" prop="carsId" style="width: 622px;">
 				    <el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderItemChange" @change="cascaderChange"
@@ -103,7 +103,7 @@
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
 	</div>
@@ -176,7 +176,6 @@ export default {
 			},
 			list: {
 				filter: {
-					storageId: '',
 					carsId: '',
 					interiorId: '',
 					colourId: ''
@@ -326,8 +325,9 @@ export default {
 			this.getList(page)
 		},
 		getList(page = 1, rows) {
+			if(!this.list.filter.storageId) return
 			this.list.loading = true
-			let promise = this.$$api.stock.getInCarList(this.list.filter, page, rows)
+			this.$$api.stock.getInCarList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -336,13 +336,9 @@ export default {
         	item.doing = false
         	return item
         })
-			})
-
-			promise.finally(_ => {
+			}).finally(_ => {
 				this.list.loading = false
 			})
-
-			return promise
 		},
 		refreshList() {
 			this.getList(this.list.page)
@@ -414,7 +410,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交车辆信息
+		submitDialogInfo() { // 提交车辆信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -459,11 +455,10 @@ export default {
 		this.$$event.$on('stock:car-list', row => {
 			this.list.filter.storageId = row.storageId
 			this.dialogList.info = row
-			this.getList().then(_ => {
-				this.dialogList.visible = true
-			})
+			this.dialogList.visible = true
+			this.getList()
 		})
-
+		
 		this.$$event.$on('stock:car-add', row => {
 			this.showDialogInfo('new', row)
 		})

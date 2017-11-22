@@ -189,7 +189,7 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()
 		},
-		submitInfo() { // 提交客户
+		submitDialogInfo() { // 提交客户
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true

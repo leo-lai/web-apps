@@ -127,6 +127,14 @@ import CountTo from 'vue-count-to'
 export default {
 	components: { CountTo },
 	name: 'index',
+	data() {
+		return {
+
+		}
+	},
+	mounted() {
+		
+	}
 }
 </script>
 <style scoped lang="less">
