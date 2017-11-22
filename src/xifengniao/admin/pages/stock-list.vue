@@ -63,7 +63,7 @@
 			  	<el-input v-model.number="dialogInfo.data.invoicePrice" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item label="定金/辆" >
-			  	<el-input v-model.number="dialogInfo.data.depositPrice" :maxlength="10"></el-input>
+			  	<el-input disabled value="3000"></el-input>
 			  </el-form-item>
 			  <el-form-item label="优惠" >
 			  	<el-input v-model.number="dialogInfo.data.discountPrice" :maxlength="10"></el-input>
@@ -74,12 +74,12 @@
             <i style="vertical-align: middle;" class="el-icon-question"></i>
           </el-tooltip>
 			  </el-form-item>
-			  <el-table class="l-table-hdbg" stripe :data="dialogInfo.data.list">
+			  <el-table class="l-table-hdbg" stripe :data="dialogInfo.list">
 			    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
 			    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
 			    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
 			    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
-			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
+			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs" min-width="120"></el-table-column>
 			    <el-table-column label="操作">
 			    	<template slot-scope="scope">
 			        <el-button class="l-text-link" type="text" size="small">查看验车照片</el-button>
@@ -148,10 +148,6 @@ export default {
 				visible: false,
 				loading: false,
 				rules: {
-					depositPrice: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
-					],
 					discountPrice: [
 						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
 						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
@@ -162,14 +158,16 @@ export default {
 					]
 				},
 				data: {
-					stockCarId: '',
+					carsId: '',
+					colourId: '',
+					interiorId: '',
 					carsName: '',
 					guidingPrice: '',
 					isOnLine: true,
-					depositPrice: '',
 					discountPrice: '',
 					invoicePrice: ''
-				}
+				},
+				list: []
 			}
 		}
 	},
@@ -213,9 +211,10 @@ export default {
 		showDialogInfo(type = 'edit', row) { // 查看/编辑库存详情
 			this.dialogInfo.type = type
 			let { carsId, colourId, interiorId } = row
+			this.$$utils.copyObj(this.dialogInfo.data, row)
 			const loading = this.$loading()
 			this.$$api.stock.getInfo({ carsId, colourId, interiorId }).then(({data}) => {
-				this.$$utils.copyObj(this.dialogInfo.data, data)
+				this.dialogInfo.list = data
 				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
@@ -234,7 +233,7 @@ export default {
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.supplier.add(this.dialogInfo.data).then(_ => {
+          this.$$api.stock.editInfo(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',

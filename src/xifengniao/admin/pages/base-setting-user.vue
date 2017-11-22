@@ -10,7 +10,7 @@
 				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
 				  <el-form-item prop="realName">
-				    <el-input placeholder="请输入供应商名称" v-model="list.filter.realName"></el-input>
+				    <el-input placeholder="请输入姓名" v-model="list.filter.realName"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -76,8 +76,8 @@
 			  </el-form-item>
 			  <el-form-item label="性别" prop="agentGender">
 			  	<el-radio-group v-model="dialogInfo.data.agentGender">
-			      <el-radio label="1">男</el-radio>
-    				<el-radio label="2">女</el-radio>
+			      <el-radio :label="1">男</el-radio>
+    				<el-radio :label="2">女</el-radio>
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item label="出生日期" prop="birthday">
@@ -169,8 +169,7 @@ export default {
 					birthday: [],
 					entryTime: [],
 					basePay: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					]
 				},
 				data: {
@@ -179,6 +178,7 @@ export default {
 					orgId: '',
 					roleId: '',
 					realName: '',
+					cardNo: '',
 					agentGender: '',
 					birthday: '',
 					entryTime: '',
@@ -252,7 +252,6 @@ export default {
 				this.dialogInfo.visible = false	
 			}
 			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
 		},
 		submitInfo() { // 提交用户信息
 			this.$refs.infoForm.validate(valid => {
