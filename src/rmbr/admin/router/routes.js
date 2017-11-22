@@ -46,7 +46,7 @@ export let userMenus = [
       { 
         path: '', 
         meta: { title: '' },
-        component: resolve => require(['../pages/index'], resolve),
+        component: resolve => require(['../pages/device'], resolve),
       }
     ],
   },

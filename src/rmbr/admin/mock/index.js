@@ -1,69 +1,26 @@
-import config from '../config'
-import axios from 'axios'
+import createService from '../api/axios'
 import MockAdapter from 'axios-mock-adapter'
-import { storage, utils } from 'assets/js/utils'
-import { Message } from 'element-ui'
+import { utils } from 'assets/js/utils'
 
 // 模拟接口列表
 import UserApi from './user'
+import DeviceApi from './device'
 
-let apis = {...UserApi}
+let apis = {...UserApi, ...DeviceApi}
 
 // 创建axios实例
-export const service = axios.create({
-  baseURL: config.api.baseURL,
-  timeout: 60000
-})
-
-// request拦截器
-service.interceptors.request.use(config => {
-  // Do something before request is sent
-  let userinfo = storage.local.get('userinfo')
-  config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-  config.headers['token'] = userinfo && userinfo.token ? userinfo.token : ''
-  config.headers['uid'] = userinfo && userinfo.id ? userinfo.id : ''
-  config.transformRequest = [function(data) {
-    let ret = []
-    for (let key in data) {
-      ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-    }
-    return ret.join('&')
-  }]
-  return config
-}, error => {
-  return Promise.reject(error)
-})
-
-// respone拦截器
-service.interceptors.response.use(response => {
-  let data = response.data
-  switch(data.code) {
-    case 200:
-      return data
-  }
-  return Promise.reject(data)
-}, error => {
-  return Promise.reject(error)
-})
+export const service = createService()
 
 export const mockFetch = {
   ajax(url = '', data = {}, method = 'GET', contentType = 'form') {
     return new Promise((resolve, reject) => {
-      // let userinfo = storage.local.get('userinfo')
-      // data.uid = userinfo && userinfo.id ? userinfo.id : ''
       service({
         url, method, data
       }).then(resolve).catch(error => {
-        error && error.message && Message({
-          type: 'error',
-          message: error.message
-        })
+        error && console.log(error.message)
         reject(error)
       })
     })
-  },
-  get(url, data) {
-    return this.ajax(url, data)
   },
   post(url, data) {
     return this.ajax(url, data, 'POST')
@@ -91,9 +48,11 @@ export default {
       mock.onPost(key).reply(config => {
         config.params = utils.url.getArgs(config.baseURL + config.url + '?' + config.data)
         return new Promise((resolve, reject) => {
+          let returnData = apis[key](config)
+          console.log(returnData)
           resolve([200, {
             code: 200,
-            data: apis[key](config),
+            data: returnData,
             msg: '请求成功'
           }])
         })

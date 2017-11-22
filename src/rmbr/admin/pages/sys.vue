@@ -2,7 +2,7 @@
 	<div class="l-main-body">
 		<el-row class="l-margin-b">
   		<el-col :span="8">
-  			<el-button type="primary" @click="showDialogInfo('new')">新增用户</el-button>
+  			<el-button type="primary" @click="showDialogInfo('new')">新增角色</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
   			
@@ -10,15 +10,18 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="姓名" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="账号" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="密码" prop="intentionCarInfo"></el-table-column>
-	    <el-table-column label="所属地区" prop="systemUserName"></el-table-column>
-	    <el-table-column label="权限集" prop="orderState"></el-table-column>
+	    <el-table-column label="姓名" prop="name"></el-table-column>
+	    <el-table-column label="账号" prop="username"></el-table-column>
+	    <el-table-column label="密码" prop="password"></el-table-column>
+	    <el-table-column label="所属地区" prop="region" min-width="120"></el-table-column>
+	    <el-table-column label="权限集" prop="operations" min-width="140" :formatter="formatOperations"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">编辑</el-button>
-	        <el-button class="l-text-error" type="text" size="small">删除</el-button>
+	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit')">编辑</el-button>
+	        	<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
+	        </span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -38,20 +41,24 @@
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="70px" style="width: 432px;"
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item label="姓名" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  <el-form-item label="姓名" prop="name">
+			    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>
 			  </el-form-item>
-			  <el-form-item label="账号" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  <el-form-item label="账号" prop="username">
+			    <el-input v-model="dialogInfo.data.username" :maxlength="50"></el-input>
 			  </el-form-item>
-			  <el-form-item label="密码" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  <el-form-item label="密码" prop="password">
+			    <el-input v-model="dialogInfo.data.password" :maxlength="50"></el-input>
 			  </el-form-item>
-			  <el-form-item label="地区" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  <el-form-item label="地区" prop="region">
+			  	<el-cascader style="width:100%;" change-on-select v-model="dialogInfo.region" :options="regionData" :props="{label: 'text', value: 'value'}"></el-cascader>
 			  </el-form-item>
-			  <el-form-item label="权限" prop="roleName">
-			    <el-input v-model="dialogInfo.data.roleName" :maxlength="50"></el-input>
+			  <el-form-item label="权限" prop="permission">
+			    <el-checkbox-group class="l-permission" v-model="dialogInfo.permission.value">
+				    <el-checkbox v-for="item in dialogInfo.permission.data" :label="item.id" :key="item.id">
+				    	{{item.name}}
+				   	</el-checkbox>
+				  </el-checkbox-group>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -62,9 +69,31 @@
 	</div>
 </template>
 <script>
+import regionData from 'assets/js/region.data'
 export default {
 	data() {
+		let that = this
+		let validateRegion = function(rule, value, callback) {
+      if (that.dialogInfo.region.length === 0) {
+        callback(new Error('请选择地区'))
+      }else{
+      	that.dialogInfo.data.region_id1 = that.dialogInfo.region[0] || ''
+      	that.dialogInfo.data.region_id2 = that.dialogInfo.region[1] || ''
+      	that.dialogInfo.data.region_id3 = that.dialogInfo.region[2] || ''
+        callback()
+      }
+		}
+
+		let validatePermission = function(rule, value, callback) {
+      if (that.dialogInfo.permission.value.length === 0) {
+        callback(new Error('请选择权限'))
+      }else{
+      	that.dialogInfo.data.operation_ids = that.dialogInfo.permission.value.join(',')
+        callback()
+      }
+		}
 		return {
+			regionData,
 			list: {
 				filter: {
 				},
@@ -78,23 +107,52 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增用户',
+				title: '新增角色',
 				visible: false,
 				loading: false,
+				permission: {
+					value: [],
+					data: []					
+				},
+				region: [],
 				rules: {
-					roleName: [
+					name: [
 						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					username: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					password: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					],
+					region: [
+						{ required: true, validator: validateRegion, trigger: 'change' }
+					],
+					permission: [
+						{ required: true, validator: validatePermission, trigger: 'change' }
 					]
 				},
 				data: {
-					roleId: '',
-					roleName: '',
-					remark: ''
+					username: '',
+					password: '',
+					name: '',
+					region_id1: '',
+					region_id2: '',
+					region_id3: '',
+					operation_ids: ''
 				}
 			}
 		}
 	},
 	methods: {
+		formatOperations(row, column, cellValue) {
+			if(cellValue && cellValue.length > 0) {
+				return cellValue.map(item => item.operation_name).join('，')
+			}else {
+				return ''
+			}
+
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},
@@ -106,10 +164,11 @@ export default {
 			this.$$api.sys.getList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.count
-        this.list.page = data.page_number
-        this.list.rows = data.per_page
+        this.list.page = Number(data.page_number) + 1
+        console.log(this.list.page)
+        this.list.rows = Number(data.per_page)
         this.list.data = data.list.map(item => {
-        	item.dong = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -129,13 +188,21 @@ export default {
 		showDialogInfo(type = 'new', row) { // 新增/修改角色弹出信息
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改用户'
+				this.dialogInfo.title = '修改角色'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
-				this.dialogInfo.title = '新增用户'
+				this.dialogInfo.title = '新增角色'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
-			this.dialogInfo.visible = true	
+
+			const loading = this.$loading()
+			this.$$api.sys.getPermission().then(({data}) => {
+				this.dialogInfo.permission.data = data
+				this.dialogInfo.visible = true		
+			}).finally(_ => {
+				loading.close()
+			})
+			
 		},
 		closeDialogInfo(done) {
 			if(done) {
@@ -144,23 +211,43 @@ export default {
 				this.dialogInfo.visible = false	
 			}
 			this.$$utils.copyObj(this.dialogInfo.data, '')
+			this.dialogInfo.region = []
+			this.dialogInfo.permission.value = []
 			this.$refs.infoForm.resetFields()	
 		},
 		submitInfo() { // 提交角色信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.role.add(this.dialogInfo.data).then(_ => {
+          this.$$api.sys.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '用户信息成功'
+							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '角色成功'
 						})
             this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
         }
+      })
+		},
+		deleteInfo(row) { // 删除
+			this.$confirm('是否确定删除该角色?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+      	row.doing = true
+				this.$$api.sys.del(row.uid).then(_ => {
+					this.$message({
+						type: 'success',
+						message: '删除角色成功'
+					})
+					this.refreshList()
+				}).finally(_ => {
+					row.doing = false
+				})
       })
 		}
 	},
@@ -169,3 +256,8 @@ export default {
 	}
 }
 </script>
+<style scoped lang="less">
+.l-permission{
+	.el-checkbox{margin:0 10px 0 0;}
+}
+</style>

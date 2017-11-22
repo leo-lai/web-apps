@@ -15,7 +15,7 @@ for (let i = 0; i < 35; i++) {
 }
 
 let _apis = {
-  '/user/list': config => {
+  '/device/list': config => {
     let { per_page, page_number } = config.params
 
     per_page = Number(per_page)
@@ -39,7 +39,7 @@ let _apis = {
       list: returnList
     }
   },
-  '/user/add': config => {
+  '/device/add': config => {
     
   }
 }

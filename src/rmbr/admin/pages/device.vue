@@ -2,17 +2,20 @@
 	<div class="l-main-body">
 		<el-row class="l-margin-b">
   		<el-col :span="4">
-  			<el-button type="primary" @click="showDialogInfo('new')">录入商户</el-button>
+  			<el-button type="primary" @click="showDialogInfo('new')">生成设备</el-button>
   		</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
-  				<el-form-item prop="name" lalel="">
+  				<el-form-item style="width: 140px;" prop="deviceNo" lalel="">
+				    <el-input placeholder="设备编号" v-model="list.filter.deviceNo"></el-input>
+				  </el-form-item>
+  				<el-form-item style="width: 140px;" prop="name" lalel="">
 				    <el-input placeholder="商家姓名" v-model="list.filter.name"></el-input>
 				  </el-form-item>
-				  <el-form-item prop="tel" lalel="">
+				  <el-form-item style="width: 140px;" prop="tel" lalel="">
 				    <el-input placeholder="手机号码" v-model="list.filter.tel"></el-input>
 				  </el-form-item>
-				  <el-form-item prop="brandId" label="">
+				  <el-form-item style="width: 140px;" prop="brandId" label="">
 				  	<el-select v-model="list.filter.guanlian" placeholder="是否有设备" @change="search()">
 				      <el-option label="是" :value="1"></el-option>
 				      <el-option label="否" :value="0"></el-option>
@@ -27,17 +30,13 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="商户姓名" prop="nickname"></el-table-column>
-	    <el-table-column label="状态" prop="status" align="center">
-	    	<template slot-scope="scope">
-	    		<el-switch v-model="scope.row.status" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用"></el-switch>
-	      </template>
-	    </el-table-column>
-	    <el-table-column label="拥有设备" prop="" align="center"></el-table-column>
-	    <el-table-column label="手机号码" prop="tel" align="center"></el-table-column>
+	    <el-table-column label="设备编号" prop="nickname"></el-table-column>
+	    <el-table-column label="属于商户" prop="" align="center"></el-table-column>
+	    <el-table-column label="设备启动次数" prop="tel" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	    		<el-button class="l-text-link" type="text" size="small">解除关联</el-button>
+	    		<el-button class="l-text-error" type="text" size="small">删除</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
