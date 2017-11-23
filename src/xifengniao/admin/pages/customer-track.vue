@@ -1,10 +1,7 @@
 <template>
 	<div>
 		<el-row>
-			<el-col :span="6">
-				<el-button type="primary" @click="showDialogAdd">新增客户</el-button>
-			</el-col>
-  		<el-col :span="18" class="l-text-right">
+  		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
   				<el-form-item>
   					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
@@ -46,49 +43,6 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 新增客户 -->
-		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogAdd"
-			:title="dialogAdd.title" :visible.sync="dialogAdd.visible" width="653px">
-  		<el-form ref="addForm" inline class="l-form1" label-width="90px" 
-  			:model="dialogAdd.data" :rules="dialogAdd.rules" @keyup.enter.native="submitAdd">
-			  <el-form-item label="客户姓名" prop="customerUsersName" >
-			    <el-input v-model="dialogAdd.data.customerUsersName" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="客户电话" prop="phoneNumber" >
-			    <el-input v-model="dialogAdd.data.phoneNumber" :maxlength="11"></el-input>
-			  </el-form-item>
-			  <el-form-item label="购车意向" prop="carPurchaseIntention" >
-			  	<el-select v-model="dialogAdd.data.carPurchaseIntention" placeholder="请选择">
-				    <el-option label="随车" :value="1"></el-option>
-				    <el-option label="3天内" :value="2"></el-option>
-				    <el-option label="7天内" :value="3"></el-option>
-				  </el-select>
-			  </el-form-item>
-			  <el-form-item label="购车方式" prop="expectWayId" >
-			  	<el-select v-model="dialogAdd.data.expectWayId" placeholder="请选择">
-				    <el-option label="全款" :value="1"></el-option>
-				    <el-option label="分期" :value="2"></el-option>
-				  </el-select>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="意向车辆" prop="intentionCarId" >
-			  	<el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderChange"
-			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="备注" prop="remark">
-			  	<el-input type="textarea" v-model="dialogAdd.data.remark" :maxlength="500"></el-input>
-			  </el-form-item>
-			  <el-form-item label="销售顾问" prop="systemUserId" >
-			  	<el-select filterable v-model="dialogAdd.data.systemUserId" placeholder="请选择">
-				    <el-option v-for="user in dialogAdd.salesList" :key="user.systemUserId" :label="user.systemUserName" :value="user.systemUserId"></el-option>
-				  </el-select>
-			  </el-form-item>
-			</el-form>
-			<span slot="footer" class="l-margin-r-m">
-				<el-button @click="closeDialogAdd()">取消</el-button>
-		    <el-button type="primary" :loading="dialogAdd.loading" @click="submitAdd">确定提交</el-button>
-		  </span>
-		</el-dialog>
-
 		<!-- 查看信息 -->
 		<el-dialog class="l-customer-view" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogInfo.visible">
   		<div class="l-flex-h">
@@ -109,25 +63,7 @@ import { mapGetters } from 'vuex'
 export default {
 	name: 'customer-track',
 	data() {
-		let that = this
-		let validateCarModel = function(rule, value, callback) {
-			if (that.cascader.value.length === 0){
-        callback(new Error('必填项'))
-      }else{
-      	that.dialogAdd.data.intentionCarId = that.cascader.value[2] || ''
-        callback()
-      }
-		}
 		return {
-			cascader: {
-				value: [],
-				data: [],
-        props: {
-        	label: 'name',
-          value: 'id',
-          children: 'children'
-        }
-			},
 			list: {
 				filter: {
 					phoneNumber: '',
@@ -142,42 +78,6 @@ export default {
 				rows: 100,
 				total: 0,
 				data: []
-			},
-			dialogAdd: {
-				title: '新增客户',
-				visible: false,
-				loading: false,
-				salesList: [],
-				rules: {
-					customerUsersName: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					phoneNumber: [
-						{ required: true, message: '必填项', trigger: 'blur' },
-						{ pattern: /^1\d{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }
-					],
-					carPurchaseIntention: [
-						{ required: true, type:'number', message: '必填项', trigger: 'change' }
-					],
-					intentionCarId: [
-						{ required: true, validator: validateCarModel, trigger: 'change' }
-					],
-					expectWayId: [
-						{ required: true, type:'number', message: '必填项', trigger: 'change' }
-					],
-					systemUserId: [
-						{ required: true, type:'number', message: '必填项', trigger: 'change' }
-					]
-				},
-				data: {
-					customerUsersName: '',
-					phoneNumber: '',
-					carPurchaseIntention: '',
-					intentionCarId: '',
-					expectWayId: '',
-					remarks: '',
-					systemUserId: ''
-				}
 			},
 			dialogInfo: {
 				visible: false
@@ -221,93 +121,11 @@ export default {
 		clear() {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
-		},
-		cascaderChange(valArr) { // 意向车型
-			let promise = null
-			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
-      if(valArr.length === 1) { // 获取车系(by brandId)
-      	if(currentBrand && currentBrand.children && currentBrand.children.length === 0) {
-	      	promise = this.$$api.car.getFamilyList(valArr[0]).then(({data}) => {
-	      		let familyList = data.map(family => {
-	      			family.children = []
-	      			return family
-	      		})
-	      		currentBrand.children = familyList
-	      		return data
-	      	})	
-      	}
-      }else if(valArr.length === 2) { // 获取车大类
-      	let currentFamily = currentBrand.children.filter(family => family.id === valArr[1])[0]
-      	if(currentFamily && currentFamily.children && currentFamily.children.length === 0) {
-	      	promise = this.$$api.car.getCarsList(valArr[1]).then(({data}) => {
-	      		currentFamily.children = data
-	      		return data
-	      	})	
-      	}
-      }else {
-      	promise = Promise.resolve()
-      }
-      return promise
-		},
-		showDialogAdd() { // 新增客户
-			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
-				this.cascader.data = data.map(item => {
-					item.children = []
-					return item
-				})
-				return data
-			})
-
-			let salesPromise = this.$$api.user.getSalesList().then(({data}) => {
-				this.dialogAdd.salesList = data
-				return data
-			})
-
-			const loading = this.$loading()
-			Promise.all([brandPromise, salesPromise]).then(dataArr =>　{
-				this.dialogAdd.data.systemUserId = this.userInfo.userId
-				this.dialogAdd.visible = true
-			}).finally(_ => {
-				loading.close()
-			})
-		},
-		closeDialogAdd(done) {
-			if(done) {
-				done()
-			}else{
-				this.dialogAdd.visible = false	
-			}
-			this.$$utils.copyObj(this.dialogAdd.data, '')
-			this.$refs.addForm.resetFields()
-		},
-		showDialogInfo() {
-			this.dialogInfo.visible = true
-		},
-		submitAdd() { // 提交客户
-			this.$refs.addForm.validate(valid => {
-        if (valid) {
-          this.dialogAdd.loading = true
-          this.$$api.customer.add(this.dialogAdd.data).then(_ => {
-            this.closeDialogAdd()
-            this.$message({
-							type: 'success',
-							message: '新增客户成功'
-						})
-            this.refreshList()
-          }).finally(()=>{
-            this.dialogAdd.loading = false
-          })  
-        }else {
-        	this.$message({
-						type: 'error',
-						message: '请完善表单信息'
-					})
-        }
-      })
 		}
 	},
 	mounted() {
-		this.$$event.$on('customer:tab', activeName => {
+		this.$$event.$on('customer:tab', (activeName, that) => {
+			this.$$parent = that
 			if(activeName === 'track' && this.list.data.length === 0) {
 				this.getList()
 				this.$store.dispatch('getZuzhiList')

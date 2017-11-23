@@ -349,6 +349,11 @@ const api = {
     signOrder(stockOrderId = '') {
       return fetch.post('/stockOrderSign', { stockOrderId })
     }
+  },
+  pay: { // 通联支付
+    orderPay(formData = {}) {
+      return fetch.post('/stockOrderPay', formData)
+    }
   }
 }
 

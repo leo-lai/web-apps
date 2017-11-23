@@ -103,7 +103,7 @@
 		</el-dialog>
 
 		<!-- 查看订车单 -->
-		<el-dialog class="l-padding-t-0" title="查看订车单" :visible.sync="viewInfo.visible">
+		<el-dialog class="l-padding-t-0" title="查看订车单" :visible.sync="viewInfo.visible" width="995px">
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
@@ -142,7 +142,6 @@
 			    </el-table-column>
 			  </el-table>
 		  </template>
-
 		  <div class="l-block-tit">资源出库明细</div>
 		  <table class="l-table-info">
   			<tr>
@@ -172,7 +171,7 @@
 		</el-dialog>
 
 		<!-- 支付订车单 -->
-		<el-dialog class="l-padding-t-0" title="支付定金" :visible.sync="payInfo.visible">
+		<el-dialog class="l-padding-t-0" title="支付定金" :visible.sync="payInfo.visible" width="995px">
   		<table class="l-table-info">
   			<tr>
   				<td class="_tit">车型</td>
@@ -201,8 +200,9 @@
   			<tr>
   				<td class="_tit">支付方式</td>
   				<td colspan="5" class="_cont">
-  					<el-radio-group v-model="payInfo.payway">
+  					<el-radio-group v-model="payInfo.payWay">
 					    <el-radio :label="1" border>银联支付</el-radio>
+					    <el-radio :label="2" border>POS机</el-radio>
 					  </el-radio-group>
   				</td>
   			</tr>
@@ -211,19 +211,28 @@
   		<div class="l-text-center l-margin-t">
 				<b class="l-fs-s l-margin-r">需要支付定金：￥3000</b>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<el-button type="primary">立即支付</el-button>
+				<el-button type="primary" @click="payNow">立即支付</el-button>
+  		</div>
+  		<div>
+	  		<form ref="payForm" target="_blank" method='post' :action="$$config.pay.url">
+	  			<table>
+	  				<tr v-for="(value, name) in payInfo.formData">
+	  					<td>{{name}}</td>
+	  					<td><input  type="text" :name="name" :value="value">	</td>
+	  				</tr>
+	  				<tr>
+	  					<td></td>
+	  					<td><input type="submit" value="提交支付"></td>
+	  				</tr>
+	  			</table>
+	  		</form>	
   		</div>
 		</el-dialog>
 	</div>
 </template>
 <script>
-import viewer from 'v-viewer/src/component.vue'
-
 export default {
 	name: 'stock-order',
-	components: {
-    viewer
-  },
 	data() {
 		let that = this
 		let validateCarModel = function(rule, value, callback) {
@@ -235,11 +244,6 @@ export default {
       }
 		}
 		return {
-			viewer: {
-				options: {},
-				visible: true,
-				images: []
-			},
 			cascader: {
 				value: [],
 				data: [],
@@ -339,17 +343,15 @@ export default {
 			},
 			payInfo: {
 				visible: false,
-				payway: 1,
-				data: {}
+				payWay: 1,
+				data: {},
+				formData: {}
 			}
 		}
 	},
 	methods: {
 		formatterState(row, column, cellValue) {
 			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
-		},
-		viewerInited(viewer) {
-			this.$$viewer = viewer
 		},
 		cascaderItemChange(valArr) {
 			let promise = Promise.resolve()
@@ -433,8 +435,7 @@ export default {
 			this.dialogInfo.type = type
 			if(type === 'new') {
 				this.dialogInfo.title = '新增订车单'
-				this.cascader.value = []
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 			}
 
 			const loading = this.$loading()
@@ -450,8 +451,12 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.resetDialogInfo()
+		},
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.cascader.value = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
 		},
 		submitDialogInfo() { // 提交订车单
 			this.$refs.infoForm.validate(valid => {
@@ -525,6 +530,21 @@ export default {
 			this.$$api.stock.getOrderInfo(row.stockOrderId).then(({data}) => {
 				this.payInfo.data = data
 				this.payInfo.visible = true
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		payNow() { // 立即支付
+			const loading = this.$loading()
+			this.$$api.pay.orderPay({
+				payWay: this.payInfo.payWay,
+				stockOrderId: this.payInfo.data.stockOrderId,
+				pickupUrl: location.href
+			}).then(({data}) => {
+				this.payInfo.formData = data
+				// setTimeout(_ => {
+				// 	this.$refs.payForm.submit()	
+				// }, 50)
 			}).finally(_ => {
 				loading.close()
 			})
