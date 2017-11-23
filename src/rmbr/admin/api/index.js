@@ -60,21 +60,7 @@ const api = {
       })
     }
   },
-  business: {
-    getList(formData = {}, page = 1, row = 20) {
-      formData.per_page = row
-      formData.page_number = page - 1      
-      return fetch.post('/seller/list', formData)
-    },
-    add(formData = {}) {
-      if(!formData.seller_id) {
-        return fetch.post('/seller/add', formData)  
-      }else {
-        return fetch.post('/seller/update', formData)
-      }
-    }
-  },
-  sys: {
+  sys: { // 系统管理
     getList(formData = {}, page = 1, row = 20) {
       formData.per_page = row
       formData.page_number = page - 1      
@@ -88,6 +74,27 @@ const api = {
     },
     getPermission() {
       return fetch.post('/permission/list')
+    }
+  },
+  business: { // 商户管理
+    getList(formData = {}, page = 1, row = 20) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/seller/list', formData)
+    },
+    add(formData = {}) {
+      if(!formData.seller_id) {
+        return fetch.post('/seller/add', formData)  
+      }else {
+        return fetch.post('/seller/update', formData)
+      }
+    }
+  },
+  device: { // 设备管理
+    getList(formData = {}, page = 1, row = 20) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return mockFetch.post('/device/list', formData)
     }
   }
 }

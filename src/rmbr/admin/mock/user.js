@@ -4,13 +4,13 @@ export let _list = []
 
 for (let i = 0; i < 35; i++) {
   _list.push(Mock.mock({
-    id: Mock.Random.id(),
+    id: Mock.Random.increment(),
     name: Mock.Random.cname(),
     username: Mock.Random.name(),
     password: Mock.Random.first(),
     region: Mock.mock('@county(true)'),
     // region: Mock.Random.region(),
-    power: '设备管理,财务管理',
+    power: Mock.Random.pick(['设备管理', '财务管理']),
   }))
 }
 

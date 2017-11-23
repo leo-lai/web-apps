@@ -1,3 +1,4 @@
+import config from '../config'
 import axios from 'axios'
 import { Message } from 'element-ui'
 import { storage, utils } from 'assets/js/utils'
@@ -5,7 +6,7 @@ import api from './index'
 
 export default function createService() {
   const service = axios.create({
-    baseURL: api.baseURL,
+    baseURL: config.api.baseURL,
     timeout: 60000
   })
 

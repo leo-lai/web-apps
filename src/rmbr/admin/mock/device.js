@@ -2,15 +2,12 @@ import Mock from 'mockjs'
 
 export let _list = []
 
-for (let i = 0; i < 35; i++) {
+for (let i = 0; i < 10; i++) {
   _list.push(Mock.mock({
-    id: Mock.Random.id(),
+    id: Mock.Random.increment(),
+    deviceNo: Mock.Random.integer(10000),
     name: Mock.Random.cname(),
-    username: Mock.Random.name(),
-    password: Mock.Random.first(),
-    region: Mock.mock('@county(true)'),
-    // region: Mock.Random.region(),
-    power: '设备管理,财务管理',
+    count: Mock.Random.integer(0,100)
   }))
 }
 

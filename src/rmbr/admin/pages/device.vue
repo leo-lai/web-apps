@@ -30,11 +30,12 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="设备编号" prop="nickname"></el-table-column>
-	    <el-table-column label="属于商户" prop="" align="center"></el-table-column>
-	    <el-table-column label="设备启动次数" prop="tel" align="center"></el-table-column>
+	    <el-table-column label="设备编号" prop="deviceNo"></el-table-column>
+	    <el-table-column label="属于商户" prop="name" align="center"></el-table-column>
+	    <el-table-column label="设备启动次数" prop="count" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
+	    		<el-button class="l-text-link" type="text" size="small">关联商户</el-button>
 	    		<el-button class="l-text-link" type="text" size="small">解除关联</el-button>
 	    		<el-button class="l-text-error" type="text" size="small">删除</el-button>
 	      </template>
@@ -213,7 +214,7 @@ export default {
 		},
 		getList(page = 1, row) {
 			this.list.loading = true
-			this.$$api.business.getList(this.list.filter, page, row)
+			this.$$api.device.getList(this.list.filter, page, row)
 			.then(({data}) => {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1
