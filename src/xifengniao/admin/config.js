@@ -5,6 +5,11 @@ let config = {
   api: {
     baseURL: 'http://111.230.170.36/tauto/management/admin'
   },
+  pay: {
+    url: 'http://ceshi.allinpay.com/gateway/index.do',
+    dev: 'http://ceshi.allinpay.com/gateway/index.do',
+    prod: 'https://service.allinpay.com/gateway/index.do'
+  },
   viewer: {
     options: {
       inline: false,

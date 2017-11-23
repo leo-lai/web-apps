@@ -10,7 +10,7 @@
 					<span class="l-text-gray">{{ dialogList.info.contractNumber }}</span>
 				</el-form-item>
 				<el-form-item label="合同扫描件">
-					<span class="l-text-link">查看</span>
+					<span :class="dialogList.info.imagesArr ? 'l-text-link' : 'l-text-gary'" @click="showImages(dialogList.info.imagesArr)">查看</span>
 				</el-form-item>
 				<el-form-item class="_flex" label="备注">
 					<span class="l-text-gray">{{ dialogList.info.remark }}</span>
@@ -26,11 +26,11 @@
 		    <el-table-column label="票证号" prop="certificateNumber" align="center"></el-table-column>
 		    <el-table-column label="验车照片" prop="stockCarImages" align="center">
 		    	<template slot-scope="scope">
-		    		<el-button class="l-text-link" type="text" size="small">查看</el-button>
+		    		<el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showImages(scope.row.imagesArr)">查看</el-button>
 		      </template>
 		    </el-table-column>
 		    <el-table-column label="入库仓位" prop="warehouseName" align="center"></el-table-column>
-		    <el-table-column label="操作" width="170" align="center">
+		    <el-table-column label="操作" align="center">
 		    	<template slot-scope="scope">
 		    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 		        <el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
@@ -76,7 +76,7 @@
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="单价" prop="unitPrice" >
-			  	<el-input v-model.number="dialogInfo.data.unitPrice" :maxlength="10"></el-input>
+			  	<el-input v-model="dialogInfo.data.unitPrice" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item label="车架号" prop="frameNumber" >
 			  	<el-input v-model="dialogInfo.data.frameNumber" :maxlength="10"></el-input>
@@ -87,7 +87,7 @@
 			  <el-form-item label="票证号" prop="certificateNumber" >
 			  	<el-input v-model="dialogInfo.data.certificateNumber" :maxlength="10"></el-input>
 			  </el-form-item>
-			  <el-form-item class="_flex" label="验车照片" prop="imageUpload">
+			  <el-form-item class="_flex" label="验车照片" prop="upload">
 			  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
 			  		:file-list="dialogInfo.upload.list"
 			  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
@@ -219,8 +219,7 @@ export default {
 						{ required: true, type:'number', message: '必填项', trigger: 'change' }
 					],
 					unitPrice: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
 					frameNumber: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -228,7 +227,7 @@ export default {
 					engineNumber: [
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
-					imageUpload: [
+					upload: [
 						{ validator: validateUpload, trigger: 'change' },
 					]
 				},
@@ -253,13 +252,15 @@ export default {
 			this.dialogInfo.upload.loading = false
 			this.dialogInfo.upload.list.push({
 				name: file.name,
-				url: response.data,
-				src: response.data
+				url: this.$$utils.image.thumb(response.data, 150),
+				thumb: this.$$utils.image.thumb(response.data, 150),
+				src: response.data,
+				status: 'success'
 			})
 		},
 		uploadPreview(file) {
-			this.$parent.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
-			this.$parent.$$viewer.show()
+			this.$$parent.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
+			this.$$parent.$$viewer.show()
 		},
 		uploadRemove(file, fileList) {
 			if(file.status === 'success') {
@@ -334,8 +335,19 @@ export default {
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
         	item.doing = false
-        	return item
-        })
+					if(item.stockCarImages) {
+						item.imagesArr = item.stockCarImages.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						})
+					}
+					return item
+				})
 			}).finally(_ => {
 				this.list.loading = false
 			})
@@ -372,10 +384,17 @@ export default {
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 				this.cascader.value = [row.brandId, row.familyId, row.carsId]
 
-				this.dialogInfo.upload.list = row.stockCarImages ? row.stockCarImages.split(',').map(imageUrl => {
-					return {url: this.$$utils.image.thumb(imageUrl, 150), src: imageUrl, name: imageUrl}
+				this.dialogInfo.upload.list = row.stockCarImages ? row.stockCarImages.split(',').map(img => {
+					return {
+						url: this.$$utils.image.thumb(img, 150), 
+						thumb: this.$$utils.image.thumb(img, 150), 
+						src: img, 
+						name: img, 
+						status: 'success'
+					}
 				}) : []
-				this.$parent.viewer.images = this.dialogInfo.upload.list
+
+				this.$$parent.viewer.images = this.dialogInfo.upload.list
 
 				if(row.brandId) {
 					brandPromise.then(data => {
@@ -389,8 +408,7 @@ export default {
 				}
 			} else {
 				this.dialogInfo.title = '新增车辆信息'
-				this.cascader.value = []
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 				this.dialogInfo.data.storageId = row.storageId
 			}
 
@@ -407,8 +425,13 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.resetDialogInfo()
+		},
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.cascader.value = []
+			this.dialogInfo.upload.list = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
 		},
 		submitDialogInfo() { // 提交车辆信息
 			this.$refs.infoForm.validate(valid => {
@@ -449,17 +472,39 @@ export default {
 					row.doing = false
 				})
       })
+		},
+		showImages(imagesArr) { // 查看图片
+			if(imagesArr && imagesArr.length > 0) {
+				this.$$parent.viewer.images = imagesArr
+				setTimeout(_ => {
+					this.$$parent.$$viewer.index = 0
+					this.$$parent.$$viewer.show()	
+				}, 50)
+			}
 		}
 	},
 	mounted() {
-		this.$$event.$on('stock:car-list', row => {
+		this.$$event.$on('stock:car-list', (row, that) => {
+			this.$$parent = that
 			this.list.filter.storageId = row.storageId
 			this.dialogList.info = row
+			if(row.contractImage) {
+				this.dialogList.info.imagesArr = row.contractImage.split(',').map(img => {
+					return {
+						url: this.$$utils.image.thumb(img, 150), 
+						thumb: this.$$utils.image.thumb(img, 150), 
+						src: img, 
+						name: img, 
+						status: 'success'
+					}
+				})
+			}
 			this.dialogList.visible = true
 			this.getList()
 		})
 		
-		this.$$event.$on('stock:car-add', row => {
+		this.$$event.$on('stock:car-add', (row, that) => {
+			this.$$parent = that
 			this.showDialogInfo('new', row)
 		})
 	}

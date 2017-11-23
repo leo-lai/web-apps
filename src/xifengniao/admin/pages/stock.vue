@@ -17,9 +17,13 @@
 		  	<stock-out-order></stock-out-order>
 		  </el-tab-pane>
 		</el-tabs>
+
+		<!-- 预览图片 -->
+		<viewer-images :images="viewer.images"></viewer-images>
 	</div>
 </template>
 <script>
+import viewerImages from 'components/viewer-images'
 import stockList from './stock-list'
 import stockIn from './stock-in'
 import stockOut from './stock-out'
@@ -28,6 +32,7 @@ import stockOutOrder from './stock-out-order'
 export default {
 	name: 'stock',
 	components: {
+		viewerImages,
 		stockList,
 		stockIn,
 		stockOut,
@@ -36,13 +41,17 @@ export default {
 	},
 	data() {
 		return {
+			viewer: {
+				images: [],
+				index: 0
+			},
 			tabActive: ''
 		}
 	},
 	methods: {
 		tabClick() {
 			this.$$utils.history.replace('?tab=' + this.tabActive)
-			this.$$event.$emit('stock:tab', this.tabActive)
+			this.$$event.$emit('stock:tab', this.tabActive, this)
 		}
 	},
 	mounted() {

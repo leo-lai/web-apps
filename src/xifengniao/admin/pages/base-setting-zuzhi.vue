@@ -410,7 +410,6 @@ export default {
 						}
 					}) : []
 
-
 					this.$$parent.viewer.images = this.dialogInfo.upload.list
 				})
 			} else {

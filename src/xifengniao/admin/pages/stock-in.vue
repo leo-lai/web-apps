@@ -95,6 +95,9 @@
 				    <el-option v-for="item in supplierList" :key="item.id" :label="item.name" :value="item.id"></el-option>
 				  </el-select>
 			  </el-form-item>
+			  <el-form-item label="合同号" prop="contractNumber" >
+			  	<el-input v-model="dialogInfo.data.contractNumber" :maxlength="50"></el-input>
+			  </el-form-item>
 			  <el-form-item label="合格证时间" prop="certificateDate" >
 			  	<el-select v-model="dialogInfo.data.certificateDate" placeholder="请选择">
 				    <el-option label="随车" :value="1"></el-option>
@@ -102,11 +105,8 @@
 				    <el-option label="7天内" :value="3"></el-option>
 				  </el-select>
 			  </el-form-item>
-			  <el-form-item label="合同号" prop="contractNumber" >
-			  	<el-input v-model="dialogInfo.data.contractNumber" :maxlength="50"></el-input>
-			  </el-form-item>
 			  <el-form-item label="物流费用" prop="logisticsCost" >
-			  	<el-input v-model.number="dialogInfo.data.logisticsCost" :maxlength="10"></el-input>
+			  	<el-input v-model="dialogInfo.data.logisticsCost" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="合同扫描件" prop="imageUpload">
 			  	<!-- <div style="line-height: 1.6; width: 50%; margin-top: 4px;">
@@ -140,22 +140,14 @@
 		</el-dialog>
 
 		<stock-in-car></stock-in-car>
-		<!-- 预览图片 -->
-		<viewer ref="viewer" class="l-viewer" :options="$$config.viewer.options" :images="viewer.images" @inited="viewerInited">
-      <template slot-scope="scope">
-      	<img v-for="{url, src} in scope.images" :key="src" :src="url" :data-source="src" >
-      </template>
-    </viewer>
 	</div>
 </template>
 <script>
-import viewer from 'v-viewer/src/component.vue'
 import stockInCar from './stock-in-car'
-
 export default {
 	name: 'stock-in',
 	components: {
-    viewer, stockInCar
+    stockInCar
   },
 	data() {
 		let that = this
@@ -171,11 +163,6 @@ export default {
 		}
 
 		return {
-			viewer: {
-				options: {},
-				visible: true,
-				images: []
-			},
 			dateOptions: {
 				shortcuts: [{
           text: '最近一周',
@@ -240,17 +227,16 @@ export default {
 				salesList: [],
 				rules: {
 					storageSource: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必填项', trigger: 'change' }
 					],
 					systemUsersId: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必填项', trigger: 'change' }
 					],
 					supplierId: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
+						{ required: true, type: 'number', message: '必填项', trigger: 'change' }
 					],
 					logisticsCost: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' },
-						{ pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
 					imageUpload: [
 						{ validator: validateUpload, trigger: 'change' },
@@ -271,20 +257,19 @@ export default {
 		}
 	},
 	methods: {
-		viewerInited(viewer) {
-			this.$$viewer = viewer
-		},
 		uploadSuccess(response, file, fileList) {
 			this.dialogInfo.upload.loading = false
 			this.dialogInfo.upload.list.push({
 				name: file.name,
-				url: response.data,
-				src: response.data
+				url: this.$$utils.image.thumb(response.data, 150),
+				thumb: this.$$utils.image.thumb(response.data, 150),
+				src: response.data,
+				status: 'success'
 			})
 		},
 		uploadPreview(file) {
-			this.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
-			this.$$viewer.show()
+			this.$$parent.$$viewer.index = this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0
+			this.$$parent.$$viewer.show()
 		},
 		uploadRemove(file, fileList) {
 			if(file.status === 'success') {
@@ -330,7 +315,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.deling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -357,21 +342,27 @@ export default {
 			})
 			
 			let infoPromise = Promise.resolve()
-
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改入库单'
 				infoPromise = this.$$api.stock.getInInfo(row.storageId)
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 				infoPromise.then(({data}) => {
 					this.$$utils.copyObj(this.dialogInfo.data, data)
-					this.dialogInfo.upload.list = data.contractImage ? data.contractImage.split(',').map(imageUrl => {
-						return {url: this.$$utils.image.thumb(imageUrl, 150), name: imageUrl, src: imageUrl}
+					this.dialogInfo.upload.list = data.contractImage ? data.contractImage.split(',').map(img => {
+						return {
+							url: this.$$utils.image.thumb(img, 150), 
+							thumb: this.$$utils.image.thumb(img, 150), 
+							src: img, 
+							name: img, 
+							status: 'success'
+						}
 					}) : []
-					this.viewer.images = this.dialogInfo.upload.list
+
+					this.$$parent.viewer.images = this.dialogInfo.upload.list
 				})
 			} else {
 				this.dialogInfo.title = '新增入库单'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
+				this.resetDialogInfo()
 			}
 
 			const loading = this.$loading()
@@ -387,8 +378,12 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.resetDialogInfo()
+		},
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.dialogInfo.upload.list = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
 		},
 		submitDialogInfo() { // 提交入库单
 			this.$refs.infoForm.validate(valid => {
@@ -396,10 +391,7 @@ export default {
           this.dialogInfo.loading = true
           this.$$api.stock.addIn(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
-            this.$message({
-							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '入库单'
-						})
+            this.$message.success((this.dialogInfo.type === 'new' ? '新增' : '修改') + '入库单成功')
             this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
@@ -421,13 +413,14 @@ export default {
 				})
 			}
 			infoPromise.finally(_ => {
-				this.$$event.$emit('stock:' + eventName, info)	
+				this.$$event.$emit('stock:' + eventName, info, this.$$parent)	
 			})
 		}
 	},
 	mounted() {
-		this.$$event.$on('stock:tab', activeName => {
+		this.$$event.$on('stock:tab', (activeName, that) => {
 			if(activeName === 'in' && this.list.data.length === 0) {
+				this.$$parent = that
 				this.getList()
 				this.$$api.supplier.getListDown().then(({data}) => {
 					this.supplierList = data
