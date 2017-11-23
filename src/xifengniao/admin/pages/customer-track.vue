@@ -44,14 +44,39 @@
 	  </el-row>
 
 		<!-- 查看信息 -->
-		<el-dialog class="l-customer-view" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogInfo.visible">
-  		<div class="l-flex-h">
-  			<div class="_info"></div>
-  			<div class="l-rest _tab">
+		<el-dialog class="l-customer-view" width="1100px"
+			:close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogInfo.visible">
+  		<div class="_flex">
+  			<div class="_info">
+  				<div class="l-text-center">
+  					<img src="http://iph.href.lu/150x150?text=LOGO">
+  					<p><b>吕文</b></p>
+  					<p>18602029523</p>
+  				</div>
+  				<dl>
+  					<dt>期望购车方式</dt>
+  					<dd>100万分期一百年</dd>
+  					<dt>意向车辆</dt>
+  					<dd>东风本田 2017 尊贵版</dd>
+  					<dt>访问备注</dt>
+  					<dd>东风本田 2017 尊贵版东风本田 2017 尊贵版东风本田 2017 尊贵版东风本田 2017 尊贵版东风本田 2017 尊贵版</dd>
+  				</dl>
+  				<dl class="l-margin-t" style="border-top: 1px solid #eee; padding-top: 0.75rem;">
+  					<dt>销售顾问</dt>
+  					<dd class="l-text-center l-fs-s">大金牙 18622022</dd>
+  				</dl>
+  			</div>
+  			<div class="_tab">
   				<el-tabs type="border-card">
-					  <el-tab-pane label="购车进度">购车进度</el-tab-pane>
-					  <el-tab-pane label="个人资料">个人资料</el-tab-pane>
-					  <el-tab-pane label="车辆资料">车辆资料</el-tab-pane>
+					  <el-tab-pane label="购车进度">
+					  	<customer-progress></customer-progress>
+					  </el-tab-pane>
+					  <el-tab-pane label="个人资料">
+					  	<customer-info></customer-info>
+					  </el-tab-pane>
+					  <el-tab-pane label="车辆资料">
+					  	<customer-carinfo></customer-carinfo>
+					  </el-tab-pane>
 					</el-tabs>
   			</div>
   		</div>
@@ -60,8 +85,16 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import customerInfo from './customer-info'
+import customerCarinfo from './customer-carinfo'
+import customerProgress from './customer-progress'
 export default {
 	name: 'customer-track',
+	components: {
+		customerInfo,
+		customerCarinfo,
+		customerProgress
+	},
 	data() {
 		return {
 			list: {
@@ -121,6 +154,9 @@ export default {
 		clear() {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
+		},
+		showDialogInfo() {
+			this.dialogInfo.visible = true
 		}
 	},
 	mounted() {
@@ -134,9 +170,23 @@ export default {
 	}
 }
 </script>
-<style scoped lang="less">
+<style lang="less">
 .l-customer-view{
-
-
+	._flex{display: flex; align-items: start;}
+	._info{
+		width: 250px; padding: 0.75rem; margin-right: 0.75rem;
+		background: #fff; border: 1px solid #d8dce5; box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
+		img { display: block; margin: 0 auto 10px; width: 80px; height: 80px; border-radius: 50%;}
+		dt, dd{ margin: 0; padding: 0; }
+		dt{color: rgba(147, 159, 177, 0.6); margin-bottom: 5px;}
+		dd{margin-bottom: 0.75rem; }
+	}
+	._tab{flex: 1;}
+	.el-dialog__headerbtn{top: 10px; right: 10px;}
+	.el-dialog{background-color: #efeff4;}
+	.el-dialog__body{padding-top: 5px;}
+	.l-table-info{
+		._tit{width: 120px;}
+	}
 }
 </style>

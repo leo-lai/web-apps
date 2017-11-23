@@ -376,9 +376,6 @@ export default {
 					})
         }
       })
-		},
-		showDialogInfo() {
-			this.dialogInfo.visible = true
 		}
 	},
 	mounted() {
