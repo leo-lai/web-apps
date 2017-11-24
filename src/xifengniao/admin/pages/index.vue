@@ -133,7 +133,6 @@ export default {
 		}
 	},
 	mounted() {
-		
 	}
 }
 </script>
@@ -152,8 +151,8 @@ ul,li{margin:0; padding: 0; list-style: none;}
 		display: flex; align-items: center; justify-content: center;
 	}
 	._circle::before, ._circle::after{content: ''; border-top: 1px solid #eff2f7; width: 50%; position: absolute; top: 50%;}
-	._circle::before{ left: -50%;  }
-	._circle::after{ right: -50%;  }
+	._circle::before{ left: -50%; }
+	._circle::after{ right: -50%; }
 	._num{font-size: 1rem; color: rgb(33, 160, 255); margin-right: 2px; font-weight: 600;}
 	._item:first-child ._circle::before, ._item:last-child ._circle::after{visibility: hidden;}
 }

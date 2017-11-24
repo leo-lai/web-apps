@@ -386,6 +386,9 @@ export default {
 				this.$store.dispatch('getZuzhiList')
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('customer:tab')
 	}
 }
 </script>

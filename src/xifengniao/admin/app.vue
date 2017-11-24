@@ -8,7 +8,15 @@
 
 <script>
 export default {
-	name: 'admin'
+	name: 'admin',
+	data() {
+		return {
+			
+		}
+	},
+	mounted() {
+
+	}
 }
 
 </script>

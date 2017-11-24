@@ -209,7 +209,7 @@
   		</table>
   		<br>
   		<div class="l-text-center l-margin-t">
-				<b class="l-fs-s l-margin-r">需要支付定金：￥3000</b>
+				<b class="l-fs-s l-margin-r">需要支付{{ payInfo.data.stockOrderState === 1 ? '定金' : '尾款' }}：￥{{payInfo.data.depositPrice}}</b>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<el-button type="primary" @click="payNow">立即支付</el-button>
   		</div>
@@ -228,11 +228,23 @@
 	  		</form>	
   		</div>
 		</el-dialog>
+
+		<!-- 二维码支付 -->
+		<el-dialog title="支付二维码" align="center" width="300px" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="qrcode.visible">
+			<div class="l-qrcode-img">
+	   		<qrcanvas ref="qrcode" :options="qrcode.opts"></qrcanvas>
+	   		<p class="l-margin"><b>本次支付金额：{{payInfo.data.depositPrice}}</b></p>
+	    </div>
+		</el-dialog>
 	</div>
 </template>
 <script>
+import Qrcanvas from 'qrcanvas-vue'
 export default {
 	name: 'stock-order',
+	components: {
+    Qrcanvas
+  },
 	data() {
 		let that = this
 		let validateCarModel = function(rule, value, callback) {
@@ -244,6 +256,10 @@ export default {
       }
 		}
 		return {
+			qrcode: {
+				opts: {},
+				visible: false
+			},
 			cascader: {
 				value: [],
 				data: [],
@@ -547,7 +563,25 @@ export default {
 						this.$refs.payForm.submit()	
 					}, 50)
 				}else {
-
+					this.qrcode.visible = true
+					this.qrcode.opts = Object.assign({}, {
+	          data: this.payInfo.formData.chooseId,
+	          cellSize: 5,
+	          correctLevel: 'H',
+	          typeNumber: 5,
+	          logo: {
+	            fontFamily: 'Arial',
+	            size: 0.15,
+	            color: '#000',
+	            text: '',
+	            clearEdges: 2,
+	            margin: 10
+	          },
+	          effect: {
+	            key: 'round', // image liquid round
+	            value: 0.2  
+	          }
+	        })
 				}
 			}).finally(_ => {
 				loading.close()

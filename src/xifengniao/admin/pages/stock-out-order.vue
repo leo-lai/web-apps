@@ -6,14 +6,14 @@
 			</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-  				<el-form-item style="width: 120px;">
-  					<el-select v-model="list.filter.stockOrderState" placeholder="出库状态" @change="search()">
+  				<el-form-item style="width: 120px;" prop="deliveryState">
+  					<el-select v-model="list.filter.deliveryState" placeholder="出库状态" @change="search()">
 				      <el-option label="未处理" :value="0"></el-option>
 				      <el-option label="已处理" :value="1"></el-option>
 				      <el-option label="已出库" :value="2"></el-option>
 				    </el-select>
   				</el-form-item>
-  				<el-form-item>
+  				<el-form-item prop="stockOrderState">
   					<el-select v-model="list.filter.stockOrderState" placeholder="订单状态" @change="search()">
 				      <el-option v-for="item in list.state" :key="item.value" :label="item.label" :value="item.value"></el-option>
 				    </el-select>
@@ -39,16 +39,17 @@
 	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
 	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
 	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center"></el-table-column>
+	    
 	    <el-table-column label="订单状态" prop="stockOrderState" :formatter="formatterState" align="center" class-name="l-fs-xs" min-width="120" ></el-table-column>
+	    <el-table-column label="出库状态" prop="" align="center"></el-table-column>
 	    <el-table-column label="操作" min-width="120" header-align="center">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button v-if="scope.row.stockOrderState === 1" class="l-text-link" type="text" size="small" @click="showPayInfo(scope.row)">支付定金</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 5" class="l-text-link" type="text" size="small" @click="showPayInfo(scope.row)">支付尾款</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 9" class="l-text-link" type="text" size="small" @click="signOrder(scope.row)">签收并自动入库</el-button>
+	        	<el-button v-if="scope.row.stockOrderState === 1" class="l-text-warn" type="text" size="small">通知有车</el-button>
+		        <el-button v-if="scope.row.stockOrderState === 3" class="l-text-link" type="text" size="small">出库车辆</el-button>
+		        <el-button v-if="scope.row.stockOrderState === 11" class="l-text-link" type="text" size="small">打印单据</el-button>
 		        <el-button class="l-text-link" type="text" size="small" @click="showViewInfo(scope.row)">查看明细</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 1" class="l-text-error" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
 	        </span>
 	      </template>
 	    </el-table-column>
@@ -288,11 +289,13 @@ export default {
 					}
 				],
 				filter: {
+					deliveryState: '',
 					stockOrderState: '',
 					stockOrderCode: '',
 					carsName: ''
 				},
 				rules: {
+					deliveryState: [],
 					stockOrderState: [],
 					stockOrderCode: [],
 					carsName: []

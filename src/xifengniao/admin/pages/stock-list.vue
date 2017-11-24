@@ -264,7 +264,7 @@ export default {
         }
       })
 		},
-		showCarImages(imagesArr) { // 查看验车图片
+		showCarImages(imagesArr = []) { // 查看验车图片
 			if(imagesArr && imagesArr.length > 0) {
 				this.$$parent.viewer.images = imagesArr
 				setTimeout(_ => {

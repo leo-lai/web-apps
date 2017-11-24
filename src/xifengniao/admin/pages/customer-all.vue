@@ -138,7 +138,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.deling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -211,7 +211,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(_ => {
-      	row.deling = true
+      	row.doing = true
 				this.$$api.supplier.del(row.supplierId).then(_ => {
 					this.$message({
 						type: 'success',
@@ -219,7 +219,7 @@ export default {
 					})
 					this.refreshList()
 				}).finally(_ => {
-					row.deling = false
+					row.doing = false
 				})
       })
 		}
@@ -231,6 +231,9 @@ export default {
 				this.$store.dispatch('getZuzhiList')
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('customer:tab')
 	}
 }
 </script>

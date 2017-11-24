@@ -32,8 +32,8 @@ export default {
 	data() {
 		return {
 			viewer: {
-				images: [],
-				index: 0
+				options: {},
+				images: []
 			},
 			tabActive: ''
 		}

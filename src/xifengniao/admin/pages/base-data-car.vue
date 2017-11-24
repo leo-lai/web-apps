@@ -294,8 +294,7 @@ export default {
 			})
 		},
 		uploadPreview(file) {
-			this.$$parent.$$viewer.index = this.dialogCheshen.upload.list.findIndex(item => item.url === file.url) || 0
-			this.$$parent.$$viewer.show()
+			this.$$parent.$$viewer.show(this.dialogCheshen.upload.list.findIndex(item => item.url === file.url) || 0)
 		},
 		uploadRemove(file, fileList) {
 			if(file.status === 'success') {
