@@ -10,12 +10,16 @@
 		  <el-tab-pane label="出库记录" name="out">
 		  	<stock-out></stock-out>
 		  </el-tab-pane>
-		  <el-tab-pane label="订车列表" name="order">
-		  	<stock-order></stock-order>
-		  </el-tab-pane>
-		  <el-tab-pane label="批发出库" name="out-order">
-		  	<stock-out-order></stock-out-order>
-		  </el-tab-pane>
+		  <template v-if="userInfo.orgLevel === 3">
+			  <el-tab-pane label="订车列表" name="order">
+			  	<stock-order></stock-order>
+			  </el-tab-pane>	
+		  </template>
+		  <template v-if="userInfo.orgLevel < 3">
+			  <el-tab-pane label="批发出库" name="out-order">
+			  	<stock-out-order></stock-out-order>
+			  </el-tab-pane>	
+		  </template>
 		</el-tabs>
 
 		<!-- 预览图片 -->
@@ -23,6 +27,7 @@
 	</div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 import viewerImages from 'components/viewer-images'
 import stockList from './stock-list'
 import stockIn from './stock-in'
@@ -48,6 +53,11 @@ export default {
 			tabActive: ''
 		}
 	},
+  computed: {
+  	...mapGetters([
+  		'userInfo'
+    ])
+  },
 	methods: {
 		tabClick() {
 			this.$$utils.history.replace('?tab=' + this.tabActive)

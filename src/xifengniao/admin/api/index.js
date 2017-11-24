@@ -141,6 +141,11 @@ const api = {
       return fetch.post('/roleListList')
     }
   },
+  index: {
+    getCount() {
+      return fetch.post('/index')
+    }
+  },
   zuzhi: { // 组织架构管理
     getList(formData = {}, page = 1, rows = 100) {
       formData.page = page
@@ -296,6 +301,12 @@ const api = {
       formData.page = page
       formData.rows = rows
       return fetch.post('/bespeakCustomerOrgList', formData)
+    },
+    notBuy(customerUsersOrgId = '') { // 标记为不购买
+      return fetch.post('/notBuyCustomerOrg', { customerUsersOrgId })
+    },
+    track(formData = {}) { // 标记为已到店
+      return fetch.post('/trackCustomerOrg', formData)
     }
   },
   stock: { // 库存管理

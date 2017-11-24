@@ -6,7 +6,7 @@
 			</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-  				<el-form-item>
+  				<el-form-item prop="stockOrderState">
   					<el-select v-model="list.filter.stockOrderState" placeholder="订单状态" @change="search()">
 				      <el-option v-for="item in list.state" :key="item.value" :label="item.label" :value="item.value"></el-option>
 				    </el-select>
@@ -209,7 +209,8 @@
   		</table>
   		<br>
   		<div class="l-text-center l-margin-t">
-				<b class="l-fs-s l-margin-r">需要支付{{ payInfo.data.stockOrderState === 1 ? '定金' : '尾款' }}：￥{{payInfo.data.depositPrice}}</b>
+  			<b class="l-fs-s l-margin-r" v-if="payInfo.data.stockOrderState === 1">需要支付定金：：￥{{payInfo.data.depositPrice}}</b>
+  			<b class="l-fs-s l-margin-r" v-else>需要支付尾款：：￥{{payInfo.data.balancePrice}}</b>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<el-button type="primary" @click="payNow">立即支付</el-button>
   		</div>

@@ -2,7 +2,7 @@
 	<div>
 		<el-row>
 			<el-col :span="6">
-				<el-button type="primary" @click="showDialogAdd">新增客户</el-button>
+				<el-button type="primary" @click="showDialogInfo('new')">新增客户</el-button>
 			</el-col>
   		<el-col :span="18" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
@@ -25,18 +25,36 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="预约车型" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="预约门店" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="客户电话" prop="phoneNumber"></el-table-column>
-	    <el-table-column label="提交时间" prop="orderState"></el-table-column>
-	    <el-table-column label="到店日期" prop="expectWayName"></el-table-column>
-	    <el-table-column label="打算购车时间" prop="expectWayName"></el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column class-name="l-fs-xs" label="预约车型" prop="intentionCarInfo" min-width="120"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="预约门店" prop="orgShortName"></el-table-column>
+	    <el-table-column label="客户姓名" prop="customerUsersName" align="center"></el-table-column>
+	    <el-table-column label="客户电话" prop="phoneNumber" align="center"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="预约到店时间" min-width="120">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">编辑</el-button>
-	        <el-button class="l-text-link" type="text" size="small">标记为已到店</el-button>
-	        <el-button class="l-text-link" type="text" size="small">标记为不购车</el-button>
+	    		<p>{{scope.row.timeOfAppointmentDate}}</p>
+	    		<p>{{scope.row.timeOfAppointment}}</p>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="打算购车时间" align="center">
+	    	<template slot-scope="scope">
+	    		{{$$config.baseData.carTime[scope.row.carPurchaseIntention - 1]}}
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="操作" min-width="120" align="center">
+	    	<template slot-scope="scope">
+	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+		    		<el-dropdown>
+		    			<el-button class="l-text-link" type="text" size="small">
+		    				标记为 <i class="el-icon-arrow-down"></i>
+		    			</el-button>
+						  <el-dropdown-menu slot="dropdown">
+						    <el-dropdown-item @click.native="showDialogTrack(scope.row)">已到店</el-dropdown-item>
+						    <el-dropdown-item @click.native="notBuy(scope.row)">不购车</el-dropdown-item>
+						  </el-dropdown-menu>
+						</el-dropdown>
+	        </span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -52,36 +70,33 @@
 	  </el-row>
 
 	  <!-- 新增客户 -->
-		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogAdd"
-			:title="dialogAdd.title" :visible.sync="dialogAdd.visible" width="713px">
-  		<el-form ref="addForm" inline class="l-form1" label-width="120px" 
-  			:model="dialogAdd.data" :rules="dialogAdd.rules" @keyup.enter.native="submitDialogAdd">
+		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="713px">
+  		<el-form ref="infoForm" inline class="l-form1" label-width="120px" 
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="客户姓名" prop="customerUsersName" >
-			    <el-input v-model="dialogAdd.data.customerUsersName" :maxlength="50"></el-input>
+			    <el-input v-model="dialogInfo.data.customerUsersName" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="客户电话" prop="phoneNumber" >
-			    <el-input v-model="dialogAdd.data.phoneNumber" :maxlength="11"></el-input>
+			    <el-input v-model="dialogInfo.data.phoneNumber" :maxlength="11"></el-input>
 			  </el-form-item>
 			  <el-form-item label="预约到店日期" prop="appointmentDate" >
 					<el-date-picker type="date" value-format="yyyy-MM-dd" :editable="false" :clearable="false" placeholder="选择日期" 
-						v-model="dialogAdd.data.appointmentDate" :picker-options="dateOptions"></el-date-picker>
+						v-model="dialogInfo.data.appointmentDate" :picker-options="dateOptions"></el-date-picker>
 			  </el-form-item>
 			  <el-form-item label="时间段" prop="timeOfAppointment">
 			  	<el-time-picker is-range format="HH:mm" value-format="HH:mm" :editable="false" :clearable="false"
 			  		start-placeholder="开始时间" end-placeholder="结束时间"
-			  		v-model="dialogAdd.data.timeOfAppointment" :picker-options="timeOptions"></el-time-picker>
+			  		v-model="dialogInfo.data.timeOfAppointment" :picker-options="timeOptions"></el-time-picker>
 			  </el-form-item>
 			  <el-form-item label="打算购车时间" prop="carPurchaseIntention" >
-			  	<el-select v-model="dialogAdd.data.carPurchaseIntention" placeholder="请选择">
-				    <el-option label="随车" :value="1"></el-option>
-				    <el-option label="3天内" :value="2"></el-option>
-				    <el-option label="7天内" :value="3"></el-option>
+			  	<el-select v-model="dialogInfo.data.carPurchaseIntention" placeholder="请选择">
+				    <el-option v-for="(name, index) in $$config.baseData.carTime" :key="index" :label="name" :value="index + 1"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="打算购车方案" prop="expectWayId">
-			  	<el-select v-model="dialogAdd.data.expectWayId" placeholder="请选择">
-				    <el-option label="全款" :value="1"></el-option>
-				    <el-option label="分期" :value="2"></el-option>
+			  	<el-select v-model="dialogInfo.data.expectWayId" placeholder="请选择">
+			  		<el-option v-for="(name, index) in $$config.baseData.buyWay" :key="index" :label="name" :value="index + 1"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="意向车辆" prop="carsId" >
@@ -89,20 +104,32 @@
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 			  </el-form-item>
 			  <el-form-item label="销售顾问" prop="systemUserId" >
-			  	<el-select filterable v-model="dialogAdd.data.systemUserId" placeholder="请选择">
-				    <el-option v-for="user in dialogAdd.salesList" :key="user.systemUserId" :label="user.systemUserName" :value="user.systemUserId"></el-option>
+			  	<el-select filterable v-model="dialogInfo.data.systemUserId" placeholder="请选择">
+				    <el-option v-for="user in salesList" :key="user.systemUserId" :label="user.systemUserName" :value="user.systemUserId"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="备注" prop="remark">
-			  	<el-input type="textarea" v-model="dialogAdd.data.remark" :maxlength="500"></el-input>
+			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
 			  </el-form-item>
 			  
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
-				<el-button @click="closeDialogAdd()">取消</el-button>
-		    <el-button type="primary" :loading="dialogAdd.loading" @click="submitDialogAdd">确定提交</el-button>
+				<el-button @click="closeDialogInfo()">取消</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
+
+		<el-dialog title="提醒" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogTrack.visible" width="400px">
+			<p class="l-margin-b">标记到店将自动转为跟踪客户，请在“跟踪客户”中查看</p>
+			<el-select filterable v-model="dialogTrack.data.systemUserId" placeholder="请选择销售顾问">
+		    <el-option v-for="user in salesList" :key="user.systemUserId" :label="user.systemUserName" :value="user.systemUserId"></el-option>
+		  </el-select>
+		  <span slot="footer" class="l-margin-r-m">
+				<el-button @click="dialogTrack.visible = false">取消</el-button>
+		    <el-button type="primary" :loading="dialogTrack.loading" @click="submitDialogTrack">确定提交</el-button>
+		  </span>
+		</el-dialog>
+
 	</div>
 </template>
 <script>
@@ -115,7 +142,7 @@ export default {
 			if (that.cascader.value.length === 0){
         callback(new Error('必填项'))
       }else{
-      	that.dialogAdd.data.carsId = that.cascader.value[2] || ''
+      	that.dialogInfo.data.carsId = that.cascader.value[2] || ''
         callback()
       }
 		}
@@ -176,11 +203,11 @@ export default {
 				total: 0,
 				data: []
 			},
-			dialogAdd: {
+			salesList: [],
+			dialogInfo: {
 				title: '新增客户',
 				visible: false,
 				loading: false,
-				salesList: [],
 				rules: {
 					customerUsersName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -209,6 +236,7 @@ export default {
 					]
 				},
 				data: {
+					customerUsersOrgId: '',
 					customerUsersName: '',
 					phoneNumber: '',
 					appointmentDate: '',
@@ -220,28 +248,11 @@ export default {
 					remarks: ''
 				}
 			},
-			dialogInfo: {
-				type: 'new',
-				title: '新增客户',
+			dialogTrack: {
 				visible: false,
-				loading: false,
-				rules: {
-					carsName: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					phoneNumber: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					orgId: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
-					]
-				},
 				data: {
-					supplierId: '',
-					carsName: '',
-					phoneNumber: '',
-					orgId: '',
-					remark: ''
+					customerUsersOrgId: '',
+					systemUserId: ''
 				}
 			}
 		}
@@ -318,64 +329,108 @@ export default {
       }
       return promise
 		},
-		showDialogAdd() { // 新增客户
-			this.resetDialogAdd()
+		showDialogInfo(type = 'new', row) { // 新增客户
+			this.resetDialogInfo()
 
 			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
 				this.cascader.data = data.map(item => {
 					item.children = []
 					return item
 				})
-				return data
 			})
 
 			let salesPromise = this.$$api.user.getSalesList().then(({data}) => {
-				this.dialogAdd.salesList = data
+				this.salesList = data
 				return data
 			})
 
+			this.dialogInfo.type = type
+			if(type === 'edit'){
+				this.dialogInfo.title = '修改客户信息'
+				this.$$utils.copyObj(this.dialogInfo.data, row)
+			}else {
+				this.dialogInfo.title = '新增客户信息'
+				this.resetDialogInfo()
+			}
+
 			const loading = this.$loading()
 			Promise.all([brandPromise, salesPromise]).then(dataArr =>　{
-				this.dialogAdd.data.systemUserId = this.userInfo.userId
-				this.dialogAdd.visible = true
+				this.dialogInfo.data.systemUserId = this.userInfo.userId
+				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
 			})
 		},
-		closeDialogAdd(done) {
+		closeDialogInfo(done) {
 			if(done) {
 				done()
 			}else{
-				this.dialogAdd.visible = false	
+				this.dialogInfo.visible = false	
 			}
-			this.resetDialogAdd()
+			this.resetDialogInfo()
 		},
-		resetDialogAdd() {
-			this.$refs.addForm && this.$refs.addForm.resetFields()
-			this.$$utils.copyObj(this.dialogAdd.data, '')
+		resetDialogInfo() {
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
-		submitDialogAdd() { // 提交客户
-			this.$refs.addForm.validate(valid => {
+		submitDialogInfo() { // 提交客户
+			this.$refs.infoForm.validate(valid => {
         if (valid) {
-          this.dialogAdd.loading = true
-          this.dialogAdd.data.timeOfAppointment = this.dialogAdd.data.timeOfAppointment.join('-')
-          this.$$api.customer.add(this.dialogAdd.data).then(_ => {
-            this.closeDialogAdd()
+          this.dialogInfo.loading = true
+          this.dialogInfo.data.timeOfAppointment = this.dialogInfo.data.timeOfAppointment.join('-')
+          this.$$api.customer.add(this.dialogInfo.data).then(_ => {
+            this.closeDialogInfo()
             this.$message({
 							type: 'success',
 							message: '新增客户成功'
 						})
             this.refreshList()
           }).finally(()=>{
-            this.dialogAdd.loading = false
+            this.dialogInfo.loading = false
           })  
         }else {
-        	this.$message({
-						type: 'error',
-						message: '请完善表单信息'
-					})
+        	this.$message.error('请完善表单信息')
         }
       })
+		},
+		notBuy(row) { // 不购买
+			this.$confirm('此操作将不再显示该条预约信息，客户状态也将变更为不买车，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+      	row.doing = true
+				this.$$api.customer.notBuy(row.customerUsersOrgId).then(_ => {
+					this.$message.success('标记成功')
+					this.refreshList()
+				}).finally(_ => {
+					row.doing = false
+				})
+      })
+		},
+		showDialogTrack(row) {
+			const loading = this.$loading()
+			this.$$api.user.getSalesList().then(({data}) => {
+				this.salesList = data
+				this.$$utils.copyObj(this.dialogTrack.data, row)
+				this.dialogTrack.visible = true
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		submitDialogTrack() {
+			if(this.dialogTrack.data.systemUserId) {
+				this.dialogTrack.loading = true
+				this.$$api.customer.track(this.dialogTrack.data).then(_ => {
+	        this.dialogTrack.visible = false
+	        this.$message.success('标记成功')
+	        this.refreshList()
+	      }).finally(()=>{
+	        this.dialogTrack.loading = false
+	      })
+	    }else {
+	    	this.$message.error('请选择销售顾问')
+	    }
 		}
 	},
 	mounted() {

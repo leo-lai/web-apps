@@ -48,10 +48,10 @@ const user = {
 		},
 		login({ commit }, formData) {
 			return api.auth.login(formData).then(({data}) => {
-				let { roleId, roleName, userName, realName, sessionId, menus } = data
+				let { sessionId, menus } = data
 				_cache.userMenus = menus
 				commit('USER_SESSIONID', sessionId)
-				commit('USER_INFO', { roleId, roleName, userName, realName, sessionId })
+				commit('USER_INFO', data)
 				return data
 			})
 		},

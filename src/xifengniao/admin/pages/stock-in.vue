@@ -52,7 +52,7 @@
 	    </el-table-column>
 	    <el-table-column label="供应商" prop="supplierName"></el-table-column>
 	    <el-table-column label="采购员" prop="systemUserName"></el-table-column>
-	    <el-table-column label="采购总价(万)" prop="totalPurchasePrice"></el-table-column>
+	    <el-table-column label="采购总价" prop="totalPurchasePrice"></el-table-column>
 	    <el-table-column label="采购总数量" prop="totalPurchase"></el-table-column>
 	    <el-table-column label="物流费用" prop="logisticsCost"></el-table-column>
 	    <el-table-column label="操作" width="170">

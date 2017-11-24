@@ -27,9 +27,9 @@
 	    <el-table-column label="备注" prop="remark" min-width="200"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-	        <span v-show="scope.row.deling" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
-	        <span v-show="!scope.row.deling">
+	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        	<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
 	        </span>
 	      </template>
@@ -128,7 +128,7 @@ export default {
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.deling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -166,7 +166,7 @@ export default {
 			this.resetDialogInfo()
 		},
 		resetDialogInfo() {
-			this.$refs.infoForm.resetFields()
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交供应商
@@ -197,7 +197,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(_ => {
-      	row.deling = true
+      	row.doing = true
 				this.$$api.supplier.del(row.supplierId).then(_ => {
 					this.$message({
 						type: 'success',
@@ -205,7 +205,7 @@ export default {
 					})
 					this.refreshList()
 				}).finally(_ => {
-					row.deling = false
+					row.doing = false
 				})
       })
 		}

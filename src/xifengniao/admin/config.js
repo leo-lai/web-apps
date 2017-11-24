@@ -10,23 +10,9 @@ let config = {
     dev: 'http://ceshi.allinpay.com/gateway/index.do',
     prod: 'https://service.allinpay.com/gateway/index.do'
   },
-  viewer: {
-    options: {
-      inline: false,
-      button: true,
-      navbar: true,
-      title: false,
-      toolbar: true,
-      tooltip: false,
-      movable: true,
-      zoomable: true,
-      rotatable: true,
-      scalable: true,
-      transition: true,
-      fullscreen: true,
-      keyboard: true,
-      url: 'data-source'
-    }
+  baseData: {
+    carTime: ['随车', '3天内', '7天内'],
+    buyWay: ['全款', '分期']
   }
 }
 

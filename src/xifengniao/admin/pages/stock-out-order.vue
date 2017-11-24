@@ -2,7 +2,7 @@
 	<div>
 		<el-row>
 			<el-col :span="4">
-				<el-button type="primary">新增出库订单</el-button>
+				<!-- <el-button type="primary">新增出库订单</el-button> -->
 			</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
@@ -46,8 +46,8 @@
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button v-if="scope.row.stockOrderState === 1" class="l-text-warn" type="text" size="small">通知有车</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 3" class="l-text-link" type="text" size="small">出库车辆</el-button>
+	        	<el-button v-if="scope.row.stockOrderState >= 3 && scope.row.stockOrderState <= 5" class="l-text-ok" type="text" size="small">通知有车</el-button>
+		        <el-button v-if="scope.row.stockOrderState === 7" class="l-text-warn" type="text" size="small">出库车辆</el-button>
 		        <el-button v-if="scope.row.stockOrderState === 11" class="l-text-link" type="text" size="small">打印单据</el-button>
 		        <el-button class="l-text-link" type="text" size="small" @click="showViewInfo(scope.row)">查看明细</el-button>
 	        </span>
