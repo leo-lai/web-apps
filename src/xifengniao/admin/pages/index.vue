@@ -133,7 +133,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$api.index.getCount()
+		// this.$$api.index.getCount()
 	}
 }
 </script>
