@@ -171,7 +171,7 @@
 		</el-dialog>
 
 		<!-- 支付订车单 -->
-		<el-dialog class="l-padding-t-0" title="支付定金" :visible.sync="payInfo.visible" width="995px">
+		<el-dialog class="l-padding-t-0" title="支付定金" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="payInfo.visible" width="995px">
   		<table class="l-table-info">
   			<tr>
   				<td class="_tit">车型</td>
@@ -213,7 +213,7 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<el-button type="primary" @click="payNow">立即支付</el-button>
   		</div>
-  		<div>
+  		<div class="l-hidden-box">
 	  		<form ref="payForm" target="_blank" method='post' :action="$$config.pay.url">
 	  			<table>
 	  				<tr v-for="(value, name) in payInfo.formData">
@@ -512,7 +512,7 @@ export default {
 					})
 					this.refreshList()
 				}).finally(_ => {
-					row.doing = false
+					row.doing = false	
 				})
       })
 		},
@@ -542,9 +542,13 @@ export default {
 				pickupUrl: location.href
 			}).then(({data}) => {
 				this.payInfo.formData = data
-				// setTimeout(_ => {
-				// 	this.$refs.payForm.submit()	
-				// }, 50)
+				if(this.payInfo.payWay == 1) {
+					setTimeout(_ => {
+						this.$refs.payForm.submit()	
+					}, 50)
+				}else {
+
+				}
 			}).finally(_ => {
 				loading.close()
 			})
