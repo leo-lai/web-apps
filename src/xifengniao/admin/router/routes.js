@@ -64,6 +64,7 @@ const routes = [
     meta: { title: '找不到页面', hidden: true },
     component: resolve => require(['../pages/404'], resolve),
   },
+  { path: '/index.html', redirect: '/', hidden: true },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

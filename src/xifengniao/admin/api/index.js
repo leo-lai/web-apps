@@ -2,6 +2,7 @@ import config from '../config'
 import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
+import router from '../router'
 
 // 创建axios实例
 const service = axios.create({
@@ -128,7 +129,8 @@ const api = {
         storage.local.remove('sessionId')
         storage.local.remove('usermenus')
         storage.local.remove('userinfo')
-        toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
+        // toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
+        router.replace('/login')
       })
     },
     changePwd(formData = {}) {
