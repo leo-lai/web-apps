@@ -39,7 +39,7 @@
 						    admin<i class="el-icon-setting l-fs-m l-margin-l-s" title="个人设置"></i>
 						  </span>
 						  <el-dropdown-menu slot="dropdown">
-						    <el-dropdown-item @click.native="pwdForm.visible = true">修改密码</el-dropdown-item>
+						    <!-- <el-dropdown-item @click.native="pwdForm.visible = true">修改密码</el-dropdown-item> -->
 						    <el-dropdown-item @click.native="logout">退出系统</el-dropdown-item>
 						  </el-dropdown-menu>
 						</el-dropdown>
@@ -60,19 +60,19 @@
 	      </el-main>
 	    </el-container>
 	  </el-container>
-		<el-dialog title="修改密码" :visible.sync="pwdForm.visible" width="500px">
-  		<el-form :model="pwdForm.data" :rules="pwdForm.rules" ref="pwdForm" label-width="100px" style="width: 400px;">
+		<el-dialog title="修改密码" :visible.sync="pwdForm.visible" width="480px">
+  		<el-form :model="pwdForm.data" :rules="pwdForm.rules" ref="pwdForm" label-width="90px" style="width: 432px;">
 			  <el-form-item label="旧密码" prop="passwordOld">
 			    <el-input type="password" v-model="pwdForm.data.passwordOld" auto-complete="off"></el-input>
 			  </el-form-item>
 			  <el-form-item label="新密码" prop="password">
 			    <el-input type="password" v-model="pwdForm.data.password" auto-complete="off"></el-input>
 			  </el-form-item>
-			  <el-form-item>
-			    <el-button type="primary" :loading="pwdForm.submiting" @click="submitPwdForm">确定修改</el-button>
-			    <el-button @click="pwdForm.visible = false">取消</el-button>
-			  </el-form-item>
 			</el-form>
+			<span slot="footer" class="l-margin-r-m">
+				<el-button @click="pwdForm.visible = false">取消</el-button>
+		    <el-button type="primary" :loading="pwdForm.loading" @click="submitPwdForm">确定提交</el-button>
+		  </span>
 		</el-dialog>
 	</div>
 </template>

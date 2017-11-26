@@ -6,17 +6,14 @@
   		</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
-  				<el-form-item style="width: 140px;" prop="deviceNo" lalel="">
-				    <el-input placeholder="设备编号" v-model="list.filter.deviceNo"></el-input>
-				  </el-form-item>
-  				<el-form-item style="width: 140px;" prop="name" lalel="">
-				    <el-input placeholder="商家姓名" v-model="list.filter.name"></el-input>
+  				<el-form-item prop="number" lalel="">
+				    <el-input placeholder="设备编号" v-model="list.filter.number"></el-input>
 				  </el-form-item>
 				  <el-form-item style="width: 140px;" prop="tel" lalel="">
 				    <el-input placeholder="手机号码" v-model="list.filter.tel"></el-input>
 				  </el-form-item>
-				  <el-form-item style="width: 140px;" prop="brandId" label="">
-				  	<el-select v-model="list.filter.guanlian" placeholder="是否有设备" @change="search()">
+				  <el-form-item style="width: 140px;" prop="related" label="">
+				  	<el-select v-model="list.filter.related" placeholder="是否有设备" @change="search()">
 				      <el-option label="是" :value="1"></el-option>
 				      <el-option label="否" :value="0"></el-option>
 				    </el-select>
@@ -30,14 +27,21 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="设备编号" prop="deviceNo"></el-table-column>
-	    <el-table-column label="属于商户" prop="name" align="center"></el-table-column>
-	    <el-table-column label="设备启动次数" prop="count" align="center"></el-table-column>
+	    <el-table-column label="设备编号" prop="number"></el-table-column>
+	    <el-table-column label="属于商户" prop="name" align="center">
+	    	<template slot-scope="scope">
+	    		<span>{{ scope.row.seller_id ? scope.row.name : '无' }}</span>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="设备启动次数" prop="start_count" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">关联商户</el-button>
-	    		<el-button class="l-text-link" type="text" size="small">解除关联</el-button>
-	    		<el-button class="l-text-error" type="text" size="small">删除</el-button>
+	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+	        	<el-button v-if="scope.row.seller_id" class="l-text-link" type="text" size="small" @click="showDialogRelate(false, scope.row)">解除关联</el-button>
+		    		<el-button v-else class="l-text-link" type="text" size="small" @click="showDialogRelate(true, scope.row)">关联商户</el-button>
+		    		<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
+	        </span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -52,36 +56,40 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 录入/编辑角色 -->
+	  <!-- 关联商家 -->
+	  <el-dialog title="关联商家" :close-on-click-modal="false" :close-on-press-escape="false"
+	  	:visible.sync="dialogRelate.visible" width="400px">
+	  	<el-form inline ref="relateForm" class="l-form1" label-width="90px"
+  			:model="dialogRelate.data" :rules="dialogRelate.rules" @keyup.enter.native="submitRelate">
+			  <el-form-item label="商家手机号">
+			    <el-input v-model="dialogRelate.data.tel" :maxlength="11" @change="getBusinessInfo()"></el-input>
+			    <span v-show="dialogRelate.searching" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;查询中...</span>
+			  </el-form-item>
+			  <el-form-item label="商家姓名">
+			    <span>{{dialogRelate.data.name}}</span>
+			  </el-form-item>
+			  <el-form-item label="商家地址">
+			    <span>{{dialogRelate.data.address}}</span>
+			  </el-form-item>
+			</el-form>
+			<span slot="footer" class="l-margin-r-m">
+				<el-button @click="dialogRelate.visible = false">取消</el-button>
+		    <el-button type="primary" :loading="dialogRelate.loading" @click="submitRelate">确定提交</el-button>
+		  </span>
+	  </el-dialog>
+
+	  <!-- 生成设备 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
-  		<el-form inline ref="infoForm" class="l-form1" label-width="90px"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="400px">
+  		<el-form inline ref="infoForm" class="l-form1" label-width="120px"
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item label="账号" prop="username">
-			    <el-input v-model="dialogInfo.data.username" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="密码" prop="password">
-			    <el-input v-model="dialogInfo.data.password" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="姓名" prop="name">
-			    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="手机号码" prop="tel">
-			    <el-input v-model="dialogInfo.data.tel" :maxlength="11"></el-input>
-			  </el-form-item>
-			  <el-form-item label="店铺名称" prop="store_name">
-			    <el-input v-model="dialogInfo.data.store_name" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="身份证号" prop="id_number">
-			    <el-input v-model="dialogInfo.data.id_number" :maxlength="18"></el-input>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="店铺地址" prop="region" @click.native="amapOpts.visible = true">
-			  	<el-input readonly placeholder="请选择" :value="amapAddress"></el-input>
+			  <el-form-item label="生成设备个数" prop="count">
+			    <el-input v-model.number="dialogInfo.data.count" :maxlength="10"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定生成</el-button>
 		  </span>
 		</el-dialog>
 
@@ -137,13 +145,13 @@ export default {
 			list: {
 				filter: {
 					tel: '',
-					name: '',
-					guanlian: ''
+					numnber: '',
+					related: ''
 				},
 				rules: {
 					tel: [],
-					name: [],
-					guanlian: []
+					numnber: [],
+					related: []
 				},
 				loading: false,
 				page: 1,
@@ -153,45 +161,29 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '录入商家',
+				title: '生成设备',
 				visible: false,
 				loading: false,
 				rules: {
-					username: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					password: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					name: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					tel: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					id_number: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					store_name: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					region: [
-						{ required: true, validator: validateRegion, trigger: 'change' },
+					count: [
+						{ required: true, type:'number',  message: '必填项', trigger: 'blur' }
 					]
 				},
 				data: {
-					username: '',
-					password: '',
+					count: ''
+				}
+			},
+			dialogRelate: {
+				visible: false,
+				loading: false,
+				searching: false,
+				data: {
+					related: true,
+					seller_id: '',
+					number: '',
 					name: '',
 					tel: '',
-					id_number: '',
-					store_name: '',
-					region_id1: '',
-					region_id2: '',
-					region_id3: '',
-					longitude: '',
-					latitude: '',
-					detail_address: ''
+					address: ''
 				}
 			}
 		}
@@ -219,7 +211,10 @@ export default {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1
         this.list.row = Number(data.per_page)
-        this.list.data = data.list
+        this.list.data = data.list.map(item => {
+        	item.doing = false
+        	return item
+        })
 			}).finally(_ => {
 				this.list.loading = false
 			})
@@ -237,11 +232,8 @@ export default {
 		showDialogInfo(type = 'new', row) { // 录入/更新商家
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '更新商家'
-				this.$$utils.copyObj(this.dialogInfo.data, row)
-				this.dialogInfo.data.seller_id = row.id
+				
 			} else {
-				this.dialogInfo.title = '录入商家'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
 			this.dialogInfo.visible = true	
@@ -252,24 +244,110 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
-			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()	
+			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
-		submitInfo() { // 提交商家信息
+		submitInfo() { // 批量生成设备
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.business.add(this.dialogInfo.data).then(_ => {
+          this.$$api.device.add(this.dialogInfo.data.count).then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '录入' : '更新') + '商家信息成功'
+							message: (this.dialogInfo.type === 'new' ? '生成' : '更新') + '设备成功'
 						})
             this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
         }
+      })
+		},
+		showDialogRelate(related = true, row) { // 关联商家
+			this.dialogRelate.data.related = related
+			this.dialogRelate.data.number = row.number
+			if(related) { // 关联
+				this.dialogRelate.visible = true
+			}else { // 解除关联
+				this.$confirm('你确定要取消吗，取消后设备不可支付？', '提示', {
+	        confirmButtonText: '确定',
+	        cancelButtonText: '取消',
+	        type: 'warning'
+	      }).then(_ => {
+	      	row.doing = true
+					this.submitRelate().finally(_ => {
+						row.doing = false
+					})
+	      })
+			}
+		},
+		submitRelate() {
+			if(this.dialogRelate.data.related && !this.dialogRelate.data.seller_id) {
+				this.$message.error('找不到商家关联')
+				return
+			}
+
+			if(!this.dialogRelate.data.number) {
+				this.$message.error('设备不存在')
+				return
+			}
+
+			this.dialogRelate.loading = true
+			return this.$$api.device.relate({
+				number: this.dialogRelate.data.number,
+				seller_id: this.dialogRelate.data.seller_id
+			}, this.dialogRelate.data.related).then(_ => {
+				this.dialogRelate.visible = false
+				this.dialogRelate.data.seller_id = ''
+				this.dialogRelate.data.number = ''
+				this.dialogRelate.data.address = ''
+
+				this.$message.success('该设备关联商家成功')
+				this.refreshList()
+			}).finally(_ => {
+				this.dialogRelate.loading = false
+			})
+		},
+		getBusinessInfo() { // 商家详情
+			if(this.dialogRelate.data.tel) {
+				this.dialogRelate.searching = true
+				this.$$api.business.getInfo({
+					tel: this.dialogRelate.data.tel
+				}).then(({data}) => {
+					this.dialogRelate.data.seller_id = data.id
+					this.dialogRelate.data.name = data.name
+					this.dialogRelate.data.address = data.province + data.city + data.district + data.detail_address
+
+				}).catch(_ => {
+					this.dialogRelate.data.seller_id = ''
+					this.dialogRelate.data.name = ''
+					this.dialogRelate.data.address = ''
+				}).finally(_ => {
+					this.dialogRelate.searching = false
+				})
+			}else {
+				this.dialogRelate.data.seller_id = ''
+				this.dialogRelate.data.name = ''
+				this.dialogRelate.data.address = ''
+			}
+		},
+		deleteInfo(row) { // 删除
+			this.$confirm('是否确定删除该设备?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+      	row.doing = true
+				this.$$api.device.del(row.number).then(_ => {
+					this.$message({
+						type: 'success',
+						message: '删除设备成功'
+					})
+					this.refreshList()
+				}).finally(_ => {
+					row.doing = false
+				})
       })
 		}
 	},

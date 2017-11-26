@@ -60,6 +60,20 @@ const api = {
       })
     }
   },
+  dashboard: {
+    getCount() {
+      return fetch.post('/dashboard/get').then(({data}) => {
+        data.recharge_amount = data.recharge_amount ? (data.recharge_amount / 100).toFixed(2) : 0
+        return data
+      })
+    },
+    getMap() {
+      return fetch.post('/dashboard/map').then(({data}) => {
+        data.seller_recharge_amount = data.seller_recharge_amount ? (data.seller_recharge_amount / 100).toFixed(2) : 0
+        return data
+      })
+    }
+  },
   sys: { // 系统管理
     getList(formData = {}, page = 1, row = 20) {
       formData.per_page = row
@@ -67,6 +81,9 @@ const api = {
       return fetch.post('/role/list', formData)
     },
     add(formData = {}) {
+      if(formData.uid || formData.user_id) {
+        return fetch.post('/role/update', formData)  
+      } 
       return fetch.post('/role/add', formData)
     },
     del(user_id = '') {
@@ -82,19 +99,78 @@ const api = {
       formData.page_number = page - 1      
       return fetch.post('/seller/list', formData)
     },
+    getInfo(formData = {}) {
+      return fetch.post('/seller/info', formData)
+    },
     add(formData = {}) {
-      if(!formData.seller_id) {
-        return fetch.post('/seller/add', formData)  
-      }else {
+      if(formData.seller_id) {
         return fetch.post('/seller/update', formData)
       }
+      return fetch.post('/seller/add', formData)
     }
   },
   device: { // 设备管理
     getList(formData = {}, page = 1, row = 20) {
       formData.per_page = row
       formData.page_number = page - 1      
-      return mockFetch.post('/device/list', formData)
+      return fetch.post('/device/list', formData)
+    },
+    relate(formData = {}, related = true) { // 关联设备
+      if(related) {
+        return fetch.post('/device/relate', formData)  
+      }else {
+        return fetch.post('/device/un_relate', formData)
+      }
+    },
+    add(count = '') {
+      return fetch.post('/device/generate', { count })
+    },
+    del(number = '') {
+      return fetch.post('/device/delete', { number })
+    },
+    getRemindList(formData = {}, page = 1, row = 20) { // 物料提醒列表
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/device/alter_list', formData)
+    },
+    supply(number = '') { // 补货
+      return fetch.post('/device/supply', { number })
+    }
+  },
+  customer: { // 消费者管理
+    getList(formData = {}, page = 1, row = 20) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/customer/list', formData)
+    }
+  },
+  recharge: { // 充值管理
+    getPrice() {
+      return fetch.post('/recharge/base/get').then(({data}) => {
+        return (data && data.money) ? (data.money / 100).toFixed(2) : 0
+      })
+    },
+    setPrice(money = 0) {
+      money = money * 100
+      return fetch.post('/recharge/base/create', { money })
+    },
+    getCouponList() {
+      return fetch.post('/recharge/coupon/list')
+    },
+    addCoupon(formData = {}) {
+      return fetch.post('/recharge/coupon/add', formData)
+    },
+    delCoupon(coupon_id = '') {
+      return fetch.post('/recharge/coupon/delete', { coupon_id })
+    },
+    getTmplList() {
+      return fetch.post('/recharge/template/list')
+    },
+    addTmpl(count = 0) {
+      return fetch.post('/recharge/template/add', { count })
+    },
+    delTmpl(template_id = '') {
+      return fetch.post('/recharge/template/delete', { template_id })
     }
   }
 }

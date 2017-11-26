@@ -18,8 +18,8 @@ import VueAMap from 'vue-amap'
 Vue.use(VueAMap)
 
 // 本地模拟请求
-import Mock from './mock'
-Mock.bootstrap()
+// import Mock from './mock'
+// Mock.bootstrap()
 
 import router from './router'
 import store from './store'

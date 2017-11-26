@@ -6,14 +6,14 @@
   		</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
-  				<el-form-item prop="name" lalel="">
+  				<el-form-item style="width: 140px;" prop="name" lalel="">
 				    <el-input placeholder="商家姓名" v-model="list.filter.name"></el-input>
 				  </el-form-item>
-				  <el-form-item prop="tel" lalel="">
+				  <el-form-item style="width: 140px;" prop="tel" lalel="">
 				    <el-input placeholder="手机号码" v-model="list.filter.tel"></el-input>
 				  </el-form-item>
-				  <el-form-item prop="brandId" label="">
-				  	<el-select v-model="list.filter.guanlian" placeholder="是否有设备" @change="search()">
+				  <el-form-item style="width: 140px;" prop="related" label="">
+				  	<el-select v-model="list.filter.related" placeholder="是否有设备" @change="search()">
 				      <el-option label="是" :value="1"></el-option>
 				      <el-option label="否" :value="0"></el-option>
 				    </el-select>
@@ -25,9 +25,8 @@
 				</el-form>
   		</el-col>
   	</el-row>
-		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
-  		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="商户姓名" prop="nickname"></el-table-column>
+		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" :data="list.data" v-loading="list.loading">
+	    <el-table-column label="商户姓名" prop="name"></el-table-column>
 	    <el-table-column label="状态" prop="status" align="center">
 	    	<template slot-scope="scope">
 	    		<el-switch v-model="scope.row.status" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用"></el-switch>
@@ -78,6 +77,9 @@
 			  <el-form-item class="_flex" label="店铺地址" prop="region" @click.native="amapOpts.visible = true">
 			  	<el-input readonly placeholder="请选择" :value="amapAddress"></el-input>
 			  </el-form-item>
+			  <el-form-item label="银行商户ID" prop="bank_id">
+			    <el-input v-model="dialogInfo.data.bank_id" :maxlength="50"></el-input>
+			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
@@ -126,9 +128,9 @@ export default {
 					that.dialogInfo.data.region_id2 = regionValue[1] || ''
 					that.dialogInfo.data.region_id3 = regionValue[2] || ''
 					
-					// that.dialogInfo.data.province = addressObj.province
-					// that.dialogInfo.data.city = addressObj.city
-					// that.dialogInfo.data.area = addressObj.area
+					that.dialogInfo.data.province = addressObj.province
+					that.dialogInfo.data.city = addressObj.city
+					that.dialogInfo.data.district = addressObj.area
 					that.dialogInfo.data.detail_address = addressObj.address
 					that.dialogInfo.data.longitude = addressObj.longitude
 					that.dialogInfo.data.latitude = addressObj.latitude
@@ -138,12 +140,12 @@ export default {
 				filter: {
 					tel: '',
 					name: '',
-					guanlian: ''
+					related: ''
 				},
 				rules: {
 					tel: [],
 					name: [],
-					guanlian: []
+					related: []
 				},
 				loading: false,
 				page: 1,
@@ -191,6 +193,10 @@ export default {
 					region_id3: '',
 					longitude: '',
 					latitude: '',
+					province: '',
+					city: '',
+					district: '',
+					bank_id: '',
 					detail_address: ''
 				}
 			}
@@ -236,15 +242,31 @@ export default {
 		},
 		showDialogInfo(type = 'new', row) { // 录入/更新商家
 			this.dialogInfo.type = type
+			let promiseInfo = Promise.resolve()
 			if(type === 'edit') {
 				this.dialogInfo.title = '更新商家'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
-				this.dialogInfo.data.seller_id = row.id
+				this.dialogInfo.data.seller_id = row.seller_id ? row.seller_id : row.id
+				promiseInfo = this.$$api.business.getInfo({
+					seller_id: this.dialogInfo.data.seller_id
+				}).then(({data}) => {
+					this.$$utils.copyObj(this.dialogInfo.data, data)
+					this.$$utils.copyObj(this.amapOpts, data)
+					this.amapOpts.area = data.district
+					this.amapOpts.address = data.detail_address
+				})
 			} else {
 				this.dialogInfo.title = '录入商家'
 				this.$$utils.copyObj(this.dialogInfo.data, '')
 			}
-			this.dialogInfo.visible = true	
+
+			const loading = this.$loading()
+			promiseInfo.finally(_ => {
+				setTimeout(_ => {
+					loading.close()
+					this.dialogInfo.visible = true
+				}, 50)
+			})
 		},
 		closeDialogInfo(done) {
 			if(done) {

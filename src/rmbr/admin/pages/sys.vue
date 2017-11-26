@@ -13,13 +13,21 @@
 	    <el-table-column label="姓名" prop="name"></el-table-column>
 	    <el-table-column label="账号" prop="username"></el-table-column>
 	    <el-table-column label="密码" prop="password"></el-table-column>
-	    <el-table-column label="所属地区" prop="region" min-width="120"></el-table-column>
-	    <el-table-column label="权限集" prop="operations" min-width="140" :formatter="formatOperations"></el-table-column>
+	    <el-table-column label="所属地区" prop="region" min-width="120">
+	    	<template slot-scope="scope">
+	    		<span>{{scope.row.province + scope.row.city + scope.row.district}}</span>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="权限集" prop="operations" min-width="140">
+	    	<template slot-scope="scope">
+	    		<p v-for="item in scope.row.operations">{{item.operation_name}}</p>
+	    	</template>
+	    </el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
 	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit')">编辑</el-button>
+	        	<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        	<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
 	        </span>
 	      </template>
@@ -51,7 +59,7 @@
 			    <el-input v-model="dialogInfo.data.password" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="地区" prop="region">
-			  	<el-cascader style="width:100%;" change-on-select v-model="dialogInfo.region" :options="regionData" :props="{label: 'text', value: 'value'}"></el-cascader>
+			  	<el-cascader ref="region" style="width:100%;" change-on-select filterable v-model="dialogInfo.region" :options="regionData" :props="{label: 'text', value: 'value'}"></el-cascader>
 			  </el-form-item>
 			  <el-form-item label="权限" prop="permission">
 			    <el-checkbox-group class="l-permission" v-model="dialogInfo.permission.value">
@@ -80,6 +88,10 @@ export default {
       	that.dialogInfo.data.region_id1 = that.dialogInfo.region[0] || ''
       	that.dialogInfo.data.region_id2 = that.dialogInfo.region[1] || ''
       	that.dialogInfo.data.region_id3 = that.dialogInfo.region[2] || ''
+
+      	that.dialogInfo.data.province = that.$refs.region.currentLabels[0] || ''
+        that.dialogInfo.data.city = that.$refs.region.currentLabels[1] || ''
+        that.dialogInfo.data.district = that.$refs.region.currentLabels[2] || ''
         callback()
       }
 		}
@@ -133,12 +145,16 @@ export default {
 					]
 				},
 				data: {
+					user_id: '',
 					username: '',
 					password: '',
 					name: '',
 					region_id1: '',
 					region_id2: '',
 					region_id3: '',
+					province: '',
+					city: '',
+					district: '',
 					operation_ids: ''
 				}
 			}
@@ -165,7 +181,6 @@ export default {
 			.then(({data}) => {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1
-        console.log(this.list.page)
         this.list.rows = Number(data.per_page)
         this.list.data = data.list.map(item => {
         	item.doing = false
@@ -190,6 +205,9 @@ export default {
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改角色'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
+				this.dialogInfo.data.user_id = row.user_id ? row.user_id : row.uid
+				this.dialogInfo.region = [row.region_id1 + '', row.region_id2 + '', row.region_id3 + '']
+				this.dialogInfo.permission.value = row.operations ? row.operations.map(item => item.operation_id) : []
 			} else {
 				this.dialogInfo.title = '新增角色'
 				this.$$utils.copyObj(this.dialogInfo.data, '')

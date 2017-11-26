@@ -70,7 +70,7 @@ export let userMenus = [
       { 
         path: '', 
         meta: { title: '' },
-        component: resolve => require(['../pages/index'], resolve),
+        component: resolve => require(['../pages/customer'], resolve),
       }
     ],
   },
@@ -82,7 +82,7 @@ export let userMenus = [
       { 
         path: '', 
         meta: { title: '' },
-        component: resolve => require(['../pages/index'], resolve),
+        component: resolve => require(['../pages/materiel'], resolve),
       }
     ],
   },
@@ -94,7 +94,7 @@ export let userMenus = [
       { 
         path: '', 
         meta: { title: '' },
-        component: resolve => require(['../pages/index'], resolve),
+        component: resolve => require(['../pages/finance'], resolve),
       }
     ],
   },
@@ -106,7 +106,7 @@ export let userMenus = [
       { 
         path: '', 
         meta: { title: '' },
-        component: resolve => require(['../pages/index'], resolve),
+        component: resolve => require(['../pages/recharge'], resolve),
       }
     ],
   },
@@ -118,7 +118,7 @@ export let userMenus = [
       { 
         path: '', 
         meta: { title: '' },
-        component: resolve => require(['../pages/index'], resolve),
+        component: resolve => require(['../pages/datamap'], resolve),
       }
     ],
   },

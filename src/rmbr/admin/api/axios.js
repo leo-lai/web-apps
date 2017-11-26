@@ -41,7 +41,6 @@ export default function createService() {
   }, error => {
     let err = { message: '' }
     if (error && error.response) {
-      err.message = error.response.data.msg
       switch (error.response.status) {
         case 400:
           err.message = '请求错误'
@@ -84,6 +83,9 @@ export default function createService() {
           break
         default:
           err.message = '服务器连接失败'
+      }
+      if(error.response.data.msg) {
+        err.message = error.response.data.msg 
       }
       err.message += `(${error.response.status})`
     }
