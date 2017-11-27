@@ -2,17 +2,10 @@
 	<div>
 		<el-row>
 			<el-col :span="4">
-				<!-- <el-button type="primary">新增出库订单</el-button> -->
+				<el-button type="primary" style="visibility:hidden;">新增出库订单</el-button>
 			</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-  				<el-form-item style="width: 120px;" prop="deliveryState">
-  					<el-select v-model="list.filter.deliveryState" placeholder="出库状态" @change="search()">
-				      <el-option label="未处理" :value="0"></el-option>
-				      <el-option label="已处理" :value="1"></el-option>
-				      <el-option label="已出库" :value="2"></el-option>
-				    </el-select>
-  				</el-form-item>
   				<el-form-item prop="stockOrderState">
   					<el-select v-model="list.filter.stockOrderState" placeholder="订单状态" @change="search()">
 				      <el-option v-for="item in list.state" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -33,21 +26,24 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="120"></el-table-column>
+	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="125"></el-table-column>
 	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="120"></el-table-column>
 	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
 	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
 	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
 	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center"></el-table-column>
-	    
-	    <el-table-column label="订单状态" prop="stockOrderState" :formatter="formatterState" align="center" class-name="l-fs-xs" min-width="120" ></el-table-column>
-	    <el-table-column label="出库状态" prop="" align="center"></el-table-column>
-	    <el-table-column label="操作" min-width="120" header-align="center">
+	    <el-table-column label="订单状态" prop="stockOrderState" align="center" class-name="l-fs-xs" min-width="130" >
+	    	<template slot-scope="scope">
+	    		<p>{{formatterState(null, null, scope.row.stockOrderState)}}</p>
+	    		<p class="l-text-error" v-if="scope.row.stockOrderState === 5">（尾款金额：{{scope.row.balancePrice}}）</p>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="操作" min-width="120" header-align="center" align="center">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button v-if="scope.row.stockOrderState >= 3 && scope.row.stockOrderState <= 5" class="l-text-ok" type="text" size="small">通知有车</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 7" class="l-text-warn" type="text" size="small">出库车辆</el-button>
+	        	<el-button v-if="scope.row.stockOrderState >= 3 && scope.row.stockOrderState < 5" class="l-text-ok" type="text" size="small" @click="showNoticeInfo(scope.row)">通知有车</el-button>
+		        <el-button v-if="scope.row.stockOrderState === 7" class="l-text-warn" type="text" size="small" @click="showOutStockInfo(scope.row)">出库车辆</el-button>
 		        <el-button v-if="scope.row.stockOrderState === 11" class="l-text-link" type="text" size="small">打印单据</el-button>
 		        <el-button class="l-text-link" type="text" size="small" @click="showViewInfo(scope.row)">查看明细</el-button>
 	        </span>
@@ -155,72 +151,116 @@
 		  <table class="l-table-info">
   			<tr>
   				<td class="_tit" width="80">物流单号</td>
-  				<td class="_cont">{{ viewInfo.data.logisticsOddNumber }}</td>
+  				<td class="_cont">{{ viewInfo.data.logisticsModeOddNumber }}</td>
   			</tr>
   			<tr>
   				<td class="_tit">随车资料</td>
   				<td class="_cont">
   					<ul class="l-gou-list">
-	  					<li><i>√</i>合格证</li>
-	  					<li><i>√</i>一致证书</li>
-	  					<li><i>√</i>环保清单</li>
-	  					<li><i>√</i>主钥匙</li>
-	  					<li><i>√</i>备用钥匙</li>
-	  					<li><i>√</i>用户手册</li>
-	  					<li><i>√</i>保养手册</li>
-	  					<li><i>√</i>首保</li>
-	  					<li><i>√</i>三包</li>
-	  					<li><i>√</i>车架号拓印纸</li>
-	  					<li><i>√</i>天线</li>
-	  					<li><i>√</i>点烟器</li>
+	  					<li v-for="(item,index) in $$config.baseData.carSpec" :key="index"><i>√</i>{{item}}</li>
   					</ul>
   				</td>
   			</tr>
   		</table>
 		</el-dialog>
 
-		<!-- 支付订车单 -->
-		<el-dialog class="l-padding-t-0" title="支付定金" :visible.sync="payInfo.visible">
+		<!-- 通知有车 -->
+		<el-dialog class="l-padding-t-0" title="通知有车" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="noticeInfo.visible">
   		<table class="l-table-info">
+  			<caption>订单基本信息</caption>
   			<tr>
-  				<td class="_tit">车型</td>
-  				<td class="_cont">{{ payInfo.data.carsName }}</td>
-  				<td class="_tit">车身颜色</td>
-  				<td class="_cont" align="center">{{ payInfo.data.colourName }}</td>
-  				<td class="_tit">内饰颜色</td>
-  				<td class="_cont" align="center">{{ payInfo.data.interiorName }}</td>
-  			</tr>
-  			<tr>
-  				<td class="_tit">订单状态</td>
-  				<td class="_cont">{{ formatterState(null, null, payInfo.data.stockOrderState) }}</td>
-  				<td class="_tit">定金</td>
-  				<td class="_cont" align="center">3000</td>
-  				<td class="_tit">数量</td>
-  				<td class="_cont" align="center">{{ payInfo.data.stockOrderNumber }}</td>
+  				<td class="_tit" width="50">车型</td>
+  				<td class="_cont" width="350">{{ noticeInfo.data.carsName }}</td>
+  				<td class="_tit" width="50">车身颜色</td>
+  				<td class="_cont" width="50" align="center">{{ noticeInfo.data.colourName }}</td>
+  				<td class="_tit" width="50">内饰颜色</td>
+  				<td class="_cont" width="70" align="center">{{ noticeInfo.data.interiorName }}</td>
   			</tr>
   			<tr>
   				<td class="_tit">订单备注</td>
-  				<td colspan="5" class="_cont">{{ payInfo.data.remark }}</td>
-  			</tr>
-  			<tr>
-  				<td class="_tit">门店地址</td>
-  				<td colspan="5" class="_cont">{{ payInfo.data.address }}</td>
-  			</tr>
-  			<tr>
-  				<td class="_tit">支付方式</td>
-  				<td colspan="5" class="_cont">
-  					<el-radio-group v-model="payInfo.payway">
-					    <el-radio :label="1" border>银联支付</el-radio>
-					  </el-radio-group>
+  				<td class="_cont" width="200">{{ noticeInfo.data.remark }}</td>
+  				<td class="_tit">出库数量</td>
+  				<td class="_cont" align="center">{{ noticeInfo.data.stockOrderNumber }}</td>
+  				<td class="_tit">支付尾款</td>
+  				<td class="_cont" align="center">
+  					<input class="_ipt" type="text" v-model="noticeInfo.formData.balancePrice" maxlength="10">
   				</td>
   			</tr>
   		</table>
-  		<br>
-  		<div class="l-text-center l-margin-t">
-				<b class="l-fs-s l-margin-r">需要支付定金：￥3000</b>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<el-button type="primary">立即支付</el-button>
-  		</div>
+  		<div class="l-block-tit">现有库存</div>
+  		<el-table class="l-table-hdbg" stripe :data="noticeInfo.data.list">
+		    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
+		    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
+		    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
+		    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
+		    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
+		    <el-table-column label="操作" align="center">
+		    	<template slot-scope="scope">
+		        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
+		      </template>
+		    </el-table-column>
+		  </el-table>
+
+		  <div class="l-margin-t l-text-center">
+		  	<el-button style="width: 200px;" type="primary" :loading="noticeInfo.loading" @click="notice()">通知有车</el-button>
+		  </div>
+		</el-dialog>
+
+		<!-- 出库车辆 -->
+		<el-dialog class="l-padding-t-0" title="出库车辆" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="outStockInfo.visible">
+  		<table class="l-table-info">
+  			<caption>订单基本信息</caption>
+  			<tr>
+  				<td class="_tit" width="50">车型</td>
+  				<td class="_cont" width="350">{{ outStockInfo.data.carsName }}</td>
+  				<td class="_tit" width="50">车身颜色</td>
+  				<td class="_cont" width="50" align="center">{{ outStockInfo.data.colourName }}</td>
+  				<td class="_tit" width="50">内饰颜色</td>
+  				<td class="_cont" width="70" align="center">{{ outStockInfo.data.interiorName }}</td>
+  			</tr>
+  			<tr>
+  				<td class="_tit">订单备注</td>
+  				<td class="_cont" colspan="3">{{ outStockInfo.data.remark }}</td>
+  				<td class="_tit">出库数量</td>
+  				<td class="_cont" align="center">{{ outStockInfo.data.stockOrderNumber }}</td>
+  			</tr>
+  			<tr>
+  				<td class="_tit">随车资料</td>
+  				<td class="_cont" colspan="5">
+  					<el-checkbox-group class="l-car-spec" v-model="outStockInfo.carSpecs">
+					    <el-checkbox v-for="(item,index) in $$config.baseData.carSpec" :key="index" :label="item"></el-checkbox>
+					  </el-checkbox-group>
+  				</td>
+  			</tr>
+  			<tr>
+  				<td class="_tit">票证物流方式</td>
+  				<td class="_cont" colspan="5">
+  					<el-radio-group v-model="outStockInfo.formData.logisticsMode">
+					    <el-radio :label="1">随车</el-radio>
+					    <el-radio :label="2">物流</el-radio>
+					  </el-radio-group>
+					  <el-input :disabled="outStockInfo.formData.logisticsMode === 1" v-model="outStockInfo.formData.logisticsOddNumber" style="width: 150px; margin-left: 15px;" placeholder="请填写物流单号"></el-input>
+  				</td>
+  			</tr>
+  		</table>
+  		<div class="l-block-tit">现有库存</div>
+  		<el-table class="l-table-hdbg" stripe :data="outStockInfo.data.list" @selection-change="outStockSlted">
+  			<el-table-column type="selection" width="55" :selectable="outStockSltable"></el-table-column>
+		    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
+		    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
+		    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
+		    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
+		    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
+		    <el-table-column label="操作" align="center">
+		    	<template slot-scope="scope">
+		        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
+		      </template>
+		    </el-table-column>
+		  </el-table>
+
+		  <div class="l-margin-t l-text-center">
+		  	<el-button style="width: 200px;" type="primary" :loading="outStockInfo.loading" @click="outStock()">出库车辆</el-button>
+		  </div>
 		</el-dialog>
 	</div>
 </template>
@@ -289,13 +329,11 @@ export default {
 					}
 				],
 				filter: {
-					deliveryState: '',
 					stockOrderState: '',
 					stockOrderCode: '',
 					carsName: ''
 				},
 				rules: {
-					deliveryState: [],
 					stockOrderState: [],
 					stockOrderCode: [],
 					carsName: []
@@ -347,9 +385,27 @@ export default {
 				visible: false,
 				data: {}
 			},
-			payInfo: {
+			noticeInfo: {
+				loading: false,
 				visible: false,
-				payway: 1,
+				formData: { 
+					stockOrderId: '', 
+					balancePrice: ''
+				},
+				data: {}
+			},
+			outStockInfo: {
+				loading: false,
+				visible: false,
+				stockCarIdArr: [],
+				carSpecs: [],
+				formData: { 
+					stockOrderId: '', 
+					stockCarIds: '',
+					logisticsMode: 1,
+					logisticsOddNumber: '',
+					followInformation: ''
+				},
 				data: {}
 			}
 		}
@@ -539,21 +595,123 @@ export default {
 			}).finally(_ => {
 				loading.close()
 			})
+		},
+		showNoticeInfo(row) { // 通知有车
+			const loading = this.$loading()
+			this.$$api.stock.noticeBefore(row.stockOrderId).then(({data}) => {
+				this.noticeInfo.formData.stockOrderId = row.stockOrderId
+				this.noticeInfo.formData.balancePrice = data.balancePrice
+				this.noticeInfo.data = data
+				this.noticeInfo.data.list = data.list ? data.list.map(item => {
+					if(item.stockCarImages) {
+						item.imagesArr = item.stockCarImages.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						})
+					}
+					return item
+				}) : []
+				this.noticeInfo.visible = true
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		notice() { // 通知有车
+			if(!this.noticeInfo.formData.balancePrice) {
+				this.$message.error('请输入支付尾款')
+				return
+			}
+			if(!/^\d{1,9}(\.\d{1,2})?$/.test(this.noticeInfo.formData.balancePrice)) {
+				this.$message.error('请正确输入尾款金额')
+				return
+			}
+
+			this.noticeInfo.loading = true
+			this.$$api.stock.notice(this.noticeInfo.formData).then(_ => {
+				this.$message.success('通知成功')
+				this.noticeInfo.visible = false
+				this.refreshList()
+			}).finally(_ => {
+				this.noticeInfo.loading = false
+			})
+		},
+		showOutStockInfo(row) { // 出库车辆
+			const loading = this.$loading()
+			this.$$api.stock.outStockBefor(row.stockOrderId).then(({data}) => {
+				this.outStockInfo.formData.stockOrderId = row.stockOrderId
+				this.outStockInfo.data = data
+				this.outStockInfo.data.list = data.list ? data.list.map(item => {
+					if(item.stockCarImages) {
+						item.imagesArr = item.stockCarImages.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						})
+					}
+					return item
+				}) : []
+				this.outStockInfo.visible = true
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		outStock() { // 出库车辆
+			if(!this.outStockInfo.formData.stockCarIds) {
+				this.$message.error('请选择出库车辆')
+				return
+			}
+			if(this.outStockInfo.formData.logisticsMode === 2 && !this.outStockInfo.formData.logisticsOddNumber){
+				this.$message.error('请填写物流单号')
+				return	
+			}
+			this.outStockInfo.formData.followInformation = this.outStockInfo.carSpecs.join(',')
+
+			this.outStockInfo.loading = true
+			this.$$api.stock.outStock(this.outStockInfo.formData).then(_ => {
+				this.$message.success('出库车辆成功')
+				this.outStockInfo.visible = false
+				this.refreshList()
+			}).finally(_ => {
+				this.outStockInfo.loading = false
+			})
+		},
+		outStockSlted(valArr) {
+			this.outStockInfo.stockCarIdArr = valArr.map(item => item.stockCarId)
+			this.outStockInfo.formData.stockCarIds = this.outStockInfo.stockCarIdArr.join(',')
+		},
+		outStockSltable(row, index) {
+			if(this.outStockInfo.stockCarIdArr.includes(row.stockCarId)) {
+				return true
+			}else{
+				return this.outStockInfo.stockCarIdArr.length < this.outStockInfo.data.stockOrderNumber	
+			}
+		},
+		showCarImages(imagesArr = []) { // 查看验车图片
+			if(imagesArr && imagesArr.length > 0) {
+				this.$$parent.viewer.images = imagesArr
+				setTimeout(_ => {
+					this.$$parent.$$viewer.index = 0
+					this.$$parent.$$viewer.show()	
+				}, 50)
+			}
 		}
 	},
 	mounted() {
-		this.$$event.$on('stock:tab', activeName => {
+		this.$$event.$on('stock:tab', (activeName, that) => {
 			if(activeName === 'out-order' && this.list.data.length === 0) {
+				this.$$parent = that
 				this.getList()
 			}
 		})
 	}
 }
 </script>
-<style lang="less">
-.l-gou-list{
-	list-style: none; margin:0; padding: 0;
-	li{display: inline-block; margin: 0 10px 5px 0; white-space: nowrap; min-width: 100px;}
-	li i{margin-right: 2px;}
-}
-</style>

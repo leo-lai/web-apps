@@ -79,7 +79,7 @@ var utils = require('./utils')
 var pages =  utils.getMultiEntry('./src/'+config.moduleName+'/*/template.html')
 Object.keys(pages).forEach(function (pathname){
   if(pathname !== 'default'){
-    app.get(new RegExp('\\/' + pathname + '(?:\\/.*)?$'), function(req, res) {
+    app.all(new RegExp('\\/' + pathname + '(?:\\/.*)?$'), function(req, res) {
       // res.set('Content-Type', 'text/html')
       // res.send(compiler.outputFileSystem.readFileSync(compiler.outputPath + '/' + pathname + '/index.html'))
       var filepath = path.join(compiler.outputPath, pathname + '/index.html')

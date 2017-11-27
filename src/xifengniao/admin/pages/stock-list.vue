@@ -81,7 +81,7 @@
 			    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
 			    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
 			    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
-			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs" min-width="120"></el-table-column>
+			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
 			    <el-table-column label="操作">
 			    	<template slot-scope="scope">
 			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>

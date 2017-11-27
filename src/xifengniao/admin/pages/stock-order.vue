@@ -32,7 +32,12 @@
 	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
 	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
 	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center"></el-table-column>
-	    <el-table-column label="订单状态" prop="stockOrderState" :formatter="formatterState" align="center" class-name="l-fs-xs" min-width="120" ></el-table-column>
+    	<el-table-column label="订单状态" prop="stockOrderState" align="center" class-name="l-fs-xs" min-width="130" >
+	    	<template slot-scope="scope">
+	    		<p>{{formatterState(null, null, scope.row.stockOrderState)}}</p>
+	    		<p class="l-text-error" v-if="scope.row.stockOrderState === 5">（尾款金额：{{scope.row.balancePrice}}）</p>
+	    	</template>
+	    </el-table-column>
 	    <el-table-column label="操作" min-width="120" header-align="center">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
@@ -119,7 +124,7 @@
   				<td class="_cont">{{ formatterState(null, null, viewInfo.data.stockOrderState) }}</td>
   				<td class="_tit">定金</td>
   				<td class="_cont" align="center">3000</td>
-  				<td class="_tit">需要出库量</td>
+  				<td class="_tit">数量</td>
   				<td class="_cont" align="center">{{ viewInfo.data.stockOrderNumber }}</td>
   			</tr>
   			<tr>
@@ -137,7 +142,7 @@
 			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
 			    <el-table-column label="操作">
 			    	<template slot-scope="scope">
-			        <el-button class="l-text-link" type="text" size="small">查看验车照片</el-button>
+			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
 			      </template>
 			    </el-table-column>
 			  </el-table>
@@ -537,10 +542,33 @@ export default {
 			const loading = this.$loading()
 			this.$$api.stock.getOrderInfo(row.stockOrderId).then(({data}) => {
 				this.viewInfo.data = data
+				this.viewInfo.data.list = data.list ? data.list.map(item => {
+					if(item.stockCarImages) {
+						item.imagesArr = item.stockCarImages.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						})
+					}
+					return item
+				}) : []
 				this.viewInfo.visible = true
 			}).finally(_ => {
 				loading.close()
 			})
+		},
+		showCarImages(imagesArr = []) { // 查看验车图片
+			if(imagesArr && imagesArr.length > 0) {
+				this.$$parent.viewer.images = imagesArr
+				setTimeout(_ => {
+					this.$$parent.$$viewer.index = 0
+					this.$$parent.$$viewer.show()	
+				}, 50)
+			}
 		},
 		showPayInfo(row) { // 支付订车单定金
 			const loading = this.$loading()
@@ -590,18 +618,12 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('stock:tab', activeName => {
+		this.$$event.$on('stock:tab', (activeName, that) => {
 			if(activeName === 'order' && this.list.data.length === 0) {
+				this.$$parent = that
 				this.getList()
 			}
 		})
 	}
 }
 </script>
-<style lang="less">
-.l-gou-list{
-	list-style: none; margin:0; padding: 0;
-	li{display: inline-block; margin: 0 10px 5px 0; white-space: nowrap; min-width: 100px;}
-	li i{margin-right: 2px;}
-}
-</style>

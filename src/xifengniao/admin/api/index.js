@@ -361,6 +361,18 @@ const api = {
     },
     signOrder(stockOrderId = '') {
       return fetch.post('/stockOrderSign', { stockOrderId })
+    },
+    noticeBefore(stockOrderId = '') { // 通知有车前信息
+      return fetch.post('/stockOrderNoticeBefor', { stockOrderId })
+    },
+    notice(formData = {}) { // 通知有车
+      return fetch.post('/stockOrderNotice', formData)
+    },
+    outStockBefor(stockOrderId = '') { // 出库车辆前信息
+      return fetch.post('/stockOrderStorageOutBefor', { stockOrderId })
+    },
+    outStock(formData = {}) { // 通知有车
+      return fetch.post('/stockOrderStorageOut', formData)
     }
   },
   pay: { // 通联支付

@@ -2,7 +2,7 @@
 	<div>
 		<el-row>
 			<el-col :span="6">
-				<el-button type="primary" @click="showDialogInfo('new')">新增客户</el-button>
+				<el-button type="primary" @click="showDialogInfo('new')">新增预约客户</el-button>
 			</el-col>
   		<el-col :span="18" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
@@ -44,7 +44,7 @@
 	    	<template slot-scope="scope">
 	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+	        	<el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑预约信息</el-button>
 		    		<el-dropdown>
 		    			<el-button class="l-text-link" type="text" size="small">
 		    				标记为 <i class="el-icon-arrow-down"></i>
@@ -69,7 +69,7 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 新增客户 -->
+	  <!-- 新增预约客户 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="713px">
   		<el-form ref="infoForm" inline class="l-form1" label-width="120px" 
@@ -205,7 +205,7 @@ export default {
 			},
 			salesList: [],
 			dialogInfo: {
-				title: '新增客户',
+				title: '新增预约客户',
 				visible: false,
 				loading: false,
 				rules: {
@@ -329,7 +329,7 @@ export default {
       }
       return promise
 		},
-		showDialogInfo(type = 'new', row) { // 新增客户
+		showDialogInfo(type = 'new', row) { // 新增预约客户
 			this.resetDialogInfo()
 
 			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
@@ -349,7 +349,7 @@ export default {
 				this.dialogInfo.title = '修改客户信息'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			}else {
-				this.dialogInfo.title = '新增客户信息'
+				this.dialogInfo.title = '新增预约客户信息'
 				this.resetDialogInfo()
 			}
 
@@ -382,7 +382,7 @@ export default {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: '新增客户成功'
+							message: '新增预约客户成功'
 						})
             this.refreshList()
           }).finally(()=>{
