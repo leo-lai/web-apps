@@ -29,8 +29,8 @@ export default {
       	loading: false,	
       	remember: true,
       	data: {
-      		phoneNumber: '18602029524',
-        	password: '123'
+      		phoneNumber: '',
+        	password: ''
       	},
       	rules: {
       		phoneNumber: [

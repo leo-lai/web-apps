@@ -1,6 +1,6 @@
 let config = {
   router: {
-    base: '/admin'
+    base: Object.is(process.env.NODE_ENV, 'production') ? '/' : '/admin'
   },
   api: {
     baseURL: 'http://111.230.170.36/tauto/management/admin'
