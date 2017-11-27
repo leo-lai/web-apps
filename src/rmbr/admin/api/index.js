@@ -3,6 +3,7 @@ import createService from './axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
 import { mockFetch } from '../mock'
+import router from '../router'
 
 // 创建axios实例
 const service = createService()
@@ -56,7 +57,8 @@ const api = {
       }).finally(() => {
         storage.local.remove('userinfo')
         storage.local.remove('usermenus')
-        toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
+        // toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
+        toLogin && router.replace('/login')
       })
     }
   },

@@ -1,6 +1,6 @@
 let config = {
 	router: {
-		base: '/admin'
+		base: Object.is(process.env.NODE_ENV, 'production') ? '/' : '/admin'
 	},
 	api: {
 		baseURL: 'http://api.leolai.cn/api/plat'

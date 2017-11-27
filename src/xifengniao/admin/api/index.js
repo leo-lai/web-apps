@@ -130,7 +130,7 @@ const api = {
         storage.local.remove('usermenus')
         storage.local.remove('userinfo')
         // toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
-        router.replace('/login')
+        toLogin && router.replace('/login')
       })
     },
     changePwd(formData = {}) {
