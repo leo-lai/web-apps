@@ -72,7 +72,11 @@ export default {
       
     },
     uploadError(error, file, fileList) {
-
+      // this.$message.error(`图片${file.name}上传失败`)
+      this.$notify.error({
+        title: '上传失败',
+        message: `图片${file.name}上传失败`
+      })
     },
     uploadExceed(files, fileList) {
       this.$message.error('最多上传9张照片')

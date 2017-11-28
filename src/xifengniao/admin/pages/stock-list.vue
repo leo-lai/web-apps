@@ -52,7 +52,7 @@
 
 	  <!-- 车辆库存详情 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="673px">
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="873px">
   		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item class="_flex" label="车辆型号" style="width: 622px;">
@@ -78,11 +78,11 @@
 			  </el-form-item>
 			  <el-table class="l-table-hdbg" stripe :data="dialogInfo.list">
 			    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
-			    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
-			    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
-			    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
-			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
-			    <el-table-column label="操作">
+			    <el-table-column label="发动机号" prop="engineNumber"  align="center"></el-table-column>
+			    <el-table-column label="票证号" prop="certificateNumber"  align="center"></el-table-column>
+			    <el-table-column label="仓位" prop="warehouseName"  align="center"></el-table-column>
+			    <el-table-column label="入库时间" prop="createDate"  align="center" class-name="l-fs-xs" min-width="120"></el-table-column>
+			    <el-table-column label="操作" align="center">
 			    	<template slot-scope="scope">
 			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
 			      </template>
