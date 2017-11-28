@@ -19,7 +19,7 @@
     "framework7-icons": "^0.8.9",
     "framework7-vue": "^0.9.2",
     "nprogress": "^0.2.0",
-    "qrcanvas-vue": "^1.0.3",
+    "qrcanvas-vue": "^1.1.0",
     "screenfull": "^3.3.2",
     "viewerjs": "^0.10.0",
     "vue": "^2.2.2",

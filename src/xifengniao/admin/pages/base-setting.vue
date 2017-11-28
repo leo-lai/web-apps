@@ -11,30 +11,21 @@
 		  	<base-setting-role></base-setting-role>
 		  </el-tab-pane>
 		</el-tabs>
-
-		<!-- 预览图片 -->
-		<viewer-images :images="viewer.images"></viewer-images>
 	</div>
 </template>
 <script>
-import viewerImages from 'components/viewer-images'
 import baseSettingZuzhi from './base-setting-zuzhi'
 import baseSettingUser from './base-setting-user'
 import baseSettingRole from './base-setting-role'
 export default {
 	name: 'base-setting',
 	components: {
-		viewerImages,
 		baseSettingZuzhi,
 		baseSettingUser,
 		baseSettingRole
 	},
 	data() {
 		return {
-			viewer: {
-				options: {},
-				images: []
-			},
 			tabActive: ''
 		}
 	},

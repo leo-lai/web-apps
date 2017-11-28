@@ -52,7 +52,7 @@ export default {
       ++this.waiting
     },
     uploadPreview(file) {
-      this.$$viewer && this.$$viewer.show(this.uploadList.findIndex(item => item.url === file.url) || 0)
+      this.$$viewer && this.$$viewer.show2(this.uploadList.findIndex(item => item.url === file.url) || 0)
     },
     uploadRemove(file, fileList) {
       if(file.status === 'success') {

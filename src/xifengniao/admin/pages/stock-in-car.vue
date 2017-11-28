@@ -93,17 +93,7 @@
 			  	<el-input v-model="dialogInfo.data.certificateNumber" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="验车照片" prop="upload">
-			  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
-			  		:file-list="dialogInfo.upload.list"
-			  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
-			  		:on-success="uploadSuccess"
-			  		:on-remove="uploadRemove"
-			  		:on-preview="uploadPreview" 
-			  		:on-progress="uploadProgress" 
-			  		:on-error="uploadError" 
-			  		:on-exceed="uploadExceed">
-					  <i class="el-icon-plus"></i>
-					</el-upload>
+			  	<uploader ref="dialogInfoUpload" :file-list.sync="dialogInfo.uploadList"></uploader>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -114,17 +104,21 @@
 	</div>
 </template>
 <script>
+import uploader from 'components/uploader'
 export default {
 	name: 'stock-in-car',
+	components: {
+		uploader
+  },
 	data() {
 		let that = this
 		let validateUpload = function(rule, value, callback) {
-			if(that.dialogInfo.upload.loading) {
+			if(that.$refs.dialogInfoUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogInfo.upload.list.length > 9) {
+			}else if(that.dialogInfo.uploadList.length > 9) {
 				callback(new Error('最多上传9张照片'))
 			}else {
-				that.dialogInfo.data.stockCarImages = that.dialogInfo.upload.list.map(item => item.src || item.url).join(',')
+				that.dialogInfo.data.stockCarImages = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
 				callback()
 			}
 		}
@@ -147,33 +141,6 @@ export default {
           value: 'id',
           children: 'children'
         }
-			},
-			dateOptions: {
-				shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
 			},
 			dialogList: {
 				info: {},
@@ -201,12 +168,7 @@ export default {
 				title: '添加车辆信息',
 				visible: false,
 				loading: false,
-				upload: {
-					list: [],
-					loading: false,
-					visible: false,
-					previewUrl: ''
-				},
+				uploadList: [],
 				colorList: [],
 				neishiList: [],
 				cangList: [],
@@ -253,44 +215,6 @@ export default {
 		}
 	},
 	methods: {
-		uploadSuccess(response, file, fileList) {
-			this.dialogInfo.upload.loading = false
-			this.dialogInfo.upload.list.push({
-				name: file.name,
-				url: this.$$utils.image.thumb(response.data, 150),
-				thumb: this.$$utils.image.thumb(response.data, 150),
-				src: response.data,
-				status: 'success'
-			})
-
-			this.$$parent.viewer.images = this.dialogInfo.upload.list
-		},
-		uploadPreview(file) {
-			this.$$parent.$$viewer.show(this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0)
-		},
-		uploadRemove(file, fileList) {
-			if(file.status === 'success') {
-				this.dialogInfo.upload.list = this.dialogInfo.upload.list.filter(item =>  {
-					if(file.response) {
-						return item.src !== file.response.data
-					}else {
-						return item.src !== (file.src || file.url)
-					}
-				})
-			}
-		},
-		uploadProgress(event, file, fileList) {
-			this.dialogInfo.upload.loading = true
-		},
-		uploadError(error, file, fileList) {
-			this.dialogInfo.upload.loading = false
-		},
-		uploadExceed(files, fileList) {
-			this.$message({
-				type: 'error',
-				message: '最多上传9张照片'
-			})
-		},
 		cascaderItemChange(valArr) {
 			let promise = Promise.resolve()
 			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
@@ -391,7 +315,7 @@ export default {
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 				this.cascader.value = [row.brandId, row.familyId, row.carsId]
 
-				this.dialogInfo.upload.list = row.stockCarImages ? row.stockCarImages.split(',').map(img => {
+				this.dialogInfo.uploadList = row.stockCarImages ? row.stockCarImages.split(',').map(img => {
 					return {
 						url: this.$$utils.image.thumb(img, 150), 
 						thumb: this.$$utils.image.thumb(img, 150), 
@@ -400,8 +324,6 @@ export default {
 						status: 'success'
 					}
 				}) : []
-
-				this.$$parent.viewer.images = this.dialogInfo.upload.list
 
 				if(row.brandId) {
 					brandPromise.then(data => {
@@ -437,7 +359,7 @@ export default {
 		resetDialogInfo() {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 			this.cascader.value = []
-			this.dialogInfo.upload.list = []
+			this.dialogInfo.uploadList = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交车辆信息

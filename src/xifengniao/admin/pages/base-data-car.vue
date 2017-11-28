@@ -116,28 +116,18 @@
 
 		  <!-- 车身颜色图片编辑 -->
 		  <el-dialog :close-on-click-modal="false" :close-on-press-escape="false" append-to-body width="600px"
-		  	:title="dialogCheshen.title" :visible.sync="dialogCheshen.innerVisible">
+		  	:title="dialogCheshen.title" :visible.sync="dialogCheshen.innerVisible" :before-close="closeCheshenImages">
 		  	<el-form inline class="l-form1" ref="cheshenColorForm" label-width="90px" style="width: 552px;"
 	  			:model="dialogCheshen.data" :rules="dialogCheshen.rules" @keyup.enter.native="submitCheshenImages">
 				  <el-form-item label="车身颜色" prop="carColourName">
 				    <el-input readonly :value="dialogCheshen.data.carColourName"></el-input>
 				  </el-form-item>
 				  <el-form-item class="_flex" label="车身照片" prop="imageUpload">
-				  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
-				  		:file-list="dialogCheshen.upload.list"
-				  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
-				  		:on-success="uploadSuccess"
-				  		:on-remove="uploadRemove"
-				  		:on-preview="uploadPreview" 
-				  		:on-progress="uploadProgress" 
-				  		:on-error="uploadError" 
-				  		:on-exceed="uploadExceed">
-						  <i class="el-icon-plus"></i>
-						</el-upload>
+				  	<uploader ref="dialogCheshenUpload" :file-list.sync="dialogCheshen.uploadList"></uploader>
 				  </el-form-item>
 				</el-form>
 				<span slot="footer" class="l-margin-r-m">
-					<el-button @click="dialogCheshen.innerVisible = false">返回</el-button>
+					<el-button @click="closeCheshenImages()">返回</el-button>
 			    <el-button type="primary" :loading="dialogCheshen.loading" @click="submitCheshenImages">确定提交</el-button>
 			  </span>
 		  </el-dialog>
@@ -145,8 +135,12 @@
 	</div>
 </template>
 <script>
+import uploader from 'components/uploader'
 export default {
 	name: 'base-data-car',
+	components: {
+		uploader
+	},
 	data() {
 		let that = this
 		let validateCarModel = function(rule, value, callback) {
@@ -161,12 +155,12 @@ export default {
 		}
 
 		let validateUpload = function(rule, value, callback) {
-			if(that.dialogCheshen.upload.loading) {
+			if(that.$refs.dialogCheshenUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogCheshen.upload.list.length > 9) {
+			}else if(that.dialogCheshen.uploadList.length > 9) {
 				callback(new Error('最多上传9张照片'))
 			}else {
-				that.dialogCheshen.data.imagePath = that.dialogCheshen.upload.list.map(item => item.src || item.url).join(',')
+				that.dialogCheshen.data.imagePath = that.dialogCheshen.uploadList.map(item => item.src || item.url).join(',')
 				callback()
 			}
 		}
@@ -263,10 +257,7 @@ export default {
 
 				title: '编辑车身颜色图片',
 				innerVisible: false,
-				upload: {
-					list: [],
-					loading: false
-				},
+				uploadList: [],
 				rules: {
 					imageUpload: [
 						{ validator: validateUpload, trigger: 'change' },
@@ -283,42 +274,6 @@ export default {
 		}
 	},
 	methods: {
-		uploadSuccess(response, file, fileList) {
-			this.dialogCheshen.upload.loading = false
-			this.dialogCheshen.upload.list.push({
-				name: file.name,
-				url: this.$$utils.image.thumb(response.data, 150),
-				thumb: this.$$utils.image.thumb(response.data, 150),
-				src: response.data,
-				status: 'success'
-			})
-		},
-		uploadPreview(file) {
-			this.$$parent.$$viewer.show(this.dialogCheshen.upload.list.findIndex(item => item.url === file.url) || 0)
-		},
-		uploadRemove(file, fileList) {
-			if(file.status === 'success') {
-				this.dialogCheshen.upload.list = this.dialogCheshen.upload.list.filter(item =>  {
-					if(file.response) {
-						return item.src !== file.response.data
-					}else {
-						return item.src !== (file.src || file.url)
-					}
-				})
-			}
-		},
-		uploadProgress(event, file, fileList) {
-			this.dialogCheshen.upload.loading = true
-		},
-		uploadError(error, file, fileList) {
-			this.dialogCheshen.upload.loading = false
-		},
-		uploadExceed(files, fileList) {
-			this.$message({
-				type: 'error',
-				message: '最多上传9张照片'
-			})
-		},
 		cascaderChange(valArr) {
 			let promise = null
 			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
@@ -496,7 +451,7 @@ export default {
 			.then(({data}) => {
 				if(data) {
 					this.dialogCheshen.data.carColourImageId = data.carColourImageId
-					this.dialogCheshen.upload.list = data.imagePath ? data.imagePath.split(',').map(img => {
+					this.dialogCheshen.uploadList = data.imagePath ? data.imagePath.split(',').map(img => {
 						return {
 							url: this.$$utils.image.thumb(img, 150), 
 							thumb: this.$$utils.image.thumb(img, 150), 
@@ -507,13 +462,20 @@ export default {
 					}) : []
 				}else {
 					this.dialogCheshen.data.carColourImageId = ''
-					this.dialogCheshen.upload.list = []
+					this.dialogCheshen.uploadList = []
 				}
-				this.$$parent.viewer.images = this.dialogCheshen.upload.list
 			}).finally(_ => {
 				loading.close()
 				this.dialogCheshen.innerVisible = true
 			})
+		},
+		closeCheshenImages(done) {
+			if(done) {
+				done()
+			}else{
+				this.dialogCheshen.innerVisible = false	
+			}
+			this.dialogCheshen.uploadList = []
 		},
 		submitCheshenImages() { // 提交车身颜色图片
 			this.$refs.cheshenColorForm.validate(valid => {
@@ -538,8 +500,7 @@ export default {
 			this.yearList.push(year++)
 		}
 
-		this.$$event.$on('base-data:tab', (activeName, that) => {
-			this.$$parent = that
+		this.$$event.$on('base-data:tab', activeName => {
 			if(activeName === 'car' && this.list.data.length === 0) {
 				this.getList()
 			}

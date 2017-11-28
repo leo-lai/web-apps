@@ -1,10 +1,13 @@
 <template>
   <div class="l-basedata-menu-box">
   	<div class="l-flex-hc _tit">
-  		<b class="l-rest">菜单名称</b>
-  		<el-button type="text" @click="showDialogInfo('new')">添加一级菜单</el-button>
+  		<b>菜单名称</b>
+  		<div class="l-rest l-text-center">
+  			<span v-if="loading" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;加载中...</span>
+  		</div>
+  		<el-button :disabled="loading" type="text" @click="showDialogInfo('new')">添加一级菜单</el-button>
   	</div>
-    <el-tree ref="menuTree" class="l-basedata-menu" highlight-current node-key="menuId" 
+    <el-tree v-if="menuList.length > 0" ref="menuTree" class="l-basedata-menu" highlight-current node-key="menuId" 
     	:data="menuList" :props="menuProps" :render-content="renderContent">
 		</el-tree>
 
@@ -36,7 +39,8 @@ export default {
   name: 'base-data-menu',
   data() {
     return {
-    	menuList: [{}],
+    	loading: false,
+    	menuList: [],
       menuProps: {
         children: 'children',
         label: 'menuName'
@@ -65,8 +69,11 @@ export default {
   },
   methods: {
   	getList() {
+  		this.loading = true
 			this.$$api.role.getMenuList().then(({data}) => {
 				this.menuList = data
+			}).finally(_ => {
+				this.loading = false
 			})
   	},
 		showDialogInfo(type = 'new', data) { // 新增/修改菜单
@@ -166,7 +173,7 @@ export default {
   },
   mounted() {
 		this.$$event.$on('base-data:tab', activeName => {
-			if(activeName === 'menu' && this.menuList.length <= 1) {
+			if(activeName === 'menu' && this.menuList.length === 0) {
 				this.getList()
 			}
 		})

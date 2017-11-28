@@ -111,17 +111,7 @@
 			  <el-form-item class="_flex" prop="upload">
 			  	<div slot="label" style="display:inline;">
 			  		显示照片<p style="font-size:12px;" class="l-text-gray">(最多上传9张)</p></div>
-			  	<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
-			  		:file-list="dialogInfo.upload.list"
-			  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
-			  		:on-success="uploadSuccess"
-			  		:on-remove="uploadRemove"
-			  		:on-preview="uploadPreview" 
-			  		:on-progress="uploadProgress" 
-			  		:on-error="uploadError" 
-			  		:on-exceed="uploadExceed">
-					  <i class="el-icon-plus"></i>
-					</el-upload>
+			  	<uploader ref="dialogInfoUpload" :file-list.sync="dialogInfo.uploadList"></uploader>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r">
@@ -136,13 +126,14 @@
 </template>
 <script>
 import AmapSelector from 'components/amap-selector'
+import uploader from 'components/uploader'
 import { getValueByText } from 'assets/js/region.data'
 import { mapGetters } from 'vuex'
 
 export default {
 	name: 'base-setting-zuzhi',
 	components: {
-		AmapSelector
+		AmapSelector, uploader
 	},
 	data() {
 		let that = this
@@ -158,14 +149,14 @@ export default {
 		}
 
 		let validateUpload = function(rule, value, callback) {
-			if(that.dialogInfo.upload.loading) {
+			if(that.$refs.dialogInfoUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogInfo.upload.list.length === 0) {
+			}else if(that.dialogInfo.uploadList.length === 0) {
 				callback(new Error('请上传照片'))
-			}else if(that.dialogInfo.upload.list.length > 9) {
+			}else if(that.dialogInfo.uploadList.length > 9) {
 				callback(new Error('最多上传9张照片'))
 			}else {
-				that.dialogInfo.data.imageUrl = that.dialogInfo.upload.list.map(item => item.src || item.url).join(',')
+				that.dialogInfo.data.imageUrl = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
 				callback()
 			}
 		}
@@ -218,11 +209,7 @@ export default {
 				title: '新增公司/门店',
 				visible: false,
 				isParent: true,
-				upload: {
-					list: [],
-					loading: false,
-					visible: false
-				},
+				uploadList: [],
 				zuzhiParents: [],
 				rules: {
 					shortName: [
@@ -301,42 +288,6 @@ export default {
     ])
 	},
 	methods: {
-		uploadSuccess(response, file, fileList) {
-			this.dialogInfo.upload.loading = false
-			this.dialogInfo.upload.list.push({
-				name: file.name,
-				url: this.$$utils.image.thumb(response.data, 150),
-				thumb: this.$$utils.image.thumb(response.data, 150),
-				src: response.data,
-				status: 'success'
-			})
-		},
-		uploadPreview(file) {
-			this.$$parent.$$viewer.show(this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0)
-		},
-		uploadRemove(file, fileList) {
-			if(file.status === 'success') {
-				this.dialogInfo.upload.list = this.dialogInfo.upload.list.filter(item =>  {
-					if(file.response) {
-						return item.src !== file.response.data
-					}else {
-						return item.src !== (file.src || file.url)
-					}
-				})
-			}
-		},
-		uploadProgress(event, file, fileList) {
-			this.dialogInfo.upload.loading = true
-		},
-		uploadError(error, file, fileList) {
-			this.dialogInfo.upload.loading = false
-		},
-		uploadExceed(files, fileList) {
-			this.$message({
-				type: 'error',
-				message: '最多上传9张照片'
-			})
-		},
 		orgLevelChange(value = 1) {
 			this.dialogInfo.isParent = value === 1 ? false : true
 			this.$$api.zuzhi.getParent(value).then(({data}) => {
@@ -396,7 +347,7 @@ export default {
 					this.dialogInfo._parentId = data.parentId
 					this.orgLevelChange(data.orgLevel)
 
-					this.dialogInfo.upload.list = this.dialogInfo.data.imageUrl ? 
+					this.dialogInfo.uploadList = this.dialogInfo.data.imageUrl ? 
 					this.dialogInfo.data.imageUrl.split(',').map(img => {
 						return {
 							url: this.$$utils.image.thumb(img, 150), 
@@ -406,8 +357,6 @@ export default {
 							status: 'success'
 						}
 					}) : []
-
-					this.$$parent.viewer.images = this.dialogInfo.upload.list
 				})
 			} else {
 				this.dialogInfo.title = '新增公司/门店'
@@ -431,7 +380,7 @@ export default {
 		},
 		resetDialogInfo() {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
-			this.dialogInfo.upload.list = []
+			this.dialogInfo.uploadList = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交组织信息
@@ -483,8 +432,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('base-setting:tab', (activeName, that) => {
-			this.$$parent = that
+		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'zuzhi' && this.list.data.length === 0) {
 				this.getList()
 			}

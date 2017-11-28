@@ -46,7 +46,7 @@
 	    <el-table-column label="采购总价" prop="totalPurchasePrice" align="center"></el-table-column>
 	    <el-table-column label="采购总数量" prop="totalPurchase" align="center"></el-table-column>
 	    <el-table-column label="物流费用" prop="logisticsCost" align="center"></el-table-column>
-	    <el-table-column label="操作" width="170" align="center" v-if="userInfo.orgLevel < 4">
+	    <el-table-column label="操作" width="170" align="center" v-if="userInfo.orgLevel < 3">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        <el-button class="l-text-link" type="text" size="small" @click="showDialogCar('car-list', scope.row)">车辆列表</el-button>
