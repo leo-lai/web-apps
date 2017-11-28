@@ -46,7 +46,7 @@
 	    <el-table-column label="采购总价" prop="totalPurchasePrice" align="center"></el-table-column>
 	    <el-table-column label="采购总数量" prop="totalPurchase" align="center"></el-table-column>
 	    <el-table-column label="物流费用" prop="logisticsCost" align="center"></el-table-column>
-	    <el-table-column label="操作" width="170" align="center">
+	    <el-table-column label="操作" width="170" align="center" v-if="userInfo.orgLevel < 4">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        <el-button class="l-text-link" type="text" size="small" @click="showDialogCar('car-list', scope.row)">车辆列表</el-button>
@@ -91,34 +91,14 @@
 			  </el-form-item>
 			  <el-form-item label="合格证时间" prop="certificateDate" >
 			  	<el-select v-model="dialogInfo.data.certificateDate" placeholder="请选择">
-				    <el-option label="随车" :value="1"></el-option>
-				    <el-option label="3天内" :value="2"></el-option>
-				    <el-option label="7天内" :value="3"></el-option>
+				    <el-option v-for="(item, index) in $$config.baseData.carTime" :key="index" :label="item" :value="index+1"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="物流费用" prop="logisticsCost" >
 			  	<el-input v-model="dialogInfo.data.logisticsCost" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="合同扫描件" prop="imageUpload">
-			  	<!-- <div style="line-height: 1.6; width: 50%; margin-top: 4px;">
-				  	<el-upload accept="image/*" multiple :limit="9" 
-				  		:file-list="dialogInfo.upload.list"
-				  		:action="$$api.baseURL + '/uploadImage'" name="img_file">
-						  <el-button size="small" type="primary">点击上传</el-button>
-						  <span slot="tip" class="el-upload__tip l-margin-l l-text-gray">只能上传jpg/png文件，且不超过2M</span>
-						</el-upload>
-					</div> -->
-					<el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
-			  		:file-list="dialogInfo.upload.list"
-			  		:action="$$api.baseURL + '/uploadImage'" name="img_file"
-			  		:on-success="uploadSuccess"
-			  		:on-remove="uploadRemove"
-			  		:on-preview="uploadPreview" 
-			  		:on-progress="uploadProgress" 
-			  		:on-error="uploadError" 
-			  		:on-exceed="uploadExceed">
-					  <i class="el-icon-plus"></i>
-					</el-upload>
+					<uploader ref="dialogInfoUpload" :file-list.sync="dialogInfo.uploadList"></uploader>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="备注" prop="remark">
 			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
@@ -129,26 +109,27 @@
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
-
 		<stock-in-car></stock-in-car>
 	</div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
+import uploader from 'components/uploader'
 import stockInCar from './stock-in-car'
 export default {
 	name: 'stock-in',
 	components: {
-    stockInCar
+		uploader, stockInCar
   },
 	data() {
 		let that = this
 		let validateUpload = function(rule, value, callback) {
-			if(that.dialogInfo.upload.loading) {
+			if(that.$refs.dialogInfoUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogInfo.upload.list.length > 9) {
+			}else if(that.dialogInfo.uploadList.length > 9) {
 				callback(new Error('最多上传9张照片'))
 			}else {
-				that.dialogInfo.data.contractImage = that.dialogInfo.upload.list.map(item => item.src || item.url).join(',')
+				that.dialogInfo.data.contractImage = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
 				callback()
 			}
 		}
@@ -210,11 +191,7 @@ export default {
 				title: '新增入库单',
 				visible: false,
 				loading: false,
-				upload: {
-					list: [],
-					loading: false,
-					visible: false
-				},
+				uploadList: [],
 				salesList: [],
 				rules: {
 					storageSource: [
@@ -247,43 +224,12 @@ export default {
 			}
 		}
 	},
+  computed: {
+  	...mapGetters([
+  		'userInfo'
+    ])
+  },
 	methods: {
-		uploadSuccess(response, file, fileList) {
-			this.dialogInfo.upload.loading = false
-			this.dialogInfo.upload.list.push({
-				name: file.name,
-				url: this.$$utils.image.thumb(response.data, 150),
-				thumb: this.$$utils.image.thumb(response.data, 150),
-				src: response.data,
-				status: 'success'
-			})
-		},
-		uploadPreview(file) {
-			this.$$parent.$$viewer.show(this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0)
-		},
-		uploadRemove(file, fileList) {
-			if(file.status === 'success') {
-				this.dialogInfo.upload.list = this.dialogInfo.upload.list.filter(item =>  {
-					if(file.response) {
-						return item.src !== file.response.data
-					}else {
-						return item.src !== (file.src || file.url)
-					}
-				})
-			}
-		},
-		uploadProgress(event, file, fileList) {
-			this.dialogInfo.upload.loading = true
-		},
-		uploadError(error, file, fileList) {
-			this.dialogInfo.upload.loading = false
-		},
-		uploadExceed(files, fileList) {
-			this.$message({
-				type: 'error',
-				message: '最多上传9张照片'
-			})
-		},
 		filterDateChange(value) {
 			if(value && value.length >= 2) {
 				this.list.filter.startDate = value[0]
@@ -338,7 +284,7 @@ export default {
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 				infoPromise.then(({data}) => {
 					this.$$utils.copyObj(this.dialogInfo.data, data)
-					this.dialogInfo.upload.list = data.contractImage ? data.contractImage.split(',').map(img => {
+					this.dialogInfo.uploadList = data.contractImage ? data.contractImage.split(',').map(img => {
 						return {
 							url: this.$$utils.image.thumb(img, 150), 
 							thumb: this.$$utils.image.thumb(img, 150), 
@@ -347,8 +293,6 @@ export default {
 							status: 'success'
 						}
 					}) : []
-
-					this.$$parent.viewer.images = this.dialogInfo.upload.list
 				})
 			} else {
 				this.dialogInfo.title = '新增入库单'
@@ -372,7 +316,7 @@ export default {
 		},
 		resetDialogInfo() {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
-			this.dialogInfo.upload.list = []
+			this.dialogInfo.uploadList = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交入库单

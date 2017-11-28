@@ -150,14 +150,18 @@
 		  <div class="l-block-tit">资源出库明细</div>
 		  <table class="l-table-info">
   			<tr>
+  				<td class="_tit" width="80">物流方式</td>
+  				<td class="_cont">
+  					<span v-if="viewInfo.data.logisticsMode">{{ viewInfo.data.logisticsMode === 1 ? '随车' : '物流' }}</span>
+  				</td>
   				<td class="_tit" width="80">物流单号</td>
-  				<td class="_cont">{{ viewInfo.data.logisticsModeOddNumber }}</td>
+  				<td class="_cont">{{ viewInfo.data.logisticsOddNumber }}</td>
   			</tr>
   			<tr>
   				<td class="_tit">随车资料</td>
-  				<td class="_cont">
-  					<ul class="l-gou-list">
-	  					<li v-for="(item,index) in $$config.baseData.carSpec" :key="index"><i>√</i>{{item}}</li>
+  				<td class="_cont" colspan="3">
+  					<ul class="l-gou-list" v-if="viewInfo.data.followInformation">
+	  					<li v-for="item in viewInfo.data.followInformation.split(',')"><i>√</i>{{item}}</li>
   					</ul>
   				</td>
   			</tr>
