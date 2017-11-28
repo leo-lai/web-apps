@@ -19,7 +19,7 @@
   				<el-form-item style="width: 120px;" prop="storageSource">
   					<el-select filterable v-model="list.filter.storageSource" placeholder="入库类型" @change="search()">
 				      <el-option label="资源采购" :value="1"></el-option>
-				    	<el-option label="4S点出货" :value="2"></el-option>
+				    	<el-option label="4S店出货" :value="2"></el-option>
 				    </el-select>
   				</el-form-item>
   				<el-form-item style="width: 180px;" prop="storageCode">
@@ -34,28 +34,19 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="入库单号" prop="storageCode" width="170">
+	    <el-table-column class-name="l-fs-xs" label="入库单号" prop="storageCode" width="170"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="入库时间" prop="createDate" width="140"></el-table-column>
+	    <el-table-column label="车辆来源" prop="storageSource" align="center">
 	    	<template slot-scope="scope">
-	    		<span style="font-size:12px;">{{scope.row.storageCode}}</span>
-	      </template>
-	    </el-table-column>
-	    <el-table-column label="入库时间" prop="createDate" width="140">
-	    	<template slot-scope="scope">
-	    		<span style="font-size:12px;">{{scope.row.createDate}}</span>
-	      </template>
-	    </el-table-column>
-	    <el-table-column label="车辆来源" prop="storageSource">
-	    	<template slot-scope="scope">
-	    		<span v-if="scope.row.storageSource == 1">资源采购</span>
-	    		<span v-else>4S店出货</span>
+	    		<span>{{$$config.baseData.carSource[scope.row.storageSource - 1]}}</span>
 	      </template>
 	    </el-table-column>
 	    <el-table-column label="供应商" prop="supplierName"></el-table-column>
-	    <el-table-column label="采购员" prop="systemUserName"></el-table-column>
-	    <el-table-column label="采购总价" prop="totalPurchasePrice"></el-table-column>
-	    <el-table-column label="采购总数量" prop="totalPurchase"></el-table-column>
-	    <el-table-column label="物流费用" prop="logisticsCost"></el-table-column>
-	    <el-table-column label="操作" width="170">
+	    <el-table-column label="采购员" prop="systemUserName" align="center"></el-table-column>
+	    <el-table-column label="采购总价" prop="totalPurchasePrice" align="center"></el-table-column>
+	    <el-table-column label="采购总数量" prop="totalPurchase" align="center"></el-table-column>
+	    <el-table-column label="物流费用" prop="logisticsCost" align="center"></el-table-column>
+	    <el-table-column label="操作" width="170" align="center">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	        <el-button class="l-text-link" type="text" size="small" @click="showDialogCar('car-list', scope.row)">车辆列表</el-button>
@@ -82,7 +73,7 @@
 			  <el-form-item label="车辆来源" prop="storageSource">
 			  	<el-select v-model="dialogInfo.data.storageSource" placeholder="请选择">
 				    <el-option label="资源采购" :value="1"></el-option>
-				    <el-option label="4S点出货" :value="2"></el-option>
+				    <el-option label="4S店出货" :value="2"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="采购员" prop="systemUsersId" >

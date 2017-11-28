@@ -7,13 +7,14 @@ let config = {
   },
   pay: {
     url: 'http://ceshi.allinpay.com/gateway/index.do',
-    dev: 'http://ceshi.allinpay.com/gateway/index.do',
     prod: 'https://service.allinpay.com/gateway/index.do'
   },
   baseData: {
+    carSource: ['资源采购', '4S店出货', '订车入库'],
     carTime: ['随车', '3天内', '7天内'],
     buyWay: ['全款', '分期'],
-    carSpec: ['合格证', '一致证书', '环保清单', '主钥匙', '备用钥匙', '用户手册', '保养手册', '首保', '三包', '车架号拓印纸', '天线', '点烟器']
+    carSpec: ['合格证', '一致证书', '环保清单', '主钥匙', '备用钥匙', '用户手册', '保养手册', '首保', '三包', '车架号拓印纸', '天线', '点烟器'],
+    orgLevel: ['公司', '分公司', '门店']
   }
 }
 

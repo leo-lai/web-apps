@@ -66,9 +66,7 @@
 			  </el-form-item>
 			  <el-form-item label="级别" prop="orgLevel">
 			    <el-select v-model="dialogInfo.data.orgLevel" placeholder="请选择" @change="orgLevelChange">
-			      <el-option label="公司" :value="1"></el-option>
-			      <el-option label="分公司" :value="2"></el-option>
-			      <el-option label="门店" :value="3"></el-option>
+			    	<el-option v-for="(item,index) in $$config.baseData.orgLevel" :key="index" :label="item" :value="index+1"></el-option>
 			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="性质" prop="orgType">

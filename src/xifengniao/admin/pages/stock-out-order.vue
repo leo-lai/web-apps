@@ -107,7 +107,7 @@
 		</el-dialog>
 
 		<!-- 查看订车单 -->
-		<el-dialog class="l-padding-t-0" title="查看订车单" :visible.sync="viewInfo.visible">
+		<el-dialog class="l-padding-t-0" title="查看订车单" :visible.sync="viewInfo.visible" width="995px">
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
@@ -165,7 +165,7 @@
 		</el-dialog>
 
 		<!-- 通知有车 -->
-		<el-dialog class="l-padding-t-0" title="通知有车" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="noticeInfo.visible">
+		<el-dialog class="l-padding-t-0" title="通知有车" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="noticeInfo.visible" width="995px">
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
@@ -207,7 +207,7 @@
 		</el-dialog>
 
 		<!-- 出库车辆 -->
-		<el-dialog class="l-padding-t-0" title="出库车辆" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="outStockInfo.visible">
+		<el-dialog class="l-padding-t-0" title="出库车辆" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="outStockInfo.visible" width="995px">
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>

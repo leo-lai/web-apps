@@ -37,8 +37,8 @@
       <div class="amap-view">
         <el-amap-search-box class="amap-search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
         <el-amap vid="amapSeletor" :center="mapCenter" :zoom="15" :plugin="plugin">
-          <el-amap-marker title="拖动此点选择地址" :position="marker.position" :events="marker.events" :visible="marker.visible" :draggable="marker.draggable" ></el-amap-marker>
-          <el-amap-info-window :position="marker.position" content="拖动此点选择地址" :visible="win.visible" :offset="win.offset"></el-amap-info-window>
+          <el-amap-marker title="拖动快速定位地址" :content="marker.content" :position="marker.position" :events="marker.events" :visible="marker.visible" :draggable="marker.draggable" :offset="[-20, -20]"></el-amap-marker>
+          <el-amap-info-window :position="marker.position" content="拖动快速定位地址" :visible="win.visible" :offset="[0, -10]"></el-amap-info-window>
         </el-amap>  
       </div>
     </div>
@@ -75,7 +75,6 @@ export default {
       show: false,
       mapCenter: [113.289201, 23.081646],
       win: {
-        offset: [0, -10],
         visible: true
       },
       marker: {
@@ -84,13 +83,16 @@ export default {
         events: {
           dragend: (e) => {
             that.getAddress(e.lnglat.lng, e.lnglat.lat)
+            that.marker.position = [e.lnglat.lng, e.lnglat.lat]
+            that.mapCenter = [e.lnglat.lng, e.lnglat.lat]
           },
           mouseover: () => {
             that.win.visible = false
           }
         },
         visible: true,
-        draggable: true
+        draggable: true,
+        content: '<div class="l-map-marker"><i class="el-icon-location"></i></div>'
       },
       searchOption: {
         city: '',
@@ -133,7 +135,6 @@ export default {
       return new Promise((resolve, reject) => {
         this.geocoder.getAddress([lng, lat], (status, result) => {
           if (status === 'complete' && result.info === 'OK') {
-            console.log(result)
             let addressComponent = result.regeocode.addressComponent
             let address = result.regeocode.formattedAddress.split(addressComponent.district)[1] || (addressComponent.street + addressComponent.streetNumber)
 
@@ -172,7 +173,7 @@ export default {
         this.options.onSelected(this.options)
         this.closeMap()  
       }else{
-        this.$message.warning('请搜索地址或拖动地图蓝色标点选择地址')
+        this.$message.warning('请搜索地址或拖动地图标点选择地址')
       }
     }
   }
@@ -180,6 +181,15 @@ export default {
 </script>
 
 <style lang="less">
+.l-map-marker{
+  background: url(marker.png) no-repeat 50% 50%; background-size: 100% 100%; position: relative;
+  width: 40px; height: 40px; text-align: center; color: #fff; line-height: 30px; font-family: monospace; font-weight: bold;
+}
+.l-map-marker:after{
+  content: '';
+  position: absolute; bottom: -10px; left: 5px; right: 5px; height: 10px;
+  background-image: radial-gradient(ellipse closest-side, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+}
 .amap-dialog .el-dialog__body{padding: 0;}
 .amap-container {display: flex; position: relative; height: 100%; }
 .amap-container .amap-address{padding: 20px 20px 0; background: rgb(239, 239, 244);}

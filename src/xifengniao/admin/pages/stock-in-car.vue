@@ -37,15 +37,20 @@
 		      </template>
 		    </el-table-column>
 		  </el-table>
-		  <el-row class="l-text-center l-margin-t">
-		  	<el-pagination layout="total, sizes, prev, pager, next, jumper"
-		  	 	@size-change="sizeChange" 
-		  	 	@current-change="pageChange" 
-		  	 	:page-sizes="$$api.pageSizes"
-		  	 	:page-size="list.rows"
-		  	 	:current-page="list.page"
-		  	 	:total="list.total">
-				</el-pagination>
+		  <el-row class="l-margin-t">
+		  	<el-col :span="20">
+			  	<el-pagination layout="total, sizes, prev, pager, next, jumper"
+			  	 	@size-change="sizeChange" 
+			  	 	@current-change="pageChange" 
+			  	 	:page-sizes="$$api.pageSizes"
+			  	 	:page-size="list.rows"
+			  	 	:current-page="list.page"
+			  	 	:total="list.total">
+					</el-pagination>	
+		  	</el-col>
+		  	<el-col :span="4" class="l-text-right">
+		  		<el-button type="primary" @click="showDialogInfo('new')">添加车辆</el-button>	
+		  	</el-col>
 		  </el-row>
 		</el-dialog>
 
@@ -257,6 +262,8 @@ export default {
 				src: response.data,
 				status: 'success'
 			})
+
+			this.$$parent.viewer.images = this.dialogInfo.upload.list
 		},
 		uploadPreview(file) {
 			this.$$parent.$$viewer.show(this.dialogInfo.upload.list.findIndex(item => item.url === file.url) || 0)
@@ -364,6 +371,7 @@ export default {
 			this.getList()
 		},
 		showDialogInfo(type = 'new', row) { // 新增/修改车辆信息
+			row = row || this.stockRow
 			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
 				this.cascader.data = data.map(item => {
 					item.children = []
@@ -442,7 +450,12 @@ export default {
 							type: 'success',
 							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '车辆信息成功'
 						})
-            this.refreshList()
+
+						if(this.$$parent) {
+							this.$$parent.refreshList()
+						}else{
+							this.refreshList()	
+						}
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
@@ -485,6 +498,7 @@ export default {
 	mounted() {
 		this.$$event.$on('stock:car-list', (row, that) => {
 			this.$$parent = that
+			this.stockRow = row
 			this.list.filter.storageId = row.storageId
 			this.dialogList.info = row
 			if(row.contractImage) {
@@ -504,6 +518,7 @@ export default {
 		
 		this.$$event.$on('stock:car-add', (row, that) => {
 			this.$$parent = that
+			this.stockRow = row
 			this.showDialogInfo('new', row)
 		})
 	}

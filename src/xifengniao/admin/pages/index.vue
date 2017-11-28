@@ -4,11 +4,11 @@
 			<el-col :span="16">
 				<el-card class="l-index-store" style="height:190px;">
 					<div class="l-flex-h">
-						<img class="l-margin-r" width="150" height="150" src="http://iph.href.lu/150x150?text=LOGO">
+						<img class="l-margin-r" width="150" height="150" :src="organization.imageUrl">
 						<div class="l-rest">
-							<h3>骏哼旗舰店</h3>
-							<p class="l-margin-tb-m l-text-gray">门店</p>
-							<p class="l-margin-tb-m l-text-gray">广东省江门市鹤山2009号</p>
+							<h3>{{organization.shortName}}</h3>
+							<p class="l-margin-tb-m l-text-gray">{{$$config.baseData.orgLevel[organization.orgLevel-1]}}</p>
+							<p class="l-margin-tb-m l-text-gray">{{organization.address}}</p>
 							<p><a class="l-text-link">更改基础设置</a></p>
 						</div>
 					</div>
@@ -21,9 +21,6 @@
 				    <el-button class="l-fr" type="text">查看全部</el-button>
 				  </div>
 				  <ul class="l-list-text">
-				  	<li>系统使用说明及操作文档下载</li>
-				  	<li>系统使用说明及操作文档下载</li>
-				  	<li>系统使用说明及操作文档下载</li>
 				  	<li>系统使用说明及操作文档下载</li>
 				  </ul>
 				</el-card>
@@ -81,17 +78,17 @@
 				  <ul class="l-circle-step">
 				  	<li class="_item">
 				  		<p class="_circle"><b>待处理</b></p>
-				  		<p><b class="_num">5</b>个订单待处理</p>
+				  		<p><b class="_num">{{stockOrder.pending}}</b>个订单待处理</p>
 				  		<p><a class="l-text-link">查看</a></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>待付尾款</b></p>
-				  		<p><b class="_num">5</b>个订单已处理，待付尾款</p>
+				  		<p><b class="_num">{{stockOrder.waitFor}}</b>个订单已处理，待付尾款</p>
 				  		<p><a class="l-text-link">查看</a></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>待签收入库</b></p>
-				  		<p><b class="_num">5</b>个订单已出库，待签收</p>
+				  		<p><b class="_num">{{stockOrder.waitingForStorage}}</b>个订单已出库，待签收</p>
 				  		<p><a class="l-text-link">查看</a></p>
 				  	</li>
 				  </ul>
@@ -129,11 +126,15 @@ export default {
 	name: 'index',
 	data() {
 		return {
-
+			organization: {},
+			stockOrder: {}
 		}
 	},
 	mounted() {
-		// this.$$api.index.getCount()
+		this.$$api.index.getCount().then(({data}) => {
+			this.organization = data.organization
+			this.stockOrder = data.stockOrder
+		})
 	}
 }
 </script>

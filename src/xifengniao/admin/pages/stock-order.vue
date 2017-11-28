@@ -38,15 +38,15 @@
 	    		<p class="l-text-error" v-if="scope.row.stockOrderState === 5">（尾款金额：{{scope.row.balancePrice}}）</p>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="操作" min-width="120" header-align="center">
+	    <el-table-column label="操作" min-width="120" align="center">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button v-if="scope.row.stockOrderState === 1" class="l-text-link" type="text" size="small" @click="showPayInfo(scope.row)">支付定金</el-button>
+	        	<el-button v-if="scope.row.stockOrderState === 1" class="l-text-error" type="text" size="small" @click="showPayInfo(scope.row)">支付定金</el-button>
 		        <el-button v-if="scope.row.stockOrderState === 5" class="l-text-link" type="text" size="small" @click="showPayInfo(scope.row)">支付尾款</el-button>
 		        <el-button v-if="scope.row.stockOrderState === 9" class="l-text-link" type="text" size="small" @click="signOrder(scope.row)">签收并自动入库</el-button>
 		        <el-button class="l-text-link" type="text" size="small" @click="showViewInfo(scope.row)">查看明细</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 1" class="l-text-error" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
+		        <el-button v-if="scope.row.stockOrderState === 1" class="l-text-default" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
 	        </span>
 	      </template>
 	    </el-table-column>
@@ -150,25 +150,18 @@
 		  <div class="l-block-tit">资源出库明细</div>
 		  <table class="l-table-info">
   			<tr>
+  				<td class="_tit" width="80">物流方式</td>
+  				<td class="_cont">
+  					<span v-if="viewInfo.data.logisticsMode">{{ viewInfo.data.logisticsMode === 1 ? '随车' : '物流' }}</span>
+  				</td>
   				<td class="_tit" width="80">物流单号</td>
   				<td class="_cont">{{ viewInfo.data.logisticsOddNumber }}</td>
   			</tr>
   			<tr>
   				<td class="_tit">随车资料</td>
-  				<td class="_cont">
-  					<ul class="l-gou-list">
-	  					<li><i>√</i>合格证</li>
-	  					<li><i>√</i>一致证书</li>
-	  					<li><i>√</i>环保清单</li>
-	  					<li><i>√</i>主钥匙</li>
-	  					<li><i>√</i>备用钥匙</li>
-	  					<li><i>√</i>用户手册</li>
-	  					<li><i>√</i>保养手册</li>
-	  					<li><i>√</i>首保</li>
-	  					<li><i>√</i>三包</li>
-	  					<li><i>√</i>车架号拓印纸</li>
-	  					<li><i>√</i>天线</li>
-	  					<li><i>√</i>点烟器</li>
+  				<td class="_cont" colspan="3">
+  					<ul class="l-gou-list" v-if="viewInfo.data.followInformation">
+	  					<li v-for="item in viewInfo.data.followInformation.split(',')"><i>√</i>{{item}}</li>
   					</ul>
   				</td>
   			</tr>
@@ -239,7 +232,7 @@
 		<el-dialog title="支付二维码" align="center" width="300px" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="qrcode.visible">
 			<div class="l-qrcode-img">
 	   		<qrcanvas ref="qrcode" :options="qrcode.opts"></qrcanvas>
-	   		<p class="l-margin"><b>本次支付金额：{{payInfo.data.depositPrice}}</b></p>
+	   		<p class="l-margin"><b>本次支付金额：{{payInfo.data.stockOrderState === 1 ? payInfo.data.depositPrice : payInfo.data.balancePrice}}</b></p>
 	    </div>
 		</el-dialog>
 	</div>

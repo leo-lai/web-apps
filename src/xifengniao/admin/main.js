@@ -3,24 +3,24 @@ import config from './config'
 import { storage, utils } from 'assets/js/utils'
 
 import Vue from 'vue'
+
+// element-ui
 import ElementUI from 'element-ui'
+Vue.use(ElementUI)
+
+// 高德地图
 import VueAMap from 'vue-amap'
+Vue.use(VueAMap)
+VueAMap.initAMapApiLoader({
+  key: '976fe9a654ec6d6127bdb1eb1db56c3e',
+  plugin: ['Scale', 'Geocoder']
+})
 
 import store from './store'
 import router from './router'
 import api from './api'
 
 import app from './app'
-
-// element-ui
-Vue.use(ElementUI)
-
-// 高德地图
-Vue.use(VueAMap)
-VueAMap.initAMapApiLoader({
-  key: '976fe9a654ec6d6127bdb1eb1db56c3e',
-  plugin: ['Scale', 'Geocoder']
-})
 
 // 事件控制中枢
 const eventHub = new Vue()

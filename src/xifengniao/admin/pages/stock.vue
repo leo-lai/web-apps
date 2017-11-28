@@ -7,9 +7,9 @@
 		  <el-tab-pane label="车辆入库" name="in">
 		  	<stock-in></stock-in>
 		  </el-tab-pane>
-		  <el-tab-pane label="出库记录" name="out">
+		  <!-- <el-tab-pane label="出库记录" name="out">
 		  	<stock-out></stock-out>
-		  </el-tab-pane>
+		  </el-tab-pane> -->
 		  <template v-if="userInfo.orgLevel === 3">
 			  <el-tab-pane label="订车列表" name="order">
 			  	<stock-order></stock-order>
@@ -31,7 +31,7 @@ import { mapGetters } from 'vuex'
 import viewerImages from 'components/viewer-images'
 import stockList from './stock-list'
 import stockIn from './stock-in'
-import stockOut from './stock-out'
+// import stockOut from './stock-out'
 import stockOrder from './stock-order'
 import stockOutOrder from './stock-out-order'
 export default {
@@ -40,7 +40,7 @@ export default {
 		viewerImages,
 		stockList,
 		stockIn,
-		stockOut,
+		// stockOut,
 		stockOrder,
 		stockOutOrder
 	},
