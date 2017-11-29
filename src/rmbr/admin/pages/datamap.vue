@@ -2,7 +2,7 @@
 	<div class="l-main-body">
 		<div class="l-dashboard-map">
 			<el-amap :zoom="14" :center="mapCenter">
-	      <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :visible="true"></el-amap-marker>
+	      <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :content="marker.content" :visible="true"></el-amap-marker>
 	    </el-amap>
 		</div>
 		<div class="l-dashboard-count">
@@ -32,11 +32,12 @@ export default {
       this.$$api.dashboard.getMap().then(data => {
         this.dashboard = data
         let avgLng = 0, avgLat = 0
-        data.map_list.forEach(item => {
+        data.map_list.forEach((item,index) => {
         	avgLng += Number(item.longitude)
         	avgLat += Number(item.latitude)
         	this.markers.push({
-	        	position: [Number(item.longitude), Number(item.latitude)]
+	        	position: [Number(item.longitude), Number(item.latitude)],
+	        	content: '<div class="l-map-marker">'+ (index+1) +'</div>'
 	        })
         })
         avgLng = avgLng / data.map_list.length

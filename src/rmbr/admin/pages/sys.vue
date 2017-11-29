@@ -20,7 +20,14 @@
 	    </el-table-column>
 	    <el-table-column label="权限集" prop="operations" min-width="140">
 	    	<template slot-scope="scope">
-	    		<p v-for="item in scope.row.operations">{{item.operation_name}}</p>
+	    		<el-popover trigger="hover" placement="bottom">
+	    			<ul class="l-permission-list">
+	    				<li v-for="item in scope.row.operations">{{item.operation_name}}</li>
+	    			</ul>
+	          <div slot="reference">
+	            <el-tag size="medium">查看权限</el-tag>
+	          </div>
+	        </el-popover>
 	    	</template>
 	    </el-table-column>
 	    <el-table-column label="操作">
@@ -46,29 +53,31 @@
 
 	  <!-- 新增/编辑角色 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
-  		<el-form ref="infoForm" label-width="70px" style="width: 432px;"
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
-			  <el-form-item label="姓名" prop="name">
-			    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="账号" prop="username">
-			    <el-input v-model="dialogInfo.data.username" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="密码" prop="password">
-			    <el-input v-model="dialogInfo.data.password" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item label="地区" prop="region">
-			  	<el-cascader ref="region" style="width:100%;" change-on-select filterable v-model="dialogInfo.region" :options="regionData" :props="{label: 'text', value: 'value'}"></el-cascader>
-			  </el-form-item>
-			  <el-form-item label="权限" prop="permission">
-			    <el-checkbox-group class="l-permission" v-model="dialogInfo.permission.value">
-				    <el-checkbox v-for="item in dialogInfo.permission.data" :label="item.id" :key="item.id">
-				    	{{item.name}}
-				   	</el-checkbox>
-				  </el-checkbox-group>
-			  </el-form-item>
-			</el-form>
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
+			<div class="l-scroll" style="max-height:400px;">
+	  		<el-form class="l-form1" ref="infoForm" label-width="80px" inline
+	  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+				  <el-form-item label="账号" prop="username">
+				    <el-input v-model="dialogInfo.data.username" :maxlength="50"></el-input>
+				  </el-form-item>
+				  <el-form-item label="姓名" prop="name">
+				    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>
+				  </el-form-item>
+				  <el-form-item label="密码" prop="password">
+				    <el-input v-model="dialogInfo.data.password" :maxlength="50"></el-input>
+				  </el-form-item>
+				  <el-form-item label="地区" prop="region">
+				  	<el-cascader ref="region" style="width:100%;" change-on-select filterable v-model="dialogInfo.region" :options="regionData" :props="{label: 'text', value: 'value'}"></el-cascader>
+				  </el-form-item>
+				  <el-form-item class="_flex" label="权限" prop="permission">
+				    <el-checkbox-group class="l-permission" v-model="dialogInfo.permission.value">
+					    <el-checkbox v-for="item in dialogInfo.permission.data" :label="item.id" :key="item.id">
+					    	{{item.name}}
+					   	</el-checkbox>
+					  </el-checkbox-group>
+				  </el-form-item>
+				</el-form>
+			</div>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitInfo">确定提交</el-button>
@@ -275,7 +284,10 @@ export default {
 }
 </script>
 <style scoped lang="less">
-.l-permission{
-	.el-checkbox{margin:0 10px 0 0;}
+.l-permission .el-checkbox{margin:0 10px 0 0; min-width: 160px;}
+.l-permission-list{
+	overflow: hidden; margin:10px 0; padding:0 0 0 40px; width: 340px; 
+	li{ float: left; width: 140px; margin: 5px 0;}
+	li:nth-child(even){margin-left: 40px;}
 }
 </style>

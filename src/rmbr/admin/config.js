@@ -4,6 +4,9 @@ let config = {
 	},
 	api: {
 		baseURL: 'http://api.leolai.cn/api/plat'
+	},
+	shop: {
+		admin: 'http://shop.leolai.cn/admin/index.php'
 	}
 }
 

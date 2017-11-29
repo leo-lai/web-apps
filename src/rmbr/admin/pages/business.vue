@@ -1,6 +1,6 @@
 <template>
 	<div class="l-main-body">
-		<el-row class="l-margin-b">
+		<el-row>
   		<el-col :span="4">
   			<el-button type="primary" @click="showDialogInfo('new')">录入商户</el-button>
   		</el-col>

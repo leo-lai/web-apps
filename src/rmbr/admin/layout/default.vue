@@ -6,8 +6,7 @@
     			<span>新疆瑞曼博尔管理系统</span>
     			<i class="el-icon-menu" title="菜单-展开/闭合" @click="doCollapse"></i>
     		</div>
-        <el-menu class="l-menu" :default-active="$route.path" :collapse="collapse" :router="true" :unique-opened="false" 
-        	background-color="#38415f" text-color="#fff" active-text-color="#ffd04b">
+        <el-menu class="l-menu" :default-active="$route.path" :collapse="collapse" :router="true" :unique-opened="false" background-color="#38415f" text-color="#fff" active-text-color="#ffd04b">
           <template v-for="menu in userMenus" v-if="!menu.hidden">
           	<el-submenu v-if="menu.children.length > 1" :index="menu.path">
 			        <template slot="title">
@@ -26,6 +25,11 @@
 				      <span slot="title">{{menu.meta.title}}</span>
 			      </el-menu-item>
           </template>
+          <el-menu-item index="" @click.native="shopAdmin">
+			      <i class="el-icon-caret-right"></i>
+			      <!-- <a style="color: inherit; text-decoration: none;" :href="$$config.shop.admin + '?token=' + userInfo.token" target="_blank" slot="title">商城管理</a> -->
+			      <span slot="title">商城管理</span>
+		      </el-menu-item>
         </el-menu>
       </el-aside>
 	    <el-container direction="vertical">
@@ -105,11 +109,15 @@ export default {
   },
   computed: {
   	...mapGetters([
+  		'userInfo',
   		'fullscreen',
       'collapse'
     ])
   },
   methods: {
+  	shopAdmin() {
+  		window.open(`${this.$$config.shop.admin}?token=${this.userInfo.token}`)
+  	},
   	doCollapse() {
   		this.$store.dispatch('toggleCollapse')
   	},

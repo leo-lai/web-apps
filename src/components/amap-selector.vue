@@ -181,15 +181,6 @@ export default {
 </script>
 
 <style lang="less">
-.l-map-marker{
-  background: url(marker.png) no-repeat 50% 50%; background-size: 100% 100%; position: relative;
-  width: 40px; height: 40px; text-align: center; color: #fff; line-height: 30px; font-family: monospace; font-weight: bold;
-}
-.l-map-marker:after{
-  content: '';
-  position: absolute; bottom: -10px; left: 5px; right: 5px; height: 10px;
-  background-image: radial-gradient(ellipse closest-side, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
-}
 .amap-dialog .el-dialog__body{padding: 0;}
 .amap-container {display: flex; position: relative; height: 100%; }
 .amap-container .amap-address{padding: 20px 20px 0; background: rgb(239, 239, 244);}

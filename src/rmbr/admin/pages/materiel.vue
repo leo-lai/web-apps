@@ -1,6 +1,6 @@
 <template>
 	<div class="l-main-body">
-		<el-row class="l-margin-b">
+		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
   				<el-form-item prop="number" lalel="">
