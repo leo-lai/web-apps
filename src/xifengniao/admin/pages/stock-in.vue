@@ -41,7 +41,7 @@
 	    		<span>{{$$config.baseData.carSource[scope.row.storageSource - 1]}}</span>
 	      </template>
 	    </el-table-column>
-	    <el-table-column label="供应商" prop="supplierName" min-width="120"></el-table-column>
+	    <el-table-column label="供应商" prop="supplierName" min-width="120" header-align="center"></el-table-column>
 	    <el-table-column label="采购员" prop="systemUserName" align="center"></el-table-column>
 	    <el-table-column label="采购总价" prop="totalPurchasePrice" align="center"></el-table-column>
 	    <el-table-column label="采购总数量" prop="totalPurchase" align="center"></el-table-column>

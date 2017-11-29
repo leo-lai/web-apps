@@ -64,8 +64,8 @@
 			  <el-form-item label="发票金额" prop="invoicePrice">
 			  	<el-input v-model="dialogInfo.data.invoicePrice" :maxlength="10"></el-input>
 			  </el-form-item>
-			  <el-form-item label="定金/辆" >
-			  	<el-input disabled value="3000"></el-input>
+			  <el-form-item label="定金/辆" prop="depositPrice">
+			  	<el-input v-model="dialogInfo.data.depositPrice"></el-input>
 			  </el-form-item>
 			  <el-form-item label="优惠" prop="discountPrice">
 			  	<el-input v-model="dialogInfo.data.discountPrice" :maxlength="10"></el-input>
@@ -156,6 +156,9 @@ export default {
 				visible: false,
 				loading: false,
 				rules: {
+					depositPrice: [
+						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					],
 					discountPrice: [
 						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
@@ -170,6 +173,7 @@ export default {
 					carsName: '',
 					guidingPrice: '',
 					isOnLine: true,
+					depositPrice: '',
 					discountPrice: '',
 					invoicePrice: ''
 				},
