@@ -266,15 +266,16 @@
 		  	<el-button style="width: 200px;" type="primary" :loading="outStockInfo.loading" @click="outStock()">出库车辆</el-button>
 		  </div>
 		</el-dialog>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
-import viewer from 'v-viewer/src/component.vue'
-
+import viewerImages from 'components/viewer-images'
 export default {
 	name: 'stock-out-order',
 	components: {
-    viewer
+    viewerImages
   },
 	data() {
 		let that = this
@@ -287,11 +288,6 @@ export default {
       }
 		}
 		return {
-			viewer: {
-				options: {},
-				visible: true,
-				images: []
-			},
 			cascader: {
 				value: [],
 				data: [],
@@ -418,9 +414,6 @@ export default {
 		formatterState(row, column, cellValue) {
 			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
 		},
-		viewerInited(viewer) {
-			this.$$viewer = viewer
-		},
 		cascaderItemChange(valArr) {
 			let promise = Promise.resolve()
 			let currentBrand = this.cascader.data.filter(brand => brand.id === valArr[0])[0]
@@ -448,6 +441,9 @@ export default {
 		},
 		cascaderChange(valArr) {
 			if(!valArr || valArr.length < 2) return
+				
+			this.dialogInfo.data.colourId = ''
+			this.dialogInfo.data.interiorId = ''
 
 			// 获取车身颜色和内饰颜色
 			this.$$api.color.getCheshenList(valArr[1]).then(({data}) => {
@@ -701,11 +697,9 @@ export default {
 		},
 		showCarImages(imagesArr = []) { // 查看验车图片
 			if(imagesArr && imagesArr.length > 0) {
-				this.$$parent.viewer.images = imagesArr
-				setTimeout(_ => {
-					this.$$parent.$$viewer.index = 0
-					this.$$parent.$$viewer.show()	
-				}, 50)
+				this.$refs.viewer.show(0, imagesArr)
+			}else{
+				this.$message.info('没有可查看图片')
 			}
 		}
 	},

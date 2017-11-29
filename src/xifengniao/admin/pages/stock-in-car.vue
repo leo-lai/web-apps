@@ -2,7 +2,7 @@
 	<div>
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" 
 			title="车辆列表" width="995px" :visible.sync="dialogList.visible">
-			<el-form style="margin-top: -20px;" class="l-form1" inline label-width="100px" label-position="left">
+			<el-form size="mini" style="margin-top: -20px;" class="l-form1" inline label-width="100px" label-position="left">
 				<el-form-item label="入库单号">
 					<span class="l-text-gray">{{ dialogList.info.storageCode }}</span>
 				</el-form-item>
@@ -101,20 +101,25 @@
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
 import uploader from 'components/uploader'
+import viewerImages from 'components/viewer-images'
 export default {
 	name: 'stock-in-car',
 	components: {
-		uploader
+		uploader, viewerImages
   },
 	data() {
 		let that = this
 		let validateUpload = function(rule, value, callback) {
 			if(that.$refs.dialogInfoUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
+			}else if(that.dialogInfo.uploadList.length === 0) {
+				callback(new Error('请上传照片'))
 			}else if(that.dialogInfo.uploadList.length > 9) {
 				callback(new Error('最多上传9张照片'))
 			}else {
@@ -195,7 +200,7 @@ export default {
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
 					upload: [
-						{ validator: validateUpload, trigger: 'change' },
+						{ required: true, validator: validateUpload, trigger: 'change' },
 					]
 				},
 				data: {
@@ -241,6 +246,10 @@ export default {
       return promise
 		},
 		cascaderChange(valArr) {
+			if(!valArr || valArr.length < 2) return
+				
+			this.dialogInfo.data.colourId = ''
+			this.dialogInfo.data.interiorId = ''
 			// 获取车身颜色和内饰颜色
 			this.$$api.color.getCheshenList(valArr[1]).then(({data}) => {
     		this.dialogInfo.colorList = data
@@ -373,11 +382,8 @@ export default {
 							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '车辆信息成功'
 						})
 
-						if(this.$$parent) {
-							this.$$parent.refreshList()
-						}else{
-							this.refreshList()	
-						}
+						this.$$parent && this.$$parent.refreshList()
+						this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
@@ -409,11 +415,9 @@ export default {
 		},
 		showImages(imagesArr = []) { // 查看图片
 			if(imagesArr && imagesArr.length > 0) {
-				this.$$parent.viewer.images = imagesArr
-				setTimeout(_ => {
-					this.$$parent.$$viewer.index = 0
-					this.$$parent.$$viewer.show()	
-				}, 50)
+				this.$refs.viewer.show(0, imagesArr)
+			}else{
+				this.$message.info('没有可查看图片')
 			}
 		}
 	},

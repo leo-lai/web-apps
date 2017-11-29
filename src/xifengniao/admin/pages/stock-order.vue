@@ -108,7 +108,7 @@
 		</el-dialog>
 
 		<!-- 查看订车单 -->
-		<el-dialog class="l-padding-t-0" title="查看订车单" :visible.sync="viewInfo.visible" width="995px">
+		<el-dialog class="l-padding-t-0" title="查看订车单" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="viewInfo.visible" width="995px">
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
@@ -213,7 +213,7 @@
 				<el-button type="primary" @click="payNow">立即支付</el-button>
   		</div>
   		<div class="l-hidden-box">
-	  		<form ref="payForm" target="_blank" method='post' :action="$$config.pay.url">
+	  		<form ref="payForm" target="payWin" method='post' :action="$$config.pay.url">
 	  			<table>
 	  				<tr v-for="(value, name) in payInfo.formData">
 	  					<td>{{name}}</td>
@@ -226,7 +226,15 @@
 	  			</table>
 	  		</form>	
   		</div>
+
+  		<!-- 支付窗口 -->
+			<el-dialog class="l-padding-t-0" :visible.sync="payInfo.innerVisible" :close-on-press-escape="false" width="1100px" append-to-body :before-close="closePayWin">
+				<div>
+					<iframe seamless id="payWin" name="payWin" style="width: 100%; height: 700px; border: none;"></iframe>
+				</div>
+			</el-dialog>
 		</el-dialog>
+		
 
 		<!-- 二维码支付 -->
 		<el-dialog title="支付二维码" align="center" width="300px" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="qrcode.visible">
@@ -235,14 +243,17 @@
 	   		<p class="l-margin"><b>本次支付金额：{{payInfo.data.stockOrderState === 1 ? payInfo.data.depositPrice : payInfo.data.balancePrice}}</b></p>
 	    </div>
 		</el-dialog>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
 import Qrcanvas from 'qrcanvas-vue'
+import viewerImages from 'components/viewer-images'
 export default {
 	name: 'stock-order',
 	components: {
-    Qrcanvas
+    Qrcanvas, viewerImages
   },
 	data() {
 		let that = this
@@ -358,6 +369,7 @@ export default {
 			},
 			payInfo: {
 				visible: false,
+				innerVisible: false,
 				payWay: 1,
 				data: {},
 				formData: {}
@@ -396,6 +408,8 @@ export default {
 		cascaderChange(valArr) {
 			if(!valArr || valArr.length < 2) return
 
+			this.dialogInfo.data.colourId = ''
+			this.dialogInfo.data.interiorId = ''
 			// 获取车身颜色和内饰颜色
 			this.$$api.color.getCheshenList(valArr[1]).then(({data}) => {
     		this.dialogInfo.colorList = data
@@ -556,11 +570,9 @@ export default {
 		},
 		showCarImages(imagesArr = []) { // 查看验车图片
 			if(imagesArr && imagesArr.length > 0) {
-				this.$$parent.viewer.images = imagesArr
-				setTimeout(_ => {
-					this.$$parent.$$viewer.index = 0
-					this.$$parent.$$viewer.show()	
-				}, 50)
+				this.$refs.viewer.show(0, imagesArr)
+			}else{
+				this.$message.info('没有可查看图片')
 			}
 		},
 		showPayInfo(row) { // 支付订车单定金
@@ -581,8 +593,16 @@ export default {
 			}).then(({data}) => {
 				this.payInfo.formData = data
 				if(this.payInfo.payWay == 1) {
-					setTimeout(_ => {
-						this.$refs.payForm.submit()	
+					this.payInfo.innerVisible = true
+					setTimeout(_cont => {
+						this.$$payWin = document.querySelector('#payWin')
+						this.$$payWin.loadtimes = 0
+						this.$$payWin.onload = () => {
+							if(++this.$$payWin.loadtimes >= 2) {
+								this.closePayWin()
+							}
+						}
+						this.$refs.payForm.submit()
 					}, 50)
 				}else {
 					this.qrcode.visible = true
@@ -608,6 +628,30 @@ export default {
 			}).finally(_ => {
 				loading.close()
 			})
+		},
+		closePayWin(done) {
+			if(done) {
+				done()
+			}else {
+				this.payInfo.innerVisible = false
+				this.payInfo.visible = false
+
+				const h = this.$createElement;
+        this.$msgbox({
+          title: '支付提示',
+          message: h('div', null, [
+            h('p', null, '请您在新打开的页面上完成支付。'),
+            h('p', { style: 'color: #ccc; font-size: 12px;' }, '支付完成后，根据您的情况点击下面按钮。')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '支付成功',
+          cancelButtonText: '支付失败',
+          type: 'warning'
+        }).then(_ => {
+          this.refreshList()
+        })
+			}
+			this.$$payWin = null
 		}
 	},
 	mounted() {

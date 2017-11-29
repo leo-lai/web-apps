@@ -14,7 +14,7 @@
     </el-upload>
 
     <!-- 预览图片 -->
-    <viewer-images :images="uploadList"></viewer-images>
+    <viewer-images ref="viewer" :images="uploadList"></viewer-images>
   </div>
 </template>
 <script>
@@ -52,7 +52,7 @@ export default {
       ++this.waiting
     },
     uploadPreview(file) {
-      this.$$viewer && this.$$viewer.show2(this.uploadList.findIndex(item => item.url === file.url) || 0)
+      this.$refs.viewer.show(this.uploadList.findIndex(item => item.url === file.url) || 0)
     },
     uploadRemove(file, fileList) {
       if(file.status === 'success') {

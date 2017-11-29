@@ -21,35 +21,26 @@
 			  </el-tab-pane>	
 		  </template>
 		</el-tabs>
-
-		<!-- 预览图片 -->
-		<viewer-images :images="viewer.images"></viewer-images>
 	</div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import viewerImages from 'components/viewer-images'
 import stockList from './stock-list'
 import stockIn from './stock-in'
-// import stockOut from './stock-out'
+import stockOut from './stock-out'
 import stockOrder from './stock-order'
 import stockOutOrder from './stock-out-order'
 export default {
 	name: 'stock',
 	components: {
-		viewerImages,
 		stockList,
 		stockIn,
-		// stockOut,
+		stockOut,
 		stockOrder,
 		stockOutOrder
 	},
 	data() {
 		return {
-			viewer: {
-				images: [],
-				index: 0
-			},
 			tabActive: ''
 		}
 	},

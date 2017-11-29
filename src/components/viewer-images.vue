@@ -1,7 +1,7 @@
 <template>
   <div class="l-viewer">
     <!-- 预览图片 -->
-    <img v-for="{thumb, src} in images" :key="src" :src="thumb" :data-source="src" >
+    <img v-for="{thumb, src} in imageList" :key="src" :src="thumb" :data-source="src" >
   </div>
 </template>
 <script>
@@ -27,56 +27,74 @@ const defaults = {
 export default {
   props: {
     images: {
-      required: true,
       type: Array,
-      default: []
+      default() {
+        return []
+      }
     },
     options: {
       type: Object
-    },
-    index: {
-      type: Number,
-      default: 0
     }
   },
   data() {
     return {
+      imageList: []
     }
   },
   methods: {
     createViewer () {
-      this.$viewer && this.$viewer.destroy() 
-      if(this.images && this.images.length > 0) {
+      if(this.imageList.length > 0) {
+        this.destroy()
+
         const options = Object.assign({}, defaults, this.options)  
         this.$viewer = new Viewer(this.$el, options)
-        this.$viewer.show2 = index => {
-          this.$viewer.index = Number(index) >= 0 ? index : this.index 
-          this.$viewer.show()
-        }
-        this.$parent.$$viewer = this.$viewer
       }
     },
-  },
-  watch: {
-    images () {
-      this.$nextTick(() => {
-        this.createViewer()
+    show(index = 0, images = []) {
+      if(images && images.length > 0) {
+        this.imageList = images
+      }
+
+      this.$nextTick(_ => {
+        setTimeout(_ => {
+          if(this.$viewer) {
+            this.$viewer.index = index
+            this.$viewer.show()
+          }
+        }, 100)
       })
     },
+    destroy() {
+      this.$viewer && this.$viewer.ready && this.$viewer.destroy()
+    }
+  },
+  watch: {
+    imageList(val) {
+      this.$nextTick(_ => {
+        if(this.$viewer && this.$viewer.ready){
+          this.$viewer.update()
+          this.$viewer.reset()
+        }else {
+          this.createViewer()  
+        }
+      })
+    },
+    images (val) {
+      if(val && val.length > 0){
+        this.imageList = val  
+      }
+    },
     options: {
-      handler: function () {
-        this.$nextTick(() => {
+      handler: function() {
+        this.$nextTick(_ => {
           this.createViewer()
         })
       },
       deep: true
     }
   },
-  mounted () {
-    this.createViewer()
-  },
   destroyed () {
-    this.$viewer && this.$viewer.destroy()
+    this.destroy()
   }
 }
 </script>

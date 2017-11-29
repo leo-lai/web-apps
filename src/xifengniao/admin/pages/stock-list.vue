@@ -94,12 +94,18 @@
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
 		</el-dialog>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import viewerImages from 'components/viewer-images'
 export default {
 	name: 'stock-list',
+	components: {
+		viewerImages
+	},
 	data() {
 		return {
 			dateOptions: {
@@ -266,11 +272,9 @@ export default {
 		},
 		showCarImages(imagesArr = []) { // 查看验车图片
 			if(imagesArr && imagesArr.length > 0) {
-				this.$$parent.viewer.images = imagesArr
-				setTimeout(_ => {
-					this.$$parent.$$viewer.index = 0
-					this.$$parent.$$viewer.show()	
-				}, 50)
+				this.$refs.viewer.show(0, imagesArr)
+			}else{
+				this.$message.info('没有可查看图片')
 			}
 		}
 	},

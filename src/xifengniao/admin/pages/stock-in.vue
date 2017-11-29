@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<el-row>
+		<el-row type="flex">
 			<el-col :span="3">
-				<el-button type="primary" @click="showDialogInfo('new')">新增入库单</el-button>
+				<el-button  v-if="userInfo.orgLevel < 3" type="primary" @click="showDialogInfo('new')">新增入库单</el-button>
 			</el-col>
   		<el-col :span="21" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
@@ -41,7 +41,7 @@
 	    		<span>{{$$config.baseData.carSource[scope.row.storageSource - 1]}}</span>
 	      </template>
 	    </el-table-column>
-	    <el-table-column label="供应商" prop="supplierName"></el-table-column>
+	    <el-table-column label="供应商" prop="supplierName" min-width="120"></el-table-column>
 	    <el-table-column label="采购员" prop="systemUserName" align="center"></el-table-column>
 	    <el-table-column label="采购总价" prop="totalPurchasePrice" align="center"></el-table-column>
 	    <el-table-column label="采购总数量" prop="totalPurchase" align="center"></el-table-column>
@@ -347,7 +347,7 @@ export default {
 				})
 			}
 			infoPromise.finally(_ => {
-				this.$$event.$emit('stock:' + eventName, info, this.$$parent)	
+				this.$$event.$emit('stock:' + eventName, info, this)	
 			})
 		}
 	},

@@ -12,29 +12,21 @@
 		  </el-tab-pane>
 		</el-tabs>
 
-		<!-- 预览图片 -->
-		<viewer-images :images="viewer.images"></viewer-images>
 	</div>
 </template>
 <script>
-import viewerImages from 'components/viewer-images'
 import customerAll from './customer-all'
 import customerTrack from './customer-track'
 import customerBespeak from './customer-bespeak'
 export default {
 	name: 'customer',
 	components: {
-		viewerImages,
 		customerAll,
 		customerTrack,
 		customerBespeak
 	},
 	data() {
 		return {
-			viewer: {
-				images: [],
-				index: 0
-			},
 			tabActive: ''
 		}
 	},
