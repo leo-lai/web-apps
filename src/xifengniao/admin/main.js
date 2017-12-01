@@ -14,7 +14,23 @@ Vue.use(VueAMap)
 VueAMap.initAMapApiLoader({
   key: '976fe9a654ec6d6127bdb1eb1db56c3e',
   plugin: ['Scale', 'Geocoder']
-})
+}) 
+
+// quill-editor
+import VueQuillEditor, { Quill } from 'vue-quill-editor'
+import 'quill-image-resize-module'
+import { ImageDrop } from 'quill-image-drop-module'
+import { ImageUpload } from 'assets/js/quill-image-upload-module'
+Quill.register('modules/imageDrop', ImageDrop)
+Quill.register('modules/imageUpload', ImageUpload)
+config.editorOption.modules.imageUpload = {
+  onChange(base64_content) {
+    return api.uploadByBase64(base64_content).then(({data}) => {
+      return data
+    })
+  }
+}
+Vue.use(VueQuillEditor, config.editorOption)
 
 import store from './store'
 import router from './router'

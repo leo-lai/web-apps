@@ -439,20 +439,33 @@ export let utils = {
       return src.replace(/\/0$/, '/' + size)
     }
   },
-  convertImgToBase64(url = '', callback, outputFormat){
-    var canvas = document.createElement('canvas'),
-      ctx = canvas.getContext('2d'),
-      img = new Image
-    img.crossOrigin = ''
-    img.onload = function(){
-      canvas.height = img.height
-      canvas.width = img.width
-      ctx.drawImage(img,0,0)
-      var dataURL = canvas.toDataURL(outputFormat || 'image/png')
-      callback.call(this, dataURL)
-      canvas = null;
-    }
-    img.src = url
+  convert: {
+    imgToBase64(url = '', callback, outputFormat){
+      var canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d'),
+        img = new Image
+      img.crossOrigin = ''
+      img.onload = function(){
+        canvas.height = img.height
+        canvas.width = img.width
+        ctx.drawImage(img,0,0)
+        var dataURL = canvas.toDataURL(outputFormat || 'image/png')
+        callback.call(this, dataURL)
+        canvas = null;
+      }
+      img.src = url
+    },
+    base64ToBlob(base64Data){  
+      //去掉url的头，并转换为byte  
+      var bytes = window.atob(base64Data.split(',')[1])
+      //处理异常,将ascii码小于0的转换为大于0  
+      var ab = new ArrayBuffer(bytes.length)
+      var ia = new Uint8Array(ab)
+      for (var i = 0; i < bytes.length; i++) {
+        ia[i] = bytes.charCodeAt(i)
+      }
+      return new Blob( [ab] , {type : 'image/png'})
+    } 
   },
   toptip(text = '', ms = 3000) {
     if(!text) return

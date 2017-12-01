@@ -38,7 +38,7 @@
 	    		<p class="l-text-error" v-if="scope.row.stockOrderState === 5">（尾款金额：{{scope.row.balancePrice}}）</p>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="操作" min-width="120" align="center">
+	    <el-table-column label="操作" min-width="130" align="center">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
@@ -92,7 +92,7 @@
 			  	<el-input disabled v-model="dialogInfo.info.price"></el-input>
 			  </el-form-item>
 			  <el-form-item label="定金/辆" >
-			  	<el-input disabled v-model="dialogInfo.info.deposit"></el-input>
+			  	<el-input disabled v-model="dialogInfo.info.depositPrice"></el-input>
 			  </el-form-item>
 			  <el-form-item label="采购数量" prop="stockOrderNumber" >
 			  	<el-input v-model.number="dialogInfo.data.stockOrderNumber" :maxlength="10"></el-input>
@@ -123,7 +123,7 @@
   				<td class="_tit">订单状态</td>
   				<td class="_cont">{{ formatterState(null, null, viewInfo.data.stockOrderState) }}</td>
   				<td class="_tit">定金</td>
-  				<td class="_cont" align="center">3000</td>
+  				<td class="_cont" align="center">{{ viewInfo.data.depositPrice }}</td>
   				<td class="_tit">数量</td>
   				<td class="_cont" align="center">{{ viewInfo.data.stockOrderNumber }}</td>
   			</tr>
@@ -183,7 +183,7 @@
   				<td class="_tit">订单状态</td>
   				<td class="_cont">{{ formatterState(null, null, payInfo.data.stockOrderState) }}</td>
   				<td class="_tit">定金</td>
-  				<td class="_cont" align="center">3000</td>
+  				<td class="_cont" align="center">{{ payInfo.data.depositPrice }}</td>
   				<td class="_tit">数量</td>
   				<td class="_cont" align="center">{{ payInfo.data.stockOrderNumber }}</td>
   			</tr>
@@ -360,7 +360,7 @@ export default {
 				},
 				info: {
 					price: '',
-					deposit: 3000
+					depositPrice: ''
 				}
 			},
 			viewInfo: {
@@ -420,6 +420,7 @@ export default {
     	// 获取指导价等信息
     	this.$$api.car.getCarsInfo(valArr[2]).then(({data}) => {
     		this.dialogInfo.info.price = data.price
+    		this.dialogInfo.info.depositPrice = data.depositPrice || 0
     	})
 		},
 		sizeChange(size = 100) {

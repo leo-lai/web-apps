@@ -64,7 +64,11 @@ var webpackConfig = {
 
     ]
   },
-  plugins: []
+  plugins: [
+    new webpack.ProvidePlugin({
+      'window.Quill': 'quill/dist/quill.min.js'
+    })
+  ]
 }
 
 module.exports = webpackConfig

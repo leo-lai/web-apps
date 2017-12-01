@@ -46,8 +46,7 @@
 	  <!-- 新增/编辑车型 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
-  		<el-form class="l-form1" ref="infoForm" label-width="100px" inline
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
+  		<el-form class="l-form1" ref="infoForm" label-width="100px" inline :model="dialogInfo.data" :rules="dialogInfo.rules">
   			<el-form-item class="_flex" label="车辆型号" prop="carModel" style="width: 622px;">
 			    <el-cascader style="width: 100%;" @active-item-change="cascaderChange"
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
@@ -88,7 +87,7 @@
 			    <el-input v-model="dialogInfo.data.price" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="车辆介绍" prop="introduce" >
-			    <el-input type="textarea" :rows="5" v-model="dialogInfo.data.introduce"></el-input>
+			 		<quill-editor ref="dialogInfoEditor" class="l-text-editor" v-model="dialogInfo.data.introduce"></quill-editor>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -143,6 +142,7 @@ export default {
 	},
 	data() {
 		let that = this
+		// 车辆型号选择
 		let validateCarModel = function(rule, value, callback) {
 			if (that.cascader.value.length === 0){
         callback(new Error('必填项'))
@@ -154,6 +154,18 @@ export default {
       }
 		}
 
+		// 富文本编辑器图片上传
+		let validateEditor = function(rule, value, callback) {
+			if(that.dialogInfo.data.introduce && 
+				that.$refs.dialogInfoEditor.$el.querySelectorAll('.l-convert-doing').length > 0) {
+				that.$message.error('等待图片上传完毕')
+				// callback(new Error(''))
+			}else {
+				callback()
+			}
+		}
+
+		// 图片配置上传
 		let validateUpload = function(rule, value, callback) {
 			if(that.$refs.dialogCheshenUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
@@ -164,6 +176,7 @@ export default {
 				callback()
 			}
 		}
+
 		return {
 			yearList: [],
 			dateOptions: {
@@ -228,6 +241,9 @@ export default {
 					],
 					price: [
 						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					],
+					introduce: [
+						{ validator: validateEditor, trigger: 'change' }
 					]
 				},
 				data: {
@@ -395,10 +411,7 @@ export default {
             this.dialogInfo.loading = false
           })  
         }else {
-        	this.$message({
-						type: 'error',
-						message: '请完善表单信息'
-					})
+        	this.$message.error('请完善表单信息')
         }
       })
 		},

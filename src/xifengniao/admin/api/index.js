@@ -12,14 +12,6 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(config => {
   // Do something before request is sent
-  config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-  config.transformRequest = [function(data) {
-    let ret = []
-    for (let key in data) {
-      ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-    }
-    return ret.join('&')
-  }]
   return config
 }, error => {
   return Promise.reject(error)
@@ -92,7 +84,17 @@ const fetch = {
     data.sessionId = storage.local.get('sessionId')
     return new Promise((resolve, reject) => {
       service({
-        url, method, data
+        url, method, data,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        transformRequest: [function(data) {
+          let ret = []
+          for (let key in data) {
+            ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+          }
+          return ret.join('&')
+        }]
       }).then(resolve).catch(error => {
         error && error.message && Message({
           type: 'error',
@@ -104,12 +106,39 @@ const fetch = {
   },
   post(url, data) {
     return this.ajax(url, data, 'POST')
+  },
+  form(url, formData) { // 自定义表单数据
+    formData && formData.append('sessionId', storage.local.get('sessionId'))
+    return new Promise((resolve, reject) => {
+      service({
+        url,
+        method: 'post',
+        data: formData
+      }).then(resolve).catch(error => {
+        error && error.message && Message({
+          type: 'error',
+          message: error.message
+        })
+        reject(error)
+      })
+    })
   }
 }
 
 const api = {
   baseURL: config.api.baseURL,
   pageSizes: [100, 200, 300, 400],
+  uploadBase64(base64Data = '') {
+    return fetch.post('/uploadImageBase64', {
+      img_file: base64Data
+    })
+  },
+  uploadByBase64(base64Data = '') {
+    var formData = new FormData()
+    //convertBase64UrlToBlob函数是将base64编码转换为Blob  
+    formData.append('img_file', utils.convert.base64ToBlob(base64Data), 'image_' + Date.now() + '.png')
+    return fetch.form('/uploadImage', formData)
+  },
   auth: {
     check() {
       return !!storage.local.get('sessionId')
