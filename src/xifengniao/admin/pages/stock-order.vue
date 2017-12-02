@@ -420,6 +420,9 @@ export default {
     	// 获取指导价等信息
     	this.$$api.car.getCarsInfo(valArr[2]).then(({data}) => {
     		this.dialogInfo.info.price = data.price
+    	})
+    	// 获取车辆定金
+    	this.$$api.car.getDepositPrice(valArr[2]).then(({data}) => {
     		this.dialogInfo.info.depositPrice = data.depositPrice || 0
     	})
 		},

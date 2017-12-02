@@ -281,6 +281,9 @@ const api = {
     },
     getCarsInfo(carId = '') { // 车大类相关信息
       return fetch.post('/carsInfo', { carId })
+    },
+    getDepositPrice(carId = '') { // 获取车辆定金
+      return fetch.post('/carDepositPrice', { carId })
     }
   },
   color: { // 车身颜色内饰管理
