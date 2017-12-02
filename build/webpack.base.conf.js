@@ -43,7 +43,8 @@ var webpackConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test'), resolve('node_modules/vue-echarts')]
+        // exclude: /node_modules(?!\/quill-image-drop-module|quill-image-resize-module)/,
+        include: [resolve('src'), resolve('node_modules/vue-echarts')]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

@@ -20,8 +20,6 @@
     "framework7-vue": "^0.9.2",
     "nprogress": "^0.2.0",
     "qrcanvas-vue": "^1.1.0",
-    "quill-image-drop-module": "^1.0.3",
-    "quill-image-resize-module": "^3.0.0",
     "screenfull": "^3.3.2",
     "viewerjs": "^0.10.0",
     "vue": "^2.2.2",

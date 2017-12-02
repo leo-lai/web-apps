@@ -388,6 +388,8 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+
+			this.$refs.dialogInfoEditor.quill.root.click()
 			this.resetDialogInfo()
 		},
 		resetDialogInfo() {

@@ -18,11 +18,10 @@ VueAMap.initAMapApiLoader({
 
 // quill-editor
 import VueQuillEditor, { Quill } from 'vue-quill-editor'
-import 'quill-image-resize-module'
-import { ImageDrop } from 'quill-image-drop-module'
-import { ImageUpload } from 'assets/js/quill-image-upload-module'
-Quill.register('modules/imageDrop', ImageDrop)
-Quill.register('modules/imageUpload', ImageUpload)
+import 'components/quill-image-resize-module'
+import ImageDrop from 'components/quill-image-drop-module'
+import ImageUpload from 'components/quill-image-upload-module'
+
 config.editorOption.modules.imageUpload = {
   onChange(base64_content) {
     return api.uploadByBase64(base64_content).then(({data}) => {
@@ -31,6 +30,11 @@ config.editorOption.modules.imageUpload = {
   }
 }
 Vue.use(VueQuillEditor, config.editorOption)
+
+// Quill.register('modules/imageResize', ImageResize)
+Quill.register('modules/imageDrop', ImageDrop)
+Quill.register('modules/imageUpload', ImageUpload)
+
 
 import store from './store'
 import router from './router'
