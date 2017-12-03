@@ -10,20 +10,7 @@
         <f7-navbar v-if="$theme.ios" title="Left Panel" sliding></f7-navbar>
         <f7-pages>
           <f7-page>
-            <f7-navbar v-if="$theme.material" title="Left Panel" sliding></f7-navbar>
-            <f7-block inner>
-              <p>Left panel content goes here</p>
-            </f7-block>
-            <f7-block-title>Load page in panel</f7-block-title>
-            <f7-list>
-              <f7-list-item link="/about/" title="About"></f7-list-item>
-              <f7-list-item link="/form/" title="Form"></f7-list-item>
-            </f7-list>
-            <f7-block-title>Load page in main view</f7-block-title>
-            <f7-list>
-              <f7-list-item link="/about/" title="About" link-view="#main-view" link-close-panel></f7-list-item>
-              <f7-list-item link="/form/" title="Form" link-view="#main-view" link-close-panel></f7-list-item>
-            </f7-list>
+            
           </f7-page>
         </f7-pages>
       </f7-view>
@@ -35,20 +22,7 @@
         <f7-navbar v-if="$theme.ios" title="Right Panel" sliding></f7-navbar>
         <f7-pages>
           <f7-page>
-            <f7-navbar v-if="$theme.material" title="Right Panel" sliding></f7-navbar>
-            <f7-block>
-              <p>Right panel content goes here</p>
-            </f7-block>
-            <f7-block-title>Load page in panel</f7-block-title>
-            <f7-list>
-              <f7-list-item link="/about/" title="About"></f7-list-item>
-              <f7-list-item link="/form/" title="Form"></f7-list-item>
-            </f7-list>
-            <f7-block-title>Load page in main view</f7-block-title>
-            <f7-list>
-              <f7-list-item link="/about/" title="About" link-view="#main-view" link-close-panel></f7-list-item>
-              <f7-list-item link="/form/" title="Form" link-view="#main-view" link-close-panel></f7-list-item>
-            </f7-list>
+            
           </f7-page>
         </f7-pages>
       </f7-view>
@@ -56,49 +30,59 @@
 
     <!-- Main Views -->
     <f7-views>
-      <f7-view id="main-view" class="theme-white" navbar-fixed tabbar-fixed main :dynamic-navbar="true">
+      <f7-view id="main-view" navbar-fixed tabbar-fixed main :dynamic-navbar="true">
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
-          <f7-nav-center sliding>{{toolbar.active.title}}</f7-nav-center>
+          <f7-nav-center sliding>首页</f7-nav-center>
+          <f7-nav-right>
+            <f7-link v-if="userInfo" text="注销" @click="logoutSubmit"></f7-link>
+          </f7-nav-right>
         </f7-navbar>
         <!-- Pages -->
         <f7-pages>
-          <f7-page name="welcome" no-navbar no-tabbar>
-            <div class="l-welcome-page" v-if="welcome.visable">
-              <f7-chip class="_skip" text="跳过" @click="closeWelcome"></f7-chip>
-              <f7-swiper ref="welcomeSwiper" :pagination="true" :params="welcome.swiper">
-                <f7-swiper-slide class="l-flex-vhc">
-                  <div>
-                    <f7-icon f7="images" size="100"></f7-icon>
-                    <p style="margin: 2rem 0 0;">在这里展示您日常风采</p>
-                  </div>
-                </f7-swiper-slide>
-                <f7-swiper-slide class="l-flex-vhc">
-                  <div>
-                    <f7-icon f7="albums" size="100"></f7-icon>
-                    <p style="margin: 2rem 0 0;">在这里聆听美妙的音乐</p>
-                  </div>
-                </f7-swiper-slide>
-                <f7-swiper-slide class="l-flex-vhc">
-                  <div>
-                    <f7-icon f7="world" size="100"></f7-icon>
-                    <p style="margin: 2rem 0 0;">在这里找到交心的陌生人</p>
-                  </div>
-                </f7-swiper-slide>
-              </f7-swiper>
-            </div>
+          <f7-page name="index" no-tabbar>
+            <table class="l-index-menu">
+              <tr>
+                <td colspan="2">
+                  <p class="l-fs-s l-text-gray">今日收益</p>
+                  <p class="l-fs-xl">￥<b>15.00</b></p>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <f7-link href="/wallet/">
+                    <f7-icon f7="card_fill"></f7-icon>
+                    <p>钱包</p>  
+                  </f7-link>
+                </td>
+                <td>
+                  <f7-icon f7="card_fill"></f7-icon>
+                  <p>设备</p>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <f7-icon f7="card_fill"></f7-icon>
+                  <p>商城</p>
+                </td>
+                <td>
+                  <f7-icon f7="card_fill"></f7-icon>
+                  <p>提醒</p>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <f7-icon f7="card_fill"></f7-icon>
+                  <p>订单</p>
+                </td>
+                <td>
+                  <f7-icon f7="card_fill"></f7-icon>
+                  <p>优惠券</p>
+                </td>
+              </tr>
+            </table>
           </f7-page>
         </f7-pages>
-        <!-- toolbar tabs -->
-        <f7-toolbar tabbar labels>
-          <f7-link v-for="(item,index) in toolbar.data" :key="item.id" @click="showTab(item)" :active="item.id === toolbar.active.id">
-            <f7-icon :icon="item.icon">
-              <f7-badge v-show="item.badge > 0" color="red">{{item.badge}}</f7-badge>
-            </f7-icon>
-            <span class="tabbar-label">{{item.title}}</span>
-          </f7-link>
-        </f7-toolbar>
-        <!-- toolbar tabs end-->
       </f7-view>
     </f7-views>
 
@@ -109,10 +93,9 @@
           <f7-page>
             <f7-navbar title="Popup">
               <f7-nav-right>
-                <f7-link close-popup>Close</f7-link>
+                <f7-link close-popup>返回</f7-link>
               </f7-nav-right>
             </f7-navbar>
-            <f7-block>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Neque, architecto. Cupiditate laudantium rem nesciunt numquam, ipsam. Voluptates omnis, a inventore atque ratione aliquam. Omnis iusto nemo quos ullam obcaecati, quod.</f7-block>
           </f7-page>
         </f7-pages>
       </f7-view>
@@ -120,25 +103,25 @@
 
     <!-- Login Screen -->
     <f7-login-screen id="login-screen">
-      <f7-view id="view-login">
+      <f7-view>
         <f7-pages>
           <f7-page login-screen>
-            <f7-login-screen-title>Login</f7-login-screen-title>
-            <f7-list form>
+            <f7-login-screen-title>欢迎登录</f7-login-screen-title>
+            <div class="l-margin l-text-center">
+              <img class="l-avatar" :src="loginForm.thumb" alt="">
+            </div>
+            <f7-list form class="l-padding">
               <f7-list-item>
-                <f7-label>Username</f7-label>
-                <f7-input name="username" placeholder="Username" type="text"></f7-input>
+                <f7-label>账号</f7-label>
+                <f7-input v-model="loginForm.username" type="text" placeholder="请输入账号"></f7-input>
               </f7-list-item>
               <f7-list-item>
-                <f7-label>Password</f7-label>
-                <f7-input name="password" type="password" placeholder="Password"></f7-input>
+                <f7-label>密码</f7-label>
+                <f7-input v-model="loginForm.password" type="password" placeholder="请输入密码"></f7-input>
               </f7-list-item>
             </f7-list>
-            <f7-list>
-              <f7-list-button title="Sign In" close-login-screen></f7-list-button>
-              <f7-list-label>
-                <p>Click Sign In to close Login Screen</p>
-              </f7-list-label>
+            <f7-list class="l-padding">
+              <f7-button fill big @click="loginSubmit">登录</f7-button>
             </f7-list>
           </f7-page>
         </f7-pages>
@@ -149,129 +132,71 @@
 </template>
 
 <script>
-
+import { mapGetters } from 'vuex'
 export default {
-  name: 'app',
+  name: 'index',
 	data() {
     const that = this
 		return {
-      welcome: {
-        visable: true,
-        swiper: {
-          // effect: 'coverflow',
-          onTransitionStart (swiper) {
-            if(swiper.swipeDirection === 'next' && swiper.slides.length - 1 === swiper.previousIndex){
-              that.closeWelcome()
-            }
-          } 
-        }
-      },
-      toolbar: {
-        active: {
-          title: '微信定制版'
-        },
-        data: [
-          {
-            id: 'chat',
-            url: '/chat',
-            active: false,
-            icon: 'l-icon-e608',
-            title: '微信',
-            badge: 9
-          },{
-            id: 'contacts',
-            url: '/contacts',
-            active: false,
-            icon: 'l-icon-e610',
-            title: '通讯录'
-          },{
-            id: 'find',
-            url: '/find',
-            active: false,
-            icon: 'l-icon-e60c',
-            title: '发现'
-          },{
-            id: 'me',
-            url: '/me',
-            active: false,
-            icon: 'l-icon-e655',
-            title: '我'
-          }
-        ]
+      loginForm: {
+        username: '',
+        password: '',
+        nickname: '',
+        open_id: '',
+        thumb: ''
       }
 		}
 	},
+  computed: {
+    ...mapGetters([
+      'userInfo'
+    ])
+  },
 	methods: {
-    closeWelcome() {
-      let mainView = this.$f7.mainView
-      let active = this.toolbar.data[0]
-      this.toolbar.active = active
-      mainView.router.load({
-        url: active.url,
-        animatePages: true,
-        reload: true,
-        pushState: false
-      })
-      if(!this.$$utils.device.isWechat){
-        mainView.showNavbar()
+    loginSubmit() {
+      if(!this.loginForm.username) {
+        this.$$utils.toptip('请输入账号')
+        return
       }
-      mainView.showToolbar()
-    },
-    showTab(active) {
-      if (!active) active = this.toolbar.data[0]
-      this.toolbar.active = active
+      if(!this.loginForm.password) {
+        this.$$utils.toptip('请输入密码')
+        return
+      }
 
-      this.$f7.mainView.router.load({
-        url: active.url,
-        animatePages: false,
-        reload: true
+      this.$f7.showIndicator()
+      this.$store.dispatch('login', this.loginForm).then(_ => {
+        this.$f7.closeModal()
+      }).finally(_ => {
+        this.$f7.hideIndicator()
+      })
+    },
+    logoutSubmit() {
+      this.$f7.showIndicator()
+      this.$store.dispatch('logout').finally(_ => {
+        this.$f7.hideIndicator()
+      })
+    },
+    checkLogin() {
+      let args = this.$$utils.url.getArgs()
+      this.$store.dispatch('checkLogin', args).then(_ => {
+        this.$f7.closeModal()
+      }).catch(urlParams => {
+        this.$$utils.copyObj(this.loginForm, urlParams)
+        this.$f7.loginScreen()
       })
     }
 	},
+  watch: {
+    userInfo(val) {
+      if(!val){
+        this.checkLogin()
+      }
+    }
+  },
 	mounted() {
-    this.$nextTick(() => {
-      setTimeout(() => {
-        let mainView = this.$f7.mainView
-        let url = mainView.url
-        let active = this.toolbar.data.filter(item => item.url === url)[0]
-
-        let welcomeCb = this.$f7.onPageReinit('welcome', page => {
-          mainView.hideNavbar(false)
-          mainView.hideToolbar(false)
-          this.welcome.visable = true
-        })
-
-        if (url === '#welcome') {
-          welcomeCb.trigger()
-        } else if(active) {
-          this.toolbar.active = active
-        } else {
-          mainView.hideToolbar(false)
-        }
-
-        if (this.$$utils.device.isWechat) {
-          mainView.hideNavbar(false)
-          this.$$(this.$f7.mainView.selector).removeClass('navbar-through')
-          this.$$(document).on('pageInit', e => {
-            if (e.detail) {
-              e.detail.page.container.classList.add('no-navbar')
-            } else {
-              this.$f7.mainView.activePage.container.classList.add('no-navbar')
-            }
-          }).trigger('pageInit')
-        }
-
-        // 野狗推送版本更新
-        this.$$wilddog.sync().ref('/appinfo').on('value', snapshot => {
-          let version = this.$$storage.local.get('version')
-          let appinfo = snapshot.val()
-          if(version && appinfo && appinfo.version !== version) {
-            this.$$storage.local.set('version', appinfo.version)
-            window.location.reload()
-          }
-        }, function (error) {
-          console.error(error)
-        })
+    this.$nextTick(_ => {
+      setTimeout(_ => {
+        this.checkLogin()
       })
     })
 	}
@@ -283,22 +208,17 @@ export default {
 @import '~framework7-icons/css/framework7-icons.css';
 @import '~assets/css/font.less';
 @import '~assets/css/base.less';
-@import '~assets/css/framework7-custom.less';
-.l-welcome-page{
-  height: 100%;
-  position: relative;
-  ._skip{
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    z-index: 100;
+body{font-size: 0.75rem;}
+.l-index-menu{
+  width: 100%; background-color: #fff;
+  text-align: center;
+  border-spacing: 0; border-collapse: collapse;
+  td{
+    width: 50%;
+    border: 1px solid #ccc;
+    padding: 1.5rem 0;
+    i~p{margin: 0.5rem 0 0 0;}
   }
-  .swiper-container{
-    height: 100%;
-    background: rgb(13, 166, 236);
-    color: #fff;
-    text-align: center;
-  }
-  i.f7-icons{color: #fff;}
+  td:active{background-color: #ccc;}
 }
 </style>

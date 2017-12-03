@@ -7,13 +7,17 @@ let config = {
     authDomain: '<wd5855906714jiwptx.wilddog.com>'
   },
   
+  api: {
+  	baseURL: 'http://api.leolai.cn/api'
+  },
+
 	framework7: {
 		root: '#app',
 		uniqueHistory: true,
 		swipeBackPage: !isWechat,
 		pushState: true,
 		pushStateRoot: '/',
-		pushStateSeparator: '!',
+		pushStateSeparator: 'wx',
 		// pushStateNoAnimation: true,
 		routes
 	}

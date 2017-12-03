@@ -116,7 +116,7 @@ export default {
   },
   methods: {
   	shopAdmin() {
-  		window.open(`${this.$$config.shop.admin}?token=${this.userInfo.token}`)
+  		window.open(`${this.$$config.shop.admin}?token=${this.userInfo.token}&uid=${this.userInfo.id}`)
   	},
   	doCollapse() {
   		this.$store.dispatch('toggleCollapse')
