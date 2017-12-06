@@ -1,5 +1,5 @@
 <template>
-  <f7-page name="wallet">
+  <f7-page name="wallet-recharge">
     <f7-navbar title="钱包充值" back-link="返回" sliding></f7-navbar>
     <ul class="l-recharge-list">
     	<li v-for="item in list" :class="{'_slted': slted.id === item.id}" @click="slt(item)">{{item.name}}</li>

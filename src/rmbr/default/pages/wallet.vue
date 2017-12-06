@@ -25,8 +25,10 @@
             </f7-link>
           </td>
           <td>
-            <f7-icon f7="card_fill"></f7-icon>
-            <p>充值记录</p>
+            <f7-link href="/wallet/record/">
+              <f7-icon f7="card_fill"></f7-icon>
+              <p>充值记录</p>
+            </f7-link>
           </td>
         </tr>
       </table>

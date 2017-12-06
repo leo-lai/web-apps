@@ -4,33 +4,9 @@
     <!-- Statusbar -->
     <f7-statusbar></f7-statusbar>
 
-    <!-- Left Panel -->
-    <f7-panel left reveal layout="dark">
-      <f7-view id="left-panel-view" navbar-through :dynamic-navbar="true">
-        <f7-navbar v-if="$theme.ios" title="Left Panel" sliding></f7-navbar>
-        <f7-pages>
-          <f7-page>
-            
-          </f7-page>
-        </f7-pages>
-      </f7-view>
-    </f7-panel>
-
-    <!-- Right Panel -->
-    <f7-panel right cover layout="dark">
-      <f7-view id="right-panel-view" navbar-through :dynamic-navbar="true">
-        <f7-navbar v-if="$theme.ios" title="Right Panel" sliding></f7-navbar>
-        <f7-pages>
-          <f7-page>
-            
-          </f7-page>
-        </f7-pages>
-      </f7-view>
-    </f7-panel>
-
     <!-- Main Views -->
     <f7-views>
-      <f7-view id="main-view" navbar-fixed tabbar-fixed main :dynamic-navbar="true">
+      <f7-view id="main-view" navbar-fixed main :dynamic-navbar="true">
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
           <f7-nav-center sliding>首页</f7-nav-center>
@@ -56,24 +32,32 @@
                   </f7-link>
                 </td>
                 <td>
-                  <f7-icon f7="card_fill"></f7-icon>
-                  <p>设备</p>
+                  <f7-link href="/device/list/">
+                    <f7-icon f7="card_fill"></f7-icon>
+                    <p>设备</p>
+                  </f7-link>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <f7-icon f7="card_fill"></f7-icon>
-                  <p>商城</p>
+                  <f7-link>
+                    <f7-icon f7="card_fill"></f7-icon>
+                    <p>商城</p>
+                  </f7-link>
                 </td>
                 <td>
-                  <f7-icon f7="card_fill"></f7-icon>
-                  <p>提醒</p>
+                  <f7-link href="/remind/list/">
+                    <f7-icon f7="card_fill"></f7-icon>
+                    <p>提醒</p>
+                  </f7-link>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <f7-icon f7="card_fill"></f7-icon>
-                  <p>订单</p>
+                  <f7-link href="/order/list/">
+                    <f7-icon f7="card_fill"></f7-icon>
+                    <p>订单</p>
+                  </f7-link>
                 </td>
                 <td>
                   <f7-icon f7="card_fill"></f7-icon>
@@ -85,21 +69,6 @@
         </f7-pages>
       </f7-view>
     </f7-views>
-
-    <!-- Popup -->
-    <f7-popup id="popup">
-      <f7-view navbar-fixed>
-        <f7-pages>
-          <f7-page>
-            <f7-navbar title="Popup">
-              <f7-nav-right>
-                <f7-link close-popup>返回</f7-link>
-              </f7-nav-right>
-            </f7-navbar>
-          </f7-page>
-        </f7-pages>
-      </f7-view>
-    </f7-popup>
 
     <!-- Login Screen -->
     <f7-login-screen id="login-screen">
@@ -127,7 +96,6 @@
         </f7-pages>
       </f7-view>
     </f7-login-screen>
-
   </div>
 </template>
 
@@ -208,6 +176,7 @@ export default {
 @import '~framework7-icons/css/framework7-icons.css';
 @import '~assets/css/font.less';
 @import '~assets/css/base.less';
+@import '~assets/css/rmbr-framework7.less';
 body{font-size: 0.75rem;}
 .l-index-menu{
   width: 100%; background-color: #fff;

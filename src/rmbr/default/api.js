@@ -184,12 +184,42 @@ const api = {
   },
 
   wallet: {
-  	rechargeList() {
+  	rechargeList() { // 充值次数列表
   		return fetch.post('/seller/order/recharge/list')
   	},
-  	rechargeOrder(formData = {}){
+  	rechargeOrder(formData = {}){ // 创建充值订单
   		return fetch.post('/seller/order/create', formData)
-  	}
+  	},
+    recordList(formData = {}, page = 1, rows = 10) { // 充值记录
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/order/list/recharge', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        data.sum = (data.sum / 100).toFixed(2)
+        return data
+      })
+    },
+    remindList() { // 充值提醒列表
+      return fetch.post('/seller/recharge/alter_check')
+    }
+  },
+
+  device: {
+    getList(formData = {}, page = 1, rows = 10) {
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/device/list', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
+    },
+    remindList() { // 设备提醒
+      return fetch.post('/seller/device/alter_list')
+    }
   }
 }
 
