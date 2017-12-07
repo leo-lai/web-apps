@@ -22,7 +22,10 @@ const store = new Vuex.Store({
 		checkLogin({ commit }, urlParams = {}) {
 			return new Promise((resolve, reject) => {
 				let userInfo = storage.local.get('seller_userinfo')
-				if(!userInfo){
+				if(userInfo && userInfo.open_id){
+					commit('USER_INFO', userInfo)
+					resolve(userInfo)
+				}else {
 					let wxInfo = storage.local.get('seller_wxInfo')
 					if(wxInfo && wxInfo.open_id) {
 						reject(wxInfo)
@@ -31,9 +34,6 @@ const store = new Vuex.Store({
 					}else {
 						api.auth.grant(window.location.href)
 					}
-				}else {
-					commit('USER_INFO', userInfo)
-					resolve(userInfo)
 				}
 			})
 		},

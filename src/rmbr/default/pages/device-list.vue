@@ -2,12 +2,12 @@
   <f7-page name="device-list">
     <f7-navbar title="设备列表" back-link="返回" sliding></f7-navbar>
     <!-- Search bar -->
-    <f7-searchbar cancel-link="取消" search-list="#search-list" placeholder="输入设备别名/设备编号" :clear="true"
+    <!-- <f7-searchbar cancel-link="取消" search-list="#search-list" placeholder="输入设备别名/设备编号" :clear="true"
       @searchbar:search="onSearch"
       @searchbar:enable="onEnable"
       @searchbar:disable="onDisable"
       @searchbar:clear="onClear">
-    </f7-searchbar>
+    </f7-searchbar> -->
   
     <!-- searchbar-not-found -->
     <!-- <f7-list class="searchbar-not-found">
@@ -15,7 +15,7 @@
     </f7-list> -->
 
     <!-- Search-through list -->
-    <f7-list class="searchbar-found" id="search-list" v-show="list.data.length > 0">
+    <f7-list class="searchbar-found" style="margin:0;" id="search-list" v-show="list.data.length > 0">
       <f7-list-item class="item-link" v-for="item in list.data" key="item" @click="openEdit(item)">
         <div slot="inner" class="l-flex-hc">
           <div class="l-rest">
@@ -34,7 +34,6 @@
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
       <div class="l-text-gray l-fs-m" slot="no-more">全部数据加载完毕</div>
     </infinite-loading>
-    
     <!-- popup -->
     <f7-popup :opened="edit.opened">
       <f7-navbar>
@@ -80,11 +79,10 @@ export default {
   },
   methods: {
     onInfinite() {
-      this.$$api.device.getList(this.page)
-      .then(data => {
+      this.$$api.device.getList(this.page).then(data => {
         let returnList = data.list
-        this.list.data = this.list.concat(returnList)
-        
+        this.list.data = this.list.data.concat(returnList)
+
         if(returnList.length > 0){
           this.$nextTick(()=>{
             this.$refs.infinite.$emit('$InfiniteLoading:loaded')

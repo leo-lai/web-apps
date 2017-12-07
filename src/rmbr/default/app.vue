@@ -6,7 +6,7 @@
 
     <!-- Main Views -->
     <f7-views>
-      <f7-view id="main-view" navbar-fixed main :dynamic-navbar="true">
+      <f7-view id="main-view" navbar-fixed main :dynamic-navbar="true" theme="lightblue">
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
           <f7-nav-center sliding>首页</f7-nav-center>
@@ -33,7 +33,7 @@
                 </td>
                 <td>
                   <f7-link href="/device/list/">
-                    <f7-icon f7="card_fill"></f7-icon>
+                    <f7-icon f7="drawers_fill"></f7-icon>
                     <p>设备</p>
                   </f7-link>
                 </td>
@@ -41,13 +41,13 @@
               <tr>
                 <td>
                   <f7-link>
-                    <f7-icon f7="card_fill"></f7-icon>
+                    <f7-icon f7="briefcase_fill"></f7-icon>
                     <p>商城</p>
                   </f7-link>
                 </td>
                 <td>
                   <f7-link href="/remind/list/">
-                    <f7-icon f7="card_fill"></f7-icon>
+                    <f7-icon f7="chat_fill"></f7-icon>
                     <p>提醒</p>
                   </f7-link>
                 </td>
@@ -55,12 +55,12 @@
               <tr>
                 <td>
                   <f7-link href="/order/list/">
-                    <f7-icon f7="card_fill"></f7-icon>
+                    <f7-icon f7="list_fill"></f7-icon>
                     <p>订单</p>
                   </f7-link>
                 </td>
                 <td>
-                  <f7-icon f7="card_fill"></f7-icon>
+                  <f7-icon f7="ticket_fill"></f7-icon>
                   <p>优惠券</p>
                 </td>
               </tr>
@@ -178,6 +178,7 @@ export default {
 @import '~assets/css/base.less';
 @import '~assets/css/rmbr-framework7.less';
 body{font-size: 0.75rem;}
+.navbar:after{background-color: #e2dfdf;}
 .l-index-menu{
   width: 100%; background-color: #fff;
   text-align: center;
