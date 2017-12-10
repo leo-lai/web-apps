@@ -23,6 +23,7 @@ const store = new Vuex.Store({
 			return new Promise((resolve, reject) => {
 				let userInfo = storage.local.get('seller_userinfo')
 				if(userInfo && userInfo.open_id){
+					store.dispatch('getUserInfo')
 					commit('USER_INFO', userInfo)
 					resolve(userInfo)
 				}else {
@@ -45,12 +46,18 @@ const store = new Vuex.Store({
 					nickname: formData.nickname
 				})
 				commit('USER_INFO', userInfo)
+				store.dispatch('getUserInfo')
 				return userInfo
 			})
 		},
 		logout({ commit }, remote = false) {
 			return api.auth.logout(remote).finally(_ => {
 				commit('USER_INFO', '')
+			})
+		},
+		getUserInfo({ commit }) {
+			return api.auth.getInfo().then(({data}) => {
+				commit('USER_INFO', Object.assign(storage.local.get('seller_userinfo'), data))
 			})
 		}
 	}

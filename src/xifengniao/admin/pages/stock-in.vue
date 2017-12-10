@@ -7,7 +7,7 @@
   		<el-col :span="21" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="dateRange" style="width:360px;">
-				  	<el-date-picker style="width: 100%;" type="datetimerange" value-format="yyyy-MM-dd hh-mm-ss"
+				  	<el-date-picker style="width: 100%;" type="datetimerange" value-format="yyyy-MM-dd hh:mm:ss"
 				  		range-separator="到" start-placeholder="从入库时间" end-placeholder="入库时间"
 				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
 				  </el-form-item>
@@ -231,11 +231,15 @@ export default {
   },
 	methods: {
 		filterDateChange(value) {
-			if(value && value.length >= 2) {
-				this.list.filter.startDate = value[0]
-				this.list.filter.endDate = value[1]
-				this.search()	
+			if(value) {
+				this.list.filter.startDate = value[0] || ''
+				this.list.filter.endDate = value[1] || ''
+				
+			}else {
+				this.list.filter.startDate = ''
+				this.list.filter.endDate = ''
 			}
+			this.search()	
 		},
 		sizeChange(size = 100) {
 			this.getList(1, size)

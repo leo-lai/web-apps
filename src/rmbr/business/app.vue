@@ -5,8 +5,8 @@
     <f7-statusbar></f7-statusbar>
 
     <!-- Main Views -->
-    <f7-views>
-      <f7-view id="main-view" navbar-fixed main :dynamic-navbar="true" theme="lightblue">
+    <f7-views theme="lightblue">
+      <f7-view id="main-view" navbar-fixed main :dynamic-navbar="true">
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
           <f7-nav-center sliding>首页</f7-nav-center>
@@ -16,12 +16,12 @@
         </f7-navbar>
         <!-- Pages -->
         <f7-pages>
-          <f7-page name="index" no-tabbar>
+          <f7-page name="index">
             <table class="l-index-menu">
               <tr>
-                <td colspan="2">
-                  <p class="l-fs-s l-text-gray">今日收益</p>
-                  <p class="l-fs-xl">￥<b>15.00</b></p>
+                <td colspan="2" style="background: #5ac8fa; color: #fff; height: 6rem;">
+                  <p class="l-fs-s">今日收益</p>
+                  <p class="l-fs-xl">￥<b>{{(userInfo ? userInfo.today_income / 100 : 0).toFixed(2)}}</b></p>
                 </td>
               </tr>
               <tr>
@@ -40,14 +40,15 @@
               </tr>
               <tr>
                 <td>
-                  <f7-link>
+                  <f7-link :href="`${$$config.shopURL}?token=${userInfo.token}&uid=${userInfo.id}`" external>
                     <f7-icon f7="briefcase_fill"></f7-icon>
                     <p>商城</p>
                   </f7-link>
                 </td>
                 <td>
-                  <f7-link href="/remind/list/">
+                  <f7-link class='l-rel' href="/remind/list/">
                     <f7-icon f7="chat_fill"></f7-icon>
+                    <i v-if="userInfo.alter" class="l-reddot"></i>
                     <p>提醒</p>
                   </f7-link>
                 </td>
@@ -60,8 +61,10 @@
                   </f7-link>
                 </td>
                 <td>
-                  <f7-icon f7="ticket_fill"></f7-icon>
-                  <p>优惠券</p>
+                  <f7-link href="/coupon/">
+                    <f7-icon f7="ticket_fill"></f7-icon>
+                    <p>优惠券</p>
+                  </f7-link>
                 </td>
               </tr>
             </table>
@@ -71,7 +74,7 @@
     </f7-views>
 
     <!-- Login Screen -->
-    <f7-login-screen id="login-screen">
+    <f7-login-screen id="login-screen" theme="lightblue">
       <f7-view>
         <f7-pages>
           <f7-page login-screen>
@@ -106,6 +109,7 @@ export default {
 	data() {
     const that = this
 		return {
+      info: {},
       loginForm: {
         username: '',
         password: '',
@@ -152,6 +156,14 @@ export default {
         this.$$utils.copyObj(this.loginForm, urlParams)
         this.$f7.loginScreen()
       })
+    },
+    getInfo() {
+      this.$f7.showIndicator()
+      this.$$api.auth.getInfo().then(({data}) => {
+        this.info = data
+      }).finally(_ => {
+        this.$f7.hideIndicator()
+      })
     }
 	},
   watch: {
@@ -165,6 +177,10 @@ export default {
     this.$nextTick(_ => {
       setTimeout(_ => {
         this.checkLogin()
+        if(this.$f7.mainView.url === '/wallet/recharge/') {
+          this.$f7.mainView.router.reloadPreviousPage('/wallet/')
+          this.$f7.mainView.history.unshift('#index')
+        }
       })
     })
 	}
@@ -178,17 +194,16 @@ export default {
 @import '~assets/css/base.less';
 @import '~assets/css/rmbr-framework7.less';
 body{font-size: 0.75rem;}
-.navbar:after{background-color: #e2dfdf;}
 .l-index-menu{
   width: 100%; background-color: #fff;
   text-align: center;
   border-spacing: 0; border-collapse: collapse;
   td{
     width: 50%;
-    border: 1px solid #ccc;
-    padding: 1.5rem 0;
-    i~p{margin: 0.5rem 0 0 0;}
+    border: 1px solid #e2dfdf; padding: 0.5rem 0;
+    i~p{margin: 0.5rem 0 0 0; color: #333;}
   }
-  td:active{background-color: #ccc;}
+  td:active{background-color: #e2dfdf;}
+  .link{display: block;padding: 1rem 0;}
 }
 </style>

@@ -10,7 +10,8 @@
     <f7-tabs>
 		  <f7-tab id="tab-1" active>
 				<div class="l-padding l-bg-white l-border-b" v-for="item in list1">
-					<p>设备号：{{item.number}}{{item.alias ? '('+item.alias+')' : ''}}</p>
+					<p>设&ensp;备&ensp;号：{{item.number}}</p>
+					<p v-if="item.alias">设备别名：{{item.alias}}</p>
 					<p class="l-text-error">机器物料不足，请及时联系工厂配货</p>
 					<p class="l-text-gray">{{item.alter_time}}</p>
 				</div>

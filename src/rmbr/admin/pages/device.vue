@@ -287,7 +287,7 @@ export default {
 			}else{
 				this.dialogRelate.visible = false	
 			}
-			this.$$utils.copyObj(this.dialogRelate.data, '')
+			// this.$$utils.copyObj(this.dialogRelate.data, '')
 		},
 		submitRelate() {
 			if(this.dialogRelate.data.related && !this.dialogRelate.data.seller_id) {

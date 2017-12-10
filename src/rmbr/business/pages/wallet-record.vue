@@ -2,13 +2,10 @@
   <f7-page name="wallet-record" toolbar-fixed>
     <f7-navbar title="充值记录" back-link="返回" sliding></f7-navbar>
     <div class="l-wallet-record l-bg-white">
-      <div class="_item l-flex-hc l-border-b l-padding" v-for="item in list.data">
-        <div class="l-rest">
-          <p>{{item.order_id}}</p>
-          <p>充值次数：{{item.pay_data}}</p>
-          <p>时间：{{item.update_time}}</p>
-        </div>
-        <b class="l-fs">￥{{item.amount}}</b>
+      <div class="_item l-border-b l-padding" v-for="item in list.data">
+        <p>订&ensp;单&ensp;号：{{item.order_id}}</p>
+        <p>时&emsp;&emsp;间：{{item.update_time}}</p>
+        <p><b class="l-fs l-fr l-text-main">￥{{item.amount}}</b>充值次数：{{item.pay_data}}</p>
       </div>
     </div>
     <infinite-loading :on-infinite="onInfinite" ref="infinite">
@@ -17,7 +14,7 @@
       <div class="l-text-gray l-fs-m" slot="no-more">全部数据加载完毕</div>
     </infinite-loading>
     <f7-toolbar >
-      <div class="l-text-right" style="width: 100%;">总共充值：{{list.sum}}元</div>
+      <div class="l-text-right l-text-main" style="width: 100%;">总共充值：{{list.sum}}元</div>
     </f7-toolbar>
   </f7-page>
 </template>
@@ -46,7 +43,7 @@ export default {
           return item
         })
         this.list.sum = data.sum
-        this.list.data = this.list.concat(returnList)
+        this.list.data = this.list.data.concat(returnList)
         
         if(returnList.length > 0){
           this.$nextTick(()=>{

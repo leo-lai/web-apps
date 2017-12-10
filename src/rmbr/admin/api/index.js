@@ -174,6 +174,13 @@ const api = {
     delTmpl(template_id = '') {
       return fetch.post('/recharge/template/delete', { template_id })
     }
+  },
+  finance: { // 财务管理
+    getList(formData = {}, page = 1, row = 20) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/order/statistics/list', formData)
+    }
   }
 }
 

@@ -11,14 +11,21 @@ let config = {
   	baseURL: 'http://api.leolai.cn/api'
   },
 
+  shopURL: 'http://shop.leolai.cn/h5',
+
 	framework7: {
 		root: '#app',
-		uniqueHistory: true,
 		swipeBackPage: !isWechat,
 		pushState: true,
 		pushStateRoot: '/',
-		pushStateSeparator: 'wx',
-		// pushStateNoAnimation: true,
+		pushStateSeparator: 'business',
+		pushStateNoAnimation: true,
+		pushStatePreventOnLoad: false,
+		modalTitle: '系统提示',
+		modalButtonOk: '确定',
+		modalButtonCancel: '取消',
+		modalPreloaderTitle: '加载中...',
+		popupCloseByOutside: false,
 		routes
 	}
 }

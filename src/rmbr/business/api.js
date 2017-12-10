@@ -174,12 +174,15 @@ const api = {
     },
     logout(remote = false) {
       return new Promise((resolve, reject) => {
-        if (!remote && this.check()) {
+        if (remote && this.check()) {
           fetch.post('/user/logout').then(resolve, reject)
         } else {
           resolve()
         }
       })
+    },
+    getInfo() { // 商家信息
+      return fetch.post('/seller/info')
     }
   },
 
@@ -190,7 +193,7 @@ const api = {
   	rechargeOrder(formData = {}){ // 创建充值订单
   		return fetch.post('/seller/order/create', formData)
   	},
-    recordList(formData = {}, page = 1, rows = 10) { // 充值记录
+    recordList(formData = {}, page = 1, rows = 50) { // 充值记录
       formData.per_page = rows
       formData.page_number = page - 1      
       return fetch.post('/seller/order/list/recharge', formData).then(({data}) => {
@@ -207,7 +210,7 @@ const api = {
   },
 
   device: {
-    getList(formData = {}, page = 1, rows = 10) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.per_page = rows
       formData.page_number = page - 1      
       return fetch.post('/seller/device/list', formData).then(({data}) => {
@@ -219,6 +222,27 @@ const api = {
     },
     remindList() { // 设备提醒
       return fetch.post('/seller/device/alter_list')
+    },
+    update(formData = {}) {
+      return fetch.post('/seller/device/update', formData)
+    }
+  },
+  coupon: {
+    getList(formData = {}, page = 1, rows = 50) {
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/coupon/list', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
+    },
+    add(formData = {}) {
+      return fetch.post('/seller/coupon/create', formData)
+    },
+    send(formData = {}) {
+      return fetch.post('/seller/coupon/send', formData)
     }
   }
 }
