@@ -1,5 +1,6 @@
 import routes from './routes'
 let isWechat = /micromessenger/i.test(navigator.userAgent)
+let isProd = Object.is(process.env.NODE_ENV, 'production')
 let config = {
 	// 野狗配置
   wilddog: {
@@ -11,14 +12,14 @@ let config = {
   	baseURL: 'http://api.leolai.cn/api'
   },
 
-  shopURL: 'http://shop.leolai.cn/h5',
+  shopURL: 'http://shop.leolai.cn/h5/#/home',
 
 	framework7: {
 		root: '#app',
 		swipeBackPage: !isWechat,
 		pushState: true,
 		pushStateRoot: '/',
-		pushStateSeparator: 'customer',
+		pushStateSeparator: isProd ? 'wx' : 'customer',
 		pushStateNoAnimation: true,
 		pushStatePreventOnLoad: false,
 		modalTitle: '系统提示',

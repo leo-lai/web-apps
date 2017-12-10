@@ -20,6 +20,9 @@ utils.url.getRootPath = function(){
 	return utils.url.join(config.framework7.pushStateRoot, config.framework7.pushStateSeparator) 
 }
 
+// 事件控制中枢
+const eventHub = new Vue()
+
 Vue.mixin({
   created() {
   	this.$$config = config
@@ -33,6 +36,8 @@ Vue.mixin({
     this.$$storage = storage
     // 接口
     this.$$api = api
+    // 组件间事件通信
+    this.$$event = eventHub
   }
 })
 

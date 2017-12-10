@@ -54,6 +54,7 @@ export default {
   },
 	data() {
 		return {
+      userInfo: {},
       list: {
         filter: {
           type: 'full_cut'
@@ -74,6 +75,10 @@ export default {
 		}
 	},
 	methods: {
+    resetInfinite() {
+      this.$refs.infinite.$emit('$InfiniteLoading:reset')
+      this.onInfinite(1)
+    },
     onInfinite(page) {
       this.$$api.coupon.getList(this.list.filter, page || this.list.page).then(data => {
         let returnList = data.list
@@ -111,8 +116,8 @@ export default {
         this.$$utils.toptip('请输入优惠券金额(整数)')
         return
       }
-      if(!/^\d{1,}$/.test(this.coupon.data.cut_money)) {
-        this.$$utils.toptip('请输入优惠券扣减金额(整数)')
+      if(!/^\d{1,9}(\.\d{1,2})?$/.test(this.coupon.data.cut_money)) {
+        this.$$utils.toptip('请输入优惠券扣减金额')
         return
       }
       if(!/^\d{1,}$/.test(this.coupon.data.count)) {
@@ -120,16 +125,25 @@ export default {
         return
       }
 
+      let formData = Object.assign(this.coupon.data)
+
+      formData.full_money = formData.full_money * 100
+      formData.cut_money = formData.cut_money * 100
 
       this.$f7.showIndicator()
-      this.$$api.coupon.add(this.coupon.data).then(({data}) => {
-        this.$refs.infinite.$emit('$InfiniteLoading:reset')
-        this.onInfinite(1)
+      this.$$api.coupon.add(formData).then(({data}) => {
         this.couponClose()
+        this.resetInfinite()
       }).finally(_ => {
         this.$f7.hideIndicator()
       })
     }
-	}
+	},
+  mounted() {
+    this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+      this.resetInfinite()
+    })
+  }
 }
 </script>

@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import infiniteLoading from 'components/vue-infinite-loading'
 export default {
   components: {
@@ -50,6 +49,7 @@ export default {
   },
 	data() {
 		return {
+      userInfo: {},
       list: {
         filter: {
           type: 'times'
@@ -67,12 +67,11 @@ export default {
 			}
 		}
 	},
-  computed: {
-    ...mapGetters([
-      'userInfo'
-    ])
-  },
 	methods: {
+    resetInfinite() {
+      this.$refs.infinite.$emit('$InfiniteLoading:reset')
+      this.onInfinite(1)
+    },
     onInfinite(page) {
       this.$$api.coupon.getList(this.list.filter, page || this.list.page).then(data => {
         let returnList = data.list
@@ -119,13 +118,18 @@ export default {
 
       this.$f7.showIndicator()
       this.$$api.coupon.add(this.coupon.data).then(({data}) => {
-        this.$refs.infinite.$emit('$InfiniteLoading:reset')
-        this.onInfinite(1)
         this.couponClose()
+        this.resetInfinite()
       }).finally(_ => {
         this.$f7.hideIndicator()
       })
     }
-	}
+	},
+  mounted() {
+    this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+      this.resetInfinite()
+    })
+  }
 }
 </script>

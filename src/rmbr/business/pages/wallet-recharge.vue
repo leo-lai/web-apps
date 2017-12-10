@@ -17,19 +17,14 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
 	data() {
 		return {
+      userInfo: {},
 			slted: {},
 			list: []
 		}
 	},
-  computed: {
-    ...mapGetters([
-      'userInfo'
-    ])
-  },
   methods: {
   	getList() {
   		this.$f7.showIndicator()
@@ -52,9 +47,12 @@ export default {
   		this.$f7.showIndicator()
   		this.$$api.wallet.rechargeOrder({
   			recharge_id: this.slted.id,
-  			open_id: this.$$storage.local.get('seller_wxInfo').open_id
+  			open_id: this.userInfo.open_id
   		}).then(({data}) => {
-  			this.$$api.wxpay(data).catch(_ => {
+  			this.$$api.wxpay(data).then(_ => {
+          this.$store.dispatch('getUserInfo')
+          this.$f7.alert('充值成功')
+        }).catch(_ => {
           this.$f7.alert('支付失败')
         })
   		}).finally(_ => {
@@ -69,7 +67,10 @@ export default {
     }
   },
 	mounted() {
-		this.getList()
+    this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+      this.getList()
+    })
 	}
 }
 </script>

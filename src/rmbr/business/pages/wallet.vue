@@ -37,17 +37,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
 	data() {
 		return {
+      userInfo: {}
 		}
 	},
-  computed: {
-    ...mapGetters([
-      'userInfo'
-    ])
-  },
   methods: {
     openPay(url) {
       if(this.$$utils.device.isIos){
@@ -57,8 +52,10 @@ export default {
       }
     }
   },
-	mounted() {
-    this.$store.dispatch('getUserInfo')
-	}
+  mounted() {
+    this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+    })
+  }
 }
 </script>

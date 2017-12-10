@@ -11,7 +11,7 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(config => {
   // Do something before request is sent
-  let userinfo = storage.local.get('seller_userinfo')
+  let userinfo = storage.local.get('customer_userinfo')
   config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
   config.headers['token'] = userinfo && userinfo.token ? userinfo.token : ''
   config.headers['uid'] = userinfo && userinfo.id ? userinfo.id : ''
@@ -44,7 +44,7 @@ service.interceptors.response.use(response => {
         err.message = '请求错误'
         break
       case 401:
-        store.dispatch('logout', false)
+        store.dispatch('login')
         err.message = '未授权，请登录'
         break
       case 403:
@@ -145,30 +145,21 @@ const api = {
   		window.location.replace(config.api.baseURL + '/wechat/login?scopes=base&url=' + url)
   	},
     check() {
-      let userinfo = storage.local.get('seller_userinfo')
-      return (userinfo && userinfo.token && userinfo.id)
+      return new Promise((resolve, reject) => {
+        let userinfo = storage.local.get('customer_userinfo')
+        if(userinfo && userinfo.token && userinfo.id){
+          resolve(userinfo)
+        }else {
+          reject('未授权，请登录')
+        }
+      })
     },
     login(formData = {}) {
       return new Promise((resolve, reject) => {
-      	fetch.post('/user/login', {
-          type: 'password',
-      		username: formData.username,
-      		password: formData.password
-      	}).then(({data}) => {
-      		storage.local.set('seller_userinfo', data)
-      		if(data.open_id){
-      			resolve(data)
-      		}else{
-      			// 绑定微信信息
-      			let wxInfo = {
-      				open_id: formData.open_id,
-      				nickname: formData.nickname,
-      				thumb: formData.thumb
-      			}
-      			fetch.post('/user/bind_wechat', wxInfo).then(_ => {
-      				resolve(Object.assign(data, wxInfo))
-      			}).catch(reject)
-      		}
+        formData.type = 'wechat'
+      	fetch.post('/user/login', formData).then(({data}) => {
+      		storage.local.set('customer_userinfo', data)
+      		resolve(data)
       	}).catch(reject)
       })
     },
@@ -181,68 +172,35 @@ const api = {
         }
       })
     },
-    getInfo() { // 商家信息
-      return fetch.post('/seller/info')
+    getInfo() {
+      return fetch.post('/user/info')
     }
   },
 
-  wallet: {
-  	rechargeList() { // 充值次数列表
-  		return fetch.post('/seller/order/recharge/list')
-  	},
-  	rechargeOrder(formData = {}){ // 创建充值订单
-  		return fetch.post('/seller/order/create', formData)
-  	},
-    recordList(formData = {}, page = 1, rows = 50) { // 充值记录
+  order: {
+    getList(formData = {}, page = 1, rows = 50) { // 消费记录
       formData.per_page = rows
       formData.page_number = page - 1      
-      return fetch.post('/seller/order/list/recharge', formData).then(({data}) => {
+      return fetch.post('/customer/order/list', formData).then(({data}) => {
         data.total = data.count
         data.page = page
         data.rows = rows
-        data.sum = (data.sum / 100).toFixed(2)
         return data
       })
-    },
-    remindList() { // 充值提醒列表
-      return fetch.post('/seller/recharge/alter_check')
     }
   },
 
-  device: {
-    getList(formData = {}, page = 1, rows = 50) {
-      formData.per_page = rows
-      formData.page_number = page - 1      
-      return fetch.post('/seller/device/list', formData).then(({data}) => {
-        data.total = data.count
-        data.page = page
-        data.rows = rows
-        return data
-      })
+  pay: {
+    getDeviceInfo(number = '') {
+      return fetch.post('/device/seller/info', { number })
     },
-    remindList() { // 设备提醒
-      return fetch.post('/seller/device/alter_list')
+    getCouponList(formData = {}) {
+      formData.page_number = 0
+      formData.per_page = 100000
+      return fetch.post('/customer/coupon/list', formData)
     },
-    update(formData = {}) {
-      return fetch.post('/seller/device/update', formData)
-    }
-  },
-  coupon: {
-    getList(formData = {}, page = 1, rows = 50) {
-      formData.per_page = rows
-      formData.page_number = page - 1      
-      return fetch.post('/seller/coupon/list', formData).then(({data}) => {
-        data.total = data.count
-        data.page = page
-        data.rows = rows
-        return data
-      })
-    },
-    add(formData = {}) {
-      return fetch.post('/seller/coupon/create', formData)
-    },
-    send(formData = {}) {
-      return fetch.post('/seller/coupon/send', formData)
+    create(formData = {}) {
+      return fetch.post('/customer/order/create', formData)
     }
   }
 }

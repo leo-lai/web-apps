@@ -60,8 +60,9 @@ export default {
   components: {
     infiniteLoading
   },
-	data: function () {
+	data() {
     return {
+      userInfo: {},
       list: {
         filter: {
           keywords: ''
@@ -81,6 +82,10 @@ export default {
     }
   },
   methods: {
+    resetInfinite() {
+      this.$refs.infinite.$emit('$InfiniteLoading:reset')
+      this.onInfinite(1)
+    },
     onInfinite(page) {
       this.$$api.device.getList(this.list.filter, page || this.list.page).then(data => {
         let returnList = data.list
@@ -105,8 +110,7 @@ export default {
     },
     onSearch(query, found) {
       this.list.filter.keywords = query
-      this.$refs.infinite.$emit('$InfiniteLoading:reset')
-      this.onInfinite(1)
+      this.resetInfinite()
     },
     onClear(query, found) {
       this.list.filter.keywords = ''
@@ -130,6 +134,12 @@ export default {
     closeEdit(item) {
       this.edit.opened = false
     }
+  },
+  mounted() {
+    this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+      this.resetInfinite()
+    })
   }
 }
 </script>

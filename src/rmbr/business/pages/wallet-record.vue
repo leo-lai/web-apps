@@ -27,7 +27,9 @@ export default {
   },
 	data() {
 		return {
+      userInfo: {},
 			list: {
+        filter: {},
         sum: 0,
         page: 1,
         data: []
@@ -35,15 +37,19 @@ export default {
 		}
 	},
   methods: {
-    onInfinite() {
-      this.$$api.wallet.recordList(this.page)
+    resetInfinite() {
+      this.$refs.infinite.$emit('$InfiniteLoading:reset')
+      this.onInfinite(1)
+    },
+    onInfinite(page) {
+      this.$$api.wallet.recordList(this.list.filter, page || this.list.page)
       .then(data => {
         let returnList = data.list.map(item => {
           item.amount = (item.amount / 100).toFixed(2)
           return item
         })
         this.list.sum = data.sum
-        this.list.data = this.list.data.concat(returnList)
+        this.list.data = data.page > 1 ? this.list.data.concat(returnList) : returnList
         
         if(returnList.length > 0){
           this.$nextTick(()=>{
@@ -62,6 +68,12 @@ export default {
         this.$refs.infinite.$emit('$InfiniteLoading:complete')
       })
     }
+  },
+  mounted() {
+    this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+      this.resetInfinite()
+    })
   }
 }
 </script>

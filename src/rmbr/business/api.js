@@ -11,7 +11,7 @@ const service = axios.create({
 // request拦截器
 service.interceptors.request.use(config => {
   // Do something before request is sent
-  let userinfo = storage.local.get('seller_userinfo')
+  let userinfo = storage.local.get('business_userinfo')
   config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
   config.headers['token'] = userinfo && userinfo.token ? userinfo.token : ''
   config.headers['uid'] = userinfo && userinfo.id ? userinfo.id : ''
@@ -145,8 +145,14 @@ const api = {
   		window.location.replace(config.api.baseURL + '/wechat/login?scopes=base&url=' + url)
   	},
     check() {
-      let userinfo = storage.local.get('seller_userinfo')
-      return (userinfo && userinfo.token && userinfo.id)
+      return new Promise((resolve, reject) => {
+        let userinfo = storage.local.get('business_userinfo')
+        if(userinfo && userinfo.token && userinfo.id){
+          resolve(userinfo)
+        }else {
+          reject('未授权，请登录')
+        }
+      })
     },
     login(formData = {}) {
       return new Promise((resolve, reject) => {
@@ -155,7 +161,7 @@ const api = {
       		username: formData.username,
       		password: formData.password
       	}).then(({data}) => {
-      		storage.local.set('seller_userinfo', data)
+      		storage.local.set('business_userinfo', data)
       		if(data.open_id){
       			resolve(data)
       		}else{
@@ -185,7 +191,11 @@ const api = {
       return fetch.post('/seller/info')
     }
   },
-
+  index: {
+    getInfo() {
+      return fetch.post('/seller/order/statistics/info')
+    }
+  },
   wallet: {
   	rechargeList() { // 充值次数列表
   		return fetch.post('/seller/order/recharge/list')
@@ -204,8 +214,15 @@ const api = {
         return data
       })
     },
-    remindList() { // 充值提醒列表
-      return fetch.post('/seller/recharge/alter_check')
+    remindList(formData = {}, page = 1, rows = 10000) { // 设备提醒
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/recharge/alter_check', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
     }
   },
 
@@ -220,8 +237,15 @@ const api = {
         return data
       })
     },
-    remindList() { // 设备提醒
-      return fetch.post('/seller/device/alter_list')
+    remindList(formData = {}, page = 1, rows = 10000) { // 设备提醒
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/device/alter_list', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
     },
     update(formData = {}) {
       return fetch.post('/seller/device/update', formData)
@@ -243,6 +267,38 @@ const api = {
     },
     send(formData = {}) {
       return fetch.post('/seller/coupon/send', formData)
+    },
+    getCustomerList(formData = {}, page = 1, rows = 50) {
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/customer/list', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
+    },
+    getRecord(formData = {}, page = 1, rows = 50) {
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/coupon/send/records', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
+    }
+  },
+  order: {
+    getList(formData = {}, page = 1, rows = 50) {
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/order/list/consume', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
     }
   }
 }

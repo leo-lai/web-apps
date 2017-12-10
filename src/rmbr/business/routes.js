@@ -1,4 +1,8 @@
 const routes = [
+  {
+    title: '首页',
+    path: '/'
+  },
 	{
     title: '钱包',
     path: '/wallet/',

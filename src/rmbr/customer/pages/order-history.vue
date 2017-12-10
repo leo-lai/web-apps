@@ -1,19 +1,18 @@
 <template>
-  <f7-page name="coupon">
-    <f7-navbar title="发放记录" back-link="返回" sliding></f7-navbar>
+  <f7-page name="order-history">
+    <f7-navbar title="消费记录" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
-    	<f7-list-item v-for="item in list.data" :key="item">
-        <div slot="inner" class="l-flex-h" style="width: 100%;">
-          <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb" width="44"></div>
-          <div class="l-rest">
-            <p class="l-text-nowrap">手机号码： {{item.tel}}</p>
-            <p class="l-text-nowrap">昵&emsp;&emsp;称： {{item.nickname}}</p>
-            <p class="l-text-nowrap">日&emsp;&emsp;期： {{item.create_time}}</p>
-            <p class="l-text-error">{{couponType[item.type]}}：{{item.title}}</p>
+      <f7-list-item v-for="item in list.data" key="order_id">
+        <div slot="inner" style="width: 100%;">
+          <div>
+            <p>单号：{{item.order_id}}</p>
+            <p>时间：{{item.create_time}}</p>
+            <p>商家：{{item.store_name}}</p>
+            <p>金额：<b class="l-fs l-text-main">{{item.amount ? (item.amount / 100).toFixed(2) : 0}}元</b></p>
           </div>
         </div>
       </f7-list-item>
-		</f7-list>
+    </f7-list>
     <infinite-loading :on-infinite="onInfinite" ref="infinite">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
@@ -30,17 +29,13 @@ export default {
   },
 	data() {
 		return {
-			userInfo: {},
-      couponType: {
-        'full_cut': '满减券',
-        'times': '次数券'
-      },
+      userInfo: {},
       list: {
         filter: {},
         page: 1,
         data: []
       }
-		}
+    }
 	},
 	methods: {
     resetInfinite() {
@@ -48,7 +43,7 @@ export default {
       this.onInfinite(1)
     },
     onInfinite(page) {
-      this.$$api.coupon.getRecord(this.list.filter, page || this.list.page).then(data => {
+      this.$$api.order.getList(this.list.filter, page || this.list.page).then(data => {
         let returnList = data.list
         this.list.data = data.page > 1 ? this.list.data.concat(returnList) : returnList
 
@@ -76,5 +71,6 @@ export default {
       this.resetInfinite()
     })
   }
+
 }
 </script>

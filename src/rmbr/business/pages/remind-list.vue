@@ -39,7 +39,7 @@ export default {
 	methods: {
 		getList1() {
 			this.$f7.showIndicator()
-  		this.$$api.device.remindList().then(({data}) => {
+  		this.$$api.device.remindList().then(data => {
   			this.isAjax = true
   			this.list1 = data
   		}).finally(_ => {
@@ -48,7 +48,7 @@ export default {
 		},
 		getList2() {
 			this.$f7.showIndicator()
-  		this.$$api.wallet.remindList().then(({data}) => {
+  		this.$$api.wallet.remindList().then(data => {
   			this.list2 = data
   		}).finally(_ => {
   			this.$f7.hideIndicator()
@@ -56,8 +56,11 @@ export default {
 		}
 	},
 	mounted() {
-		this.getList1()
-		this.getList2()
+		this.$$event.$on('user:login', userInfo => {
+      this.userInfo = userInfo
+      this.getList1()
+			this.getList2()
+    })
 	}
 }
 </script>

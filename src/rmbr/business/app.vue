@@ -21,7 +21,7 @@
               <tr>
                 <td colspan="2" style="background: #5ac8fa; color: #fff; height: 6rem;">
                   <p class="l-fs-s">今日收益</p>
-                  <p class="l-fs-xl">￥<b>{{(userInfo ? userInfo.today_income / 100 : 0).toFixed(2)}}</b></p>
+                  <p class="l-fs-xl">￥<b>{{index.today_sum}}</b></p>
                 </td>
               </tr>
               <tr>
@@ -40,7 +40,7 @@
               </tr>
               <tr>
                 <td>
-                  <f7-link :href="`${$$config.shopURL}?token=${userInfo.token}&uid=${userInfo.id}`" external>
+                  <f7-link :href="`${$$config.shopURL}?rtoken=${userInfo.token}&uid=${userInfo.id}`" external>
                     <f7-icon f7="briefcase_fill"></f7-icon>
                     <p>商城</p>
                   </f7-link>
@@ -109,7 +109,10 @@ export default {
 	data() {
     const that = this
 		return {
-      info: {},
+      index: {
+        all_sum: 0,
+        today_sum: 0
+      },
       loginForm: {
         username: '',
         password: '',
@@ -125,6 +128,22 @@ export default {
     ])
   },
 	methods: {
+    checkLogin() {
+      let args = this.$$utils.url.getArgs()
+      this.$store.dispatch('checkLogin', args).then(userInfo => {
+        this.$$event.$emit('user:login', userInfo)
+        this.$$api.index.getInfo().then(({data}) => {
+          if(data){
+            this.index.all_sum = (Number(data.all_sum) / 100).toFixed(2)
+            this.index.today_sum = (Number(data.today_sum) / 100).toFixed(2)
+          }
+        })
+        this.$f7.closeModal()
+      }).catch(urlParams => {
+        this.$$utils.copyObj(this.loginForm, urlParams)
+        this.$f7.loginScreen()
+      })
+    },
     loginSubmit() {
       if(!this.loginForm.username) {
         this.$$utils.toptip('请输入账号')
@@ -136,7 +155,8 @@ export default {
       }
 
       this.$f7.showIndicator()
-      this.$store.dispatch('login', this.loginForm).then(_ => {
+      this.$store.dispatch('login', this.loginForm).then(userInfo => {
+        this.$$event.$emit('user:login', userInfo)
         this.$f7.closeModal()
       }).finally(_ => {
         this.$f7.hideIndicator()
@@ -145,23 +165,6 @@ export default {
     logoutSubmit() {
       this.$f7.showIndicator()
       this.$store.dispatch('logout').finally(_ => {
-        this.$f7.hideIndicator()
-      })
-    },
-    checkLogin() {
-      let args = this.$$utils.url.getArgs()
-      this.$store.dispatch('checkLogin', args).then(_ => {
-        this.$f7.closeModal()
-      }).catch(urlParams => {
-        this.$$utils.copyObj(this.loginForm, urlParams)
-        this.$f7.loginScreen()
-      })
-    },
-    getInfo() {
-      this.$f7.showIndicator()
-      this.$$api.auth.getInfo().then(({data}) => {
-        this.info = data
-      }).finally(_ => {
         this.$f7.hideIndicator()
       })
     }
@@ -176,7 +179,14 @@ export default {
 	mounted() {
     this.$nextTick(_ => {
       setTimeout(_ => {
+        this.$f7.onPageInit('*', page => {
+          this.$$api.auth.check().then(userInfo => {
+            this.$$event.$emit('user:login', userInfo)
+          })
+        })
+
         this.checkLogin()
+        
         if(this.$f7.mainView.url === '/wallet/recharge/') {
           this.$f7.mainView.router.reloadPreviousPage('/wallet/')
           this.$f7.mainView.history.unshift('#index')
