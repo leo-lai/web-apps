@@ -1,7 +1,7 @@
 <template>
 	<div class="l-main-body">
     <ul class="l-index-count">
-      <li>
+      <li @click="$router.push('/finance')">
         <h3>今日充值</h3>
         <p><b>{{dashboard.recharge_amount}}</b>元</p>
       </li>

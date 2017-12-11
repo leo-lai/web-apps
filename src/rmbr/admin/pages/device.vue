@@ -57,12 +57,11 @@
 	  </el-row>
 
 	  <!-- 关联商家 -->
-	  <el-dialog title="关联商家" :close-on-click-modal="false" :close-on-press-escape="false"
-	  	:visible.sync="dialogRelate.visible" width="400px">
+	  <el-dialog title="关联商家" :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogRelate" :visible.sync="dialogRelate.visible" width="400px">
 	  	<el-form inline ref="relateForm" class="l-form1" label-width="90px"
   			:model="dialogRelate.data" :rules="dialogRelate.rules" @keyup.enter.native="submitRelate">
 			  <el-form-item label="商家手机号">
-			    <el-input v-model="dialogRelate.data.tel" :maxlength="11" @change="getBusinessInfo()"></el-input>
+			    <el-input v-model="dialogRelate.data.tel" :maxlength="11" @blur="getBusinessInfo()"></el-input>
 			    <span v-show="dialogRelate.searching" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;查询中...</span>
 			  </el-form-item>
 			  <el-form-item label="商家姓名">
@@ -73,7 +72,7 @@
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
-				<el-button @click="dialogRelate.visible = false">取消</el-button>
+				<el-button @click="closeDialogRelate()">取消</el-button>
 		    <el-button type="primary" :loading="dialogRelate.loading" @click="submitRelate">确定提交</el-button>
 		  </span>
 	  </el-dialog>
@@ -82,7 +81,7 @@
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="400px">
   		<el-form inline ref="infoForm" class="l-form1" label-width="120px"
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
+  			:model="dialogInfo.data" :rules="dialogInfo.rules" @submit.native.prevent @keyup.enter.native="submitInfo">
 			  <el-form-item label="生成设备个数" prop="count">
 			    <el-input v-model.number="dialogInfo.data.count" :maxlength="10"></el-input>
 			  </el-form-item>
@@ -282,6 +281,14 @@ export default {
 	      })
 			}
 		},
+		closeDialogRelate(done) {
+			if(done) {
+				done()
+			}else{
+				this.dialogRelate.visible = false	
+			}
+			// this.$$utils.copyObj(this.dialogRelate.data, '')
+		},
 		submitRelate() {
 			if(this.dialogRelate.data.related && !this.dialogRelate.data.seller_id) {
 				this.$message.error('找不到商家关联')
@@ -298,11 +305,7 @@ export default {
 				number: this.dialogRelate.data.number,
 				seller_id: this.dialogRelate.data.seller_id
 			}, this.dialogRelate.data.related).then(_ => {
-				this.dialogRelate.visible = false
-				this.dialogRelate.data.seller_id = ''
-				this.dialogRelate.data.number = ''
-				this.dialogRelate.data.address = ''
-
+				this.closeDialogRelate()
 				this.$message.success('该设备关联商家成功')
 				this.refreshList()
 			}).finally(_ => {
@@ -315,7 +318,7 @@ export default {
 				this.$$api.business.getInfo({
 					tel: this.dialogRelate.data.tel
 				}).then(({data}) => {
-					this.dialogRelate.data.seller_id = data.id
+					this.dialogRelate.data.seller_id = data.uid
 					this.dialogRelate.data.name = data.name
 					this.dialogRelate.data.address = data.province + data.city + data.district + data.detail_address
 

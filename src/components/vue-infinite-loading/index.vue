@@ -75,7 +75,7 @@
     props: {
       distance: {
         type: Number,
-        default: 100,
+        default: 50,
       },
       onInfinite: Function,
       spinner: String,

@@ -33,8 +33,8 @@ export default {
         this.dashboard = data
         let avgLng = 0, avgLat = 0
         data.map_list.forEach((item,index) => {
-        	avgLng += Number(item.longitude)
-        	avgLat += Number(item.latitude)
+        	avgLng += Number(item.longitude) <= 180 ? Number(item.longitude) : 0
+        	avgLat += Number(item.latitude) <= 90 ? Number(item.latitude) : 0
         	this.markers.push({
 	        	position: [Number(item.longitude), Number(item.latitude)],
 	        	content: '<div class="l-map-marker">'+ (index+1) +'</div>'
