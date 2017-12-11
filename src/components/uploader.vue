@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple :limit="9"
+    <el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple
       :file-list="fileList"
       :action="$$api.baseURL + '/uploadImage'" name="img_file"
       :on-success="uploadSuccess"

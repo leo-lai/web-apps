@@ -104,7 +104,7 @@
 			</div>
 			<div ref="cheshenScroll" class="l-scroll" style="max-height: 400px;">
 	  		<el-table class="l-table-hdbg" :data="dialogCheshen.list">
-			    <el-table-column label="车身颜色" prop="carColourName" min-width="100"></el-table-column>
+			    <el-table-column label="车身颜色" prop="carColourName"></el-table-column>
 			    <el-table-column label="操作" align="center">
 			    	<template slot-scope="scope">
 			        <el-button class="l-text-link" type="text" size="small" @click="dialogCheshenImages(scope.row)">编辑图片</el-button>
@@ -169,8 +169,6 @@ export default {
 		let validateUpload = function(rule, value, callback) {
 			if(that.$refs.dialogCheshenUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogCheshen.uploadList.length > 9) {
-				callback(new Error('最多上传9张照片'))
 			}else {
 				that.dialogCheshen.data.imagePath = that.dialogCheshen.uploadList.map(item => item.src || item.url).join(',')
 				callback()

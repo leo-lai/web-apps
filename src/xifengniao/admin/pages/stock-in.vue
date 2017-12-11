@@ -126,8 +126,6 @@ export default {
 		let validateUpload = function(rule, value, callback) {
 			if(that.$refs.dialogInfoUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogInfo.uploadList.length > 9) {
-				callback(new Error('最多上传9张照片'))
 			}else {
 				that.dialogInfo.data.contractImage = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
 				callback()

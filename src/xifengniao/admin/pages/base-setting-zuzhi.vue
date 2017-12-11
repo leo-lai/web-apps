@@ -153,8 +153,6 @@ export default {
 				callback(new Error('图片正在上传中'))
 			}else if(that.dialogInfo.uploadList.length === 0) {
 				callback(new Error('请上传照片'))
-			}else if(that.dialogInfo.uploadList.length > 9) {
-				callback(new Error('最多上传9张照片'))
 			}else {
 				that.dialogInfo.data.imageUrl = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
 				callback()
