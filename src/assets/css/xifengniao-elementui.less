@@ -120,11 +120,14 @@ h4{font-size: 0.55rem;}
 .l-padding-t-0 .el-dialog__body{padding-top: 15px; padding-bottom: 15px;}
 .l-table-info{
 	border-collapse: collapse; width: 100%;
+	*{box-sizing: border-box;}
 	caption{text-align: left; color: rgba(147, 159, 177, 0.6);; padding: 5px 0;}
-	td{padding: 10px 20px; border:1px solid #e5e9f2; min-width: 50px;}
+	td{padding: 10px 20px; border:1px solid #e5e9f2; min-width: 70px;}
 	td._tit{background-color: rgba(229, 233, 242, 1); white-space: nowrap;}
 	tr:nth-of-type(even) td._tit{background-color: rgba(229, 233, 242, 0.3);}
-	._ipt{box-sizing: border-box;	border: 1px solid #ccc; border-radius: 2px; padding: 5px 10px; width: 100%; }
+	._ipt{border: 1px solid #ccc; border-radius: 2px; padding: 5px; width: 100%; }
+	._ipt2{border: none; padding: 5px; width: 100%; }
+	._radio .el-radio{min-width: 55px; display: inline-block;}
 }
 
 .l-block-tit{color: rgba(147, 159, 177, 0.6);; margin: 0.75rem 0 0.25rem; font-size: 12px;}
@@ -172,3 +175,8 @@ h4{font-size: 0.55rem;}
   min-height: 8rem;
   padding-bottom: 1rem;
 }
+
+.el-button+.el-button--text{margin-left: 5px;}
+.el-checkbox{ margin-right: 30px; }
+.el-checkbox:last-child{margin-right: 0;}
+.el-checkbox+.el-checkbox{margin-left: 0;}

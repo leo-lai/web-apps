@@ -12,7 +12,7 @@
       <!-- <el-checkbox class="_remember" v-model="loginForm.remember" checked>记住密码</el-checkbox> -->
       <el-form-item style="width:100%;">
         <el-button type="primary" style="width:100%; margin-top: 1rem;" @click.native.prevent="submitForm" :loading="loginForm.loading">登录</el-button>
-        <!-- <el-button @click.native.prevent="resetForm">重置</el-button> -->
+        <!-- <el-button @click.native.prevent="resetForm">刷新</el-button> -->
       </el-form-item>
     </el-form>
     <div class="l-copy-right" style="margin-top: 1rem;">©2017-2018 新疆瑞曼博尔生物科技有限公司</div>

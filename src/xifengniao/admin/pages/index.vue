@@ -4,7 +4,7 @@
 			<el-col :span="16">
 				<el-card class="l-index-store" style="height:190px;">
 					<div class="l-flex-h">
-						<img class="l-margin-r" width="150" height="150" :src="organization.imageUrl">
+						<img class="l-margin-r" width="150" height="150" :src="organization.imageArr[0]">
 						<div class="l-rest">
 							<h3>{{organization.shortName}}</h3>
 							<p class="l-margin-tb-m l-text-gray">{{$$config.baseData.orgLevel[organization.orgLevel-1]}}</p>
@@ -126,12 +126,15 @@ export default {
 	name: 'index',
 	data() {
 		return {
-			organization: {},
+			organization: {
+				imageArr: [],
+			},
 			stockOrder: {}
 		}
 	},
 	mounted() {
 		this.$$api.index.getCount().then(({data}) => {
+			data.organization.imageArr = data.organization.imageUrl ? data.organization.imageUrl.split(',') : []
 			this.organization = data.organization
 			this.stockOrder = data.stockOrder
 		})

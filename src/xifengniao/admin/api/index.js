@@ -323,6 +323,21 @@ const api = {
       formData.rows = rows
       return fetch.post('/customerOrgList', formData)
     },
+    getInfo(formData = {}) {
+      return fetch.post('/customerUsersrInfo', formData)
+    },
+    saveUserInfo(formData = {}) {
+      return fetch.post('/changeUserInfo', formData)
+    },
+    saveCarInfo(formData = {}) {
+      return fetch.post('/changeUserCarInfo', formData)
+    },
+    addOrder(formData = {}) { // 新增/编辑
+      return fetch.post('/editCustomerOrder', formData)
+    },
+    getOrderInfo(customerOrderId = '') {
+      return fetch.post('/customerOrderInfo', { customerOrderId })
+    },
     add(formData = {}) { // 新增客户
       return fetch.post('/addCustomerUsersr', formData)
     }, // 跟踪列表
@@ -340,7 +355,7 @@ const api = {
       return fetch.post('/notBuyCustomerOrg', { customerUsersOrgId })
     },
     track(formData = {}) { // 标记为已到店
-      return fetch.post('/trackCustomerOrg', formData)
+      return fetch.post('/systenUserChangeCustomerOrg', formData)
     }
   },
   stock: { // 库存管理

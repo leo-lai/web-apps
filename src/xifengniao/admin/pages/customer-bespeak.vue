@@ -18,43 +18,36 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">重置</el-button>
+				    <el-button @click="clear">刷新</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="预约车型" prop="intentionCarInfo" min-width="120"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="预约门店" prop="orgShortName"></el-table-column>
-	    <el-table-column label="客户姓名" prop="customerUsersName" align="center"></el-table-column>
-	    <el-table-column label="客户电话" prop="phoneNumber" align="center"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="预约到店时间" min-width="120">
+	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
+	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="预约车型" prop="intentionCarInfo" min-width="150"></el-table-column>
+	    <el-table-column label="预约门店" prop="orgShortName" align="center"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="预约到店时间" align="center" min-width="140">
 	    	<template slot-scope="scope">
-	    		<p>{{scope.row.timeOfAppointmentDate}}</p>
-	    		<p>{{scope.row.timeOfAppointment}}</p>
+	    		<span style="display:inline-block;">{{scope.row.appointmentDate}}</span>
+	    		<span style="display:inline-block; margin-left: 0.125rem;">{{scope.row.timeOfAppointment}}</span>
 	    	</template>
 	    </el-table-column>
 	    <el-table-column label="打算购车时间" align="center">
 	    	<template slot-scope="scope">
-	    		{{$$config.baseData.carTime[scope.row.carPurchaseIntention - 1]}}
+	    		{{$$config.baseData.buyTime[scope.row.carPurchaseIntention - 1]}}
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="操作" min-width="120" align="center">
+	    <el-table-column label="操作" min-width="150" align="center">
 	    	<template slot-scope="scope">
-	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
-	        <span v-show="!scope.row.doing">
-	        	<el-button class="l-text-link l-margin-r-s" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑预约信息</el-button>
-		    		<el-dropdown>
-		    			<el-button class="l-text-link" type="text" size="small">
-		    				标记为 <i class="el-icon-arrow-down"></i>
-		    			</el-button>
-						  <el-dropdown-menu slot="dropdown">
-						    <el-dropdown-item @click.native="showDialogTrack(scope.row)">已到店</el-dropdown-item>
-						    <el-dropdown-item @click.native="notBuy(scope.row)">不购车</el-dropdown-item>
-						  </el-dropdown-menu>
-						</el-dropdown>
+	    		<span v-show="!scope.row.doing">
+	    			<el-button type="text" size="mini" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+		        <el-button type="text" size="mini" @click="showDialogTrack(scope.row)">转为跟踪客户</el-button>
+		        <el-button type="text" size="mini" @click="notBuy(scope.row)">标记不购车</el-button>
 	        </span>
+	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -87,11 +80,11 @@
 			  <el-form-item label="时间段" prop="timeOfAppointment">
 			  	<el-time-picker is-range format="HH:mm" value-format="HH:mm" :editable="false" :clearable="false"
 			  		start-placeholder="开始时间" end-placeholder="结束时间"
-			  		v-model="dialogInfo.data.timeOfAppointment" :picker-options="timeOptions"></el-time-picker>
+			  		v-model="dialogInfo.timeOfAppointment" :picker-options="timeOptions"></el-time-picker>
 			  </el-form-item>
 			  <el-form-item label="打算购车时间" prop="carPurchaseIntention" >
 			  	<el-select v-model="dialogInfo.data.carPurchaseIntention" placeholder="请选择">
-				    <el-option v-for="(name, index) in $$config.baseData.carTime" :key="index" :label="name" :value="index + 1"></el-option>
+				    <el-option v-for="(name, index) in $$config.baseData.buyTime" :key="index" :label="name" :value="index + 1"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="打算购车方案" prop="expectWayId">
@@ -100,7 +93,7 @@
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="意向车辆" prop="carsId" >
-			  	<el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderChange"
+			  	<el-cascader id="d_carsName" ref="r_carsName" style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderChange"
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 			  </el-form-item>
 			  <el-form-item label="销售顾问" prop="systemUserId" >
@@ -143,6 +136,14 @@ export default {
         callback(new Error('必填项'))
       }else{
       	that.dialogInfo.data.carsId = that.cascader.value[2] || ''
+        callback()
+      }
+		}
+		let validateTimeRang = function(rule, value, callback) {
+			if (that.dialogInfo.timeOfAppointment.length === 0){
+        callback(new Error('必填项'))
+      }else{
+      	that.dialogInfo.data.timeOfAppointment = that.dialogInfo.timeOfAppointment.join('-')
         callback()
       }
 		}
@@ -208,6 +209,7 @@ export default {
 				title: '新增预约客户',
 				visible: false,
 				loading: false,
+				timeOfAppointment: [],
 				rules: {
 					customerUsersName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -229,7 +231,7 @@ export default {
 						{ required: true, message: '必填项', trigger: 'change' }
 					],
 					timeOfAppointment: [
-						{ required: true, type: 'array', message: '必填项', trigger: 'change' }
+						{ required: true, validator: validateTimeRang, message: '必填项', trigger: 'change' }
 					],
 					systemUserId: [
 						{ required: true, type:'number', message: '必填项', trigger: 'change' }
@@ -346,16 +348,27 @@ export default {
 
 			this.dialogInfo.type = type
 			if(type === 'edit'){
-				this.dialogInfo.title = '修改客户信息'
+				this.dialogInfo.title = '修改预约信息'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
+				this.dialogInfo.timeOfAppointment = this.dialogInfo.data.timeOfAppointment ? this.dialogInfo.data.timeOfAppointment.split('-') : []
+				this.cascader.value = [row.brandId, row.familyId, row.intentionCarId]
+				if(row.brandId) {
+					brandPromise.then(data => {
+						this.cascaderChange([row.brandId]).then(_ => {
+							if(row.familyId) {
+								this.cascaderChange([row.brandId, row.familyId])
+							}		
+						})
+					})
+				}
+
 			}else {
-				this.dialogInfo.title = '新增预约客户信息'
+				this.dialogInfo.title = '新增预约信息'
+				// this.dialogInfo.data.systemUserId = this.userInfo.userId
 				this.resetDialogInfo()
 			}
-
 			const loading = this.$loading()
 			Promise.all([brandPromise, salesPromise]).then(dataArr =>　{
-				this.dialogInfo.data.systemUserId = this.userInfo.userId
 				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
@@ -371,6 +384,7 @@ export default {
 		},
 		resetDialogInfo() {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
+			this.dialogInfo.timeOfAppointment = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交客户
@@ -423,7 +437,7 @@ export default {
 				this.dialogTrack.loading = true
 				this.$$api.customer.track(this.dialogTrack.data).then(_ => {
 	        this.dialogTrack.visible = false
-	        this.$message.success('标记成功')
+	        this.$message.success('分配成功')
 	        this.refreshList()
 	      }).finally(()=>{
 	        this.dialogTrack.loading = false

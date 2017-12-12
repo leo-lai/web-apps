@@ -13,20 +13,20 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">重置</el-button>
+				    <el-button @click="clear">刷新</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="意向/购置车辆" prop="intentionCarInfo" min-width="150"></el-table-column>
-	    <el-table-column label="销售顾问" prop="systemUserName"></el-table-column>
-	    <el-table-column label="最新购车状态" prop="orderState"></el-table-column>
-	    <el-table-column label="购车方案" prop="expectWayName" min-width="150"></el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="意向/购置车辆" prop="intentionCarInfo" min-width="150"></el-table-column>
+	    <el-table-column label="销售顾问" prop="systemUserName" align="center"></el-table-column>
+	    <el-table-column label="最新购车状态" prop="orderState" align="center"></el-table-column>
+	    <el-table-column label="购车方案" prop="expectWayName" align="center"></el-table-column>
+	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
 	        <el-button class="l-text-link" type="text" size="small">查看</el-button>
 	      </template>

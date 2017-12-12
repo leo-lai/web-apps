@@ -124,10 +124,7 @@ export default {
 							console.log(this.$refs.menuTree)
 						}
 
-						this.$message({
-							type: 'success',
-							message
-						})
+						this.$message.success(message)
 						this.closeDialogInfo()
 						
           }).finally(()=>{
@@ -143,10 +140,7 @@ export default {
         type: 'warning'
       }).then(_ => {
 				this.$$api.menu.del(data.menuId).then(_ => {
-					this.$message({
-						type: 'success',
-						message: '删除菜单成功'
-					})
+					this.$message.success('删除菜单成功')
 
 					const parent = node.parent
 		      const children = parent.data.children || parent.data

@@ -13,22 +13,22 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">重置</el-button>
+				    <el-button @click="clear">刷新</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="意向/购置车辆" prop="intentionCarInfo" min-width="150"></el-table-column>
-	    <el-table-column label="销售顾问" prop="systemUserName"></el-table-column>
-	    <el-table-column label="最新购车状态" prop="orderState"></el-table-column>
-	    <el-table-column label="购车方案" prop="expectWayName" min-width="150"></el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="意向/购置车辆" prop="intentionCarInfo" min-width="150"></el-table-column>
+	    <el-table-column label="销售顾问" prop="systemUserName" align="center"></el-table-column>
+	    <el-table-column label="最新购车状态" prop="orderState" align="center"></el-table-column>
+	    <el-table-column label="购车方案" prop="expectWayName" align="center"></el-table-column>
+	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo(scope.row)">查看</el-button>
+	        <el-button type="text" size="small" @click="showDialogInfo(scope.row)">查看</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -44,38 +44,35 @@
 	  </el-row>
 
 		<!-- 查看信息 -->
-		<el-dialog class="l-customer-view" width="1100px"
-			:close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogInfo.visible">
+		<el-dialog class="l-customer-view" width="1100px" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogInfo.visible">
   		<div class="_flex">
   			<div class="_info">
   				<div class="l-text-center">
-  					<img src="http://iph.href.lu/150x150?text=LOGO">
-  					<p><b>吕文</b></p>
-  					<p>18602029523</p>
+  					<img :src="viewInfo.user.headPortrait || '/static/default.png'">
+  					<p><b>{{viewInfo.user.customerUsersName}}</b></p>
+  					<p>{{viewInfo.user.phoneNumber}}</p>
   				</div>
   				<dl>
   					<dt>期望购车方式</dt>
-  					<dd>100万分期一百年</dd>
+  					<dd>{{viewInfo.base.expectWayName || '无'}}</dd>
   					<dt>意向车辆</dt>
-  					<dd>东风本田 2017 尊贵版</dd>
-  					<dt>访问备注</dt>
-  					<dd>东风本田 2017 尊贵版东风本田 2017 尊贵版东风本田 2017 尊贵版东风本田 2017 尊贵版东风本田 2017 尊贵版</dd>
+  					<dd>{{viewInfo.base.intentionCarInfo || '无'}}</dd>
   				</dl>
   				<dl class="l-margin-t" style="border-top: 1px solid #eee; padding-top: 0.75rem;">
   					<dt>销售顾问</dt>
-  					<dd class="l-text-center l-fs-s">大金牙 18622022</dd>
+  					<dd class="l-text-center l-fs-s">{{viewInfo.base.systemUserName || '无'}}</dd>
   				</dl>
   			</div>
   			<div class="_tab">
   				<el-tabs type="border-card">
 					  <el-tab-pane label="购车进度">
-					  	<customer-progress></customer-progress>
+					  	<customer-progress :data="viewInfo.order"></customer-progress>
 					  </el-tab-pane>
 					  <el-tab-pane label="个人资料">
-					  	<customer-info></customer-info>
+					  	<customer-info :data="viewInfo.user"></customer-info>
 					  </el-tab-pane>
 					  <el-tab-pane label="车辆资料">
-					  	<customer-carinfo></customer-carinfo>
+					  	<customer-carinfo :data="viewInfo.car"></customer-carinfo>
 					  </el-tab-pane>
 					</el-tabs>
   			</div>
@@ -112,8 +109,14 @@ export default {
 				total: 0,
 				data: []
 			},
+			viewInfo: {
+				base: {},
+				user: {},
+				car: {}
+			},
 			dialogInfo: {
-				visible: false
+				visible: false,
+				data: {}
 			}
 		}
 	},
@@ -155,8 +158,25 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo() {
-			this.dialogInfo.visible = true
+		showDialogInfo(row) {
+			let loading = this.$loading()
+			this.$$api.customer.getInfo({
+				customerUsersId: row.customerUsersId,
+				customerUsersOrgId: row.customerUsersOrgId
+			}).then(({data}) => {
+				data.userMap.isHasDriversLicense = Number(data.userMap.isHasDriversLicense)
+				this.viewInfo.base = data.customerOrgMap
+				this.viewInfo.car = data.customerCarMap
+				this.viewInfo.user = data.userMap
+				this.viewInfo.order =  Object.assign({
+					customerOrderId: data.orderMap.customerOrderId || '',
+					orderState:  data.orderMap.orderState || '',
+					customerUsersId: data.userMap.customerUsersId
+				}, data.orderMap, data.customerOrgMap)
+				this.dialogInfo.visible = true
+			}).finally(_ => {
+				loading.close()
+			})
 		}
 	},
 	mounted() {
@@ -175,7 +195,7 @@ export default {
 </script>
 <style lang="less">
 .l-customer-view{
-	._flex{display: flex; align-items: start;}
+	._flex{display: flex;}
 	._info{
 		width: 250px; padding: 0.75rem; margin-right: 0.75rem;
 		background: #fff; border: 1px solid #d8dce5; box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);
@@ -185,11 +205,14 @@ export default {
 		dd{margin-bottom: 0.75rem; }
 	}
 	._tab{flex: 1;}
+	.el-tabs__content{height: 500px; }
+	.el-tab-pane{height: 100%; }
 	.el-dialog__headerbtn{top: 10px; right: 10px;}
 	.el-dialog{background-color: #efeff4;}
 	.el-dialog__body{padding-top: 5px;}
 	.l-table-info{
-		._tit{width: 120px;}
+		._tit{width: 140px;}
+		._cont{width: 215px;}
 	}
 }
 </style>
