@@ -79,7 +79,7 @@
 			  </el-form-item>
 			  <el-form-item label="时间段" prop="timeOfAppointment">
 			  	<el-time-picker is-range format="HH:mm" value-format="HH:mm" :editable="false" :clearable="false"
-			  		start-placeholder="开始时间" end-placeholder="结束时间"
+			  		start-placeholder="开始时间" end-placeholder="结束时间" 
 			  		v-model="dialogInfo.timeOfAppointment" :picker-options="timeOptions"></el-time-picker>
 			  </el-form-item>
 			  <el-form-item label="打算购车时间" prop="carPurchaseIntention" >
@@ -183,7 +183,7 @@ export default {
         }]
       },
       timeOptions: {
-      	selectableRange: ['09:00:00 - 20:00:00']
+      	selectableRange: ['08:00:00 - 19:00:00', '09:00:00 - 20:00:00']
       },
 			list: {
 				filter: {
@@ -209,7 +209,7 @@ export default {
 				title: '新增预约客户',
 				visible: false,
 				loading: false,
-				timeOfAppointment: [],
+				timeOfAppointment: ['08:00','20-00'],
 				rules: {
 					customerUsersName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
@@ -384,14 +384,14 @@ export default {
 		},
 		resetDialogInfo() {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
-			this.dialogInfo.timeOfAppointment = []
+			// this.dialogInfo.timeOfAppointment = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交客户
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.dialogInfo.data.timeOfAppointment = this.dialogInfo.data.timeOfAppointment.join('-')
+          this.dialogInfo.data.timeOfAppointment = this.dialogInfo.timeOfAppointment.join('-')
           this.$$api.customer.add(this.dialogInfo.data).then(_ => {
             this.closeDialogInfo()
             this.$message({

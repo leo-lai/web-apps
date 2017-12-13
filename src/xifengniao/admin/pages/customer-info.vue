@@ -186,7 +186,7 @@ export default {
 	methods: {
 		submit() {
 			this.loading = true
-			this.$$api.customer.saveInfo(this.data).then(_ => {
+			this.$$api.customer.saveUserInfo(this.data).then(_ => {
 				this.$message.success('保存个人资料成功')
 			}).finally(_ => {
 				this.loading = false

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-upload class="l-upload-card" accept="image/*" list-type="picture-card" multiple
+    <el-upload class="l-upload-card" :class="{'_limit': uploadList.length >= limit }" accept="image/*" list-type="picture-card" multiple :limit="limit"
       :file-list="fileList"
       :action="$$api.baseURL + '/uploadImage'" name="img_file"
       :on-success="uploadSuccess"
@@ -27,6 +27,10 @@ export default {
     fileList: {
       type: Array,
       default: []
+    },
+    limit: {
+      type: Number,
+      default: 12
     }
   },
   data() {
@@ -79,7 +83,7 @@ export default {
       })
     },
     uploadExceed(files, fileList) {
-      this.$message.error('最多上传9张照片')
+      this.$message.error('最多上传' + this.limit + '张照片')
     }
   },
   watch: {
@@ -94,3 +98,19 @@ export default {
   }
 }
 </script>
+<style lang="less">
+.l-upload-card{
+  .el-upload-list--picture-card .el-upload-list__item,
+  .el-upload--picture-card{
+    width: 80px; height: 80px;
+  }
+  .el-upload--picture-card{
+    line-height: 80px;
+  }
+  .el-icon-close-tip{font-size: 0;}
+  &._limit .el-upload--picture-card{
+    visibility: hidden;
+  }
+}
+
+</style>

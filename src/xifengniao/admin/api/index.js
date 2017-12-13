@@ -27,6 +27,7 @@ service.interceptors.response.use(response => {
         type: 'error',
         message: data.message || '登录失效，请重新登录',
         onClose() {
+          storage.local.remove('sessionId')
           api.auth.logout()
         }
       })
@@ -159,7 +160,7 @@ const api = {
         storage.local.remove('usermenus')
         storage.local.remove('userinfo')
         // toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
-        toLogin && router.replace('/login')
+        toLogin && router.replace(`/login?to=` + location.href)
       })
     },
     changePwd(formData = {}) {
@@ -335,8 +336,20 @@ const api = {
     addOrder(formData = {}) { // 新增/编辑
       return fetch.post('/editCustomerOrder', formData)
     },
-    getOrderInfo(customerOrderId = '') {
+    getOrderInfo(customerOrderId = '') { // 获取订单详情
       return fetch.post('/customerOrderInfo', { customerOrderId })
+    },
+    payOrder(formData = {}) { // 支付定金
+      return fetch.post('/payInOrder', formData)
+    },
+    bankPass(customerOrderId = '') { // 银行审核通过
+      return fetch.post('/bankApprovalPass', { customerOrderId })
+    },
+    fullPay(customerOrderId = '') { // 银行审核不通过，改成全款支付尾款
+      return fetch.post('/changeFullPayment', { customerOrderId })
+    },
+    giveCar(formData = {}) {
+      return fetch.post('/turnOverVehicle', formData)
     },
     add(formData = {}) { // 新增客户
       return fetch.post('/addCustomerUsersr', formData)

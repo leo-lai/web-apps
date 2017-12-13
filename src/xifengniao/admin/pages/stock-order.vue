@@ -610,24 +610,7 @@ export default {
 					}, 50)
 				}else {
 					this.qrcode.visible = true
-					this.qrcode.opts = Object.assign({}, {
-	          data: this.payInfo.formData.chooseId,
-	          cellSize: 5,
-	          correctLevel: 'H',
-	          typeNumber: 5,
-	          logo: {
-	            fontFamily: 'Arial',
-	            size: 0.15,
-	            color: '#000',
-	            text: '',
-	            clearEdges: 2,
-	            margin: 10
-	          },
-	          effect: {
-	            key: 'round', // image liquid round
-	            value: 0.2  
-	          }
-	        })
+					this.qrcode.opts = Object.assign({}, this.$$config.qrcodeOption, { data: this.payInfo.formData.chooseId })
 				}
 			}).finally(_ => {
 				loading.close()

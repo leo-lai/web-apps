@@ -1,14 +1,59 @@
 <template>
 	<div>
-		<div v-if="!data.orderState" style="padding: 150px 0 0 0; text-align:center;">
-			<el-button style="width: 120px;" type="primary" @click="showDialogInfo('new')">开单</el-button>
-		</div>
-		<div v-else-if="data.orderState === 1" style="padding: 150px 0 0 0; text-align:center;">
-			<p class="l-fs">待客户支付定金</p>
-			<p style="margin-top: 50px;">
-				<el-button style="width: 120px;" @click="showDialogInfo('edit')">编辑订单</el-button>
-				<el-button style="width: 120px;" type="primary">支付定金</el-button>
-			</p>
+		<div class="l-margin l-text-center l-order-state" style="padding: 110px 0 0 0;">
+			<div v-if="!data.orderState">
+				<el-button style="width: 120px;" type="primary" @click="showDialogInfo('new')">开单</el-button>
+			</div>
+			<div v-else-if="data.orderState === 1">
+				<p class="l-fs">待客户支付定金</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" @click="showDialogInfo('edit')">编辑订单</el-button>
+					<el-button style="width: 120px;" type="primary" @click="showDialogPay(1)">支付定金</el-button>
+				</p>
+			</div>
+			<div v-else-if="data.orderState === 3">
+				<p class="l-fs">客户已支付定金，待银行审批贷款方案</p>
+				<p class="l-margin-t">农业银行可以在员工端提交审核材料，其他银行在银行审批通过后点击“银行审批通过按钮”</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+					<el-button style="width: 120px;" type="primary" @click="bankPass">银行审批通过</el-button>
+				</p>
+				<p class="l-margin-t">
+					<el-button style="width: 255px;" @click="fullPay">审批不通过，全额支付尾款</el-button>
+				</p>
+			</div>
+			<div v-else-if="data.orderState === 5">
+				<p class="l-fs">待仓库出库车辆</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+				</p>
+			</div>
+			<div v-else-if="data.orderState === 7">
+				<p class="l-fs">仓库已出库车辆，待客户验车并支付尾款</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+					<el-button style="width: 120px;" type="primary" @click="showDialogPay(2)">支付尾款</el-button>
+				</p>
+			</div>
+			<div v-else-if="data.orderState === 9">
+				<p class="l-fs">客户已支付尾款，待加装精品及上牌</p>
+				<p class="l-margin-t">请在完成加装及上牌后，在员工端点击“完成”操作</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+				</p>
+			</div>
+			<div v-else-if="data.orderState === 11">
+				<p class="l-fs">加装及上牌完成，待客户提车</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" type="primary" @click="dialogGive.visible = true">交付车辆</el-button>
+				</p>
+			</div>
+			<div v-else-if="data.orderState === 13">
+				<p class="l-fs">已交付车辆</p>
+				<p style="margin-top: 50px;">
+					<el-button style="width: 120px;" type="primary" @click="showDialogInfo('new')">再次开单</el-button>
+				</p>
+			</div>
 		</div>
 		<div class="l-margin l-text-center"><el-button class="l-text-link" type="text">查看购车历程</el-button></div>
 
@@ -111,13 +156,58 @@
 				<el-button @click="closeDialogInfo()">取消</el-button>
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">生成订单</el-button>
 		  </span>
-		</el-dialog>		
+		</el-dialog>
+
+		<!-- 支付定金 -->
+		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogPay.title" :visible.sync="dialogPay.visible" width="420px">
+			<el-form ref="payForm" style="width: 335px;" label-width="100px" 
+				:model="dialogPay.data" :rules="dialogPay.rules" @keyup.enter.native="submitDialogPay">
+  			<el-form-item label="支付金额" prop="amount">
+			    <el-input v-model="dialogPay.data.amount" :maxlength="10"><i style="padding: 0 5px;" slot="suffix">元</i></el-input>
+			  </el-form-item>
+			  <el-form-item label="支付方式" prop="isCash">
+			  	<el-radio-group v-model="dialogPay.data.isCash">
+			      <el-radio :label="0" border>POS刷卡</el-radio>
+			      <el-radio :label="1" border>现金支付</el-radio>
+			    </el-radio-group>
+			  </el-form-item>
+			  <el-form-item style="margin-top: 50px;" label="" prop="isCash">
+			  	<el-button type="primary" :loading="dialogPay.loading" @click="submitDialogPay">立即支付</el-button>
+			  </el-form-item>
+  		</el-form>
+		</el-dialog>
+
+		<!-- 二维码支付 -->
+		<el-dialog title="支付二维码" align="center" width="300px" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="qrcode.visible" :before-close="closeQrpay">
+			<div class="l-qrcode-img">
+	   		<qrcanvas ref="qrcode" :options="qrcode.opts"></qrcanvas>
+	   		<p class="l-margin"><b>本次支付金额：{{dialogPay.data.amount}}</b></p>
+	    </div>
+		</el-dialog>
+
+		<!-- 交付车辆 -->
+		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogGive.title" :visible.sync="dialogGive.visible" width="420px">
+			<div class="l-form1-row">
+				<div class="_tit"><b>上传人车合照</b> <i class="l-text-error">*</i></div>
+				<div class="_cont">
+			    <uploader class="l-dialog-give" ref="dialogGiveUpload" :limit="1" :file-list.sync="dialogGive.uploadList"></uploader>
+				</div>
+				<div class="l-text-center l-margin-t">
+					<el-button type="primary" :loading="dialogGive.loading" @click="giveCar">确认交付</el-button>
+				</div>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 <script>
 import config from '../config'
+import Qrcanvas from 'qrcanvas-vue'
+import uploader from 'components/uploader'
 export default {
 	name: 'customer-progress',
+	components: {
+    Qrcanvas, uploader
+  },
 	props: {
 		data: {
 			type: Object,
@@ -161,7 +251,6 @@ export default {
           children: 'children'
         }
 			},
-			
 			dialogInfo: {
 				type: 'new',
 				title: '新增订单',
@@ -224,6 +313,38 @@ export default {
 					followInformation: [],
 					remark: ''
 				}
+			},
+			qrcode: {
+				opts: {},
+				visible: false
+			},
+			dialogPay: {
+				type: 1,
+				title: '支付定金',
+				visible: false,
+				loading: false,
+				rules: {
+					amount: [
+						{ required: true, pattern: config.regexp.money, message: '必填项（保留两位小数点）', trigger: 'blur' }
+					],
+					isCash: [
+						{ required: true, type: 'number', message: '必填项', trigger: 'change' }
+					]
+				},
+				data: {
+					customerOrderId: '',
+					amount: '',
+					isCash: 0
+				}
+			},
+			dialogGive: {
+				title: '交付车辆',
+				visible: false,
+				uploadList: [],
+				data: {
+					customerOrderId: '',
+					extractCarImage: ''
+				}
 			}
 		}
 	},
@@ -270,6 +391,12 @@ export default {
     		this.dialogInfo.neishiList = data
     	})
 		},
+		getOrderInfo() {
+			return this.$$api.customer.getOrderInfo(this.data.customerOrderId).then(({data}) => {
+				this.data.orderState = data.customerOrderState
+				return data
+			})
+		},
 		showDialogInfo(type = 'new') {
 			
 			let promises = []
@@ -293,7 +420,7 @@ export default {
 			this.dialogInfo.type = type
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改订单信息'
-				let infoPromise = this.$$api.customer.getOrderInfo(this.data.customerOrderId).then(({data}) => {
+				let infoPromise = this.getOrderInfo().then(data => {
 					this.$$utils.copyObj(this.dialogInfo.data, data)
 					this.dialogInfo.data.followInformation = data.followInformation ? data.followInformation.split(',') : []
 
@@ -334,6 +461,14 @@ export default {
 			}
 		},
 		submitDialogInfo() {
+			if(this.dialogInfo.data.isTakeLicensePlate === 1 && !this.dialogInfo.data.licensePlatePriace) {
+				this.$message.error('请输入上牌费用')
+				return
+			}
+			if(this.dialogInfo.data.isInsurance === 1 && !this.dialogInfo.data.insurancePriace) {
+				this.$message.error('请输入商业保险金额')
+				return
+			}
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -351,6 +486,95 @@ export default {
 					})
         }
       })
+		},
+		showDialogPay(type = 1) {
+			this.dialogPay.visible = true
+			this.dialogPay.type = type
+			this.dialogPay.title = type === 1 ? '支付定金' : '支付尾款'
+		},
+		submitDialogPay() {
+			this.dialogPay.data.customerOrderId = this.data.customerOrderId
+			this.$refs.payForm.validate(valid => {
+        if (valid) {
+        	if(this.dialogPay.data.isCash === 1) {
+        		this.$confirm('确定收到了现金再继续此操作，是否继续?', '提示', {
+		          confirmButtonText: '确定',
+		          cancelButtonText: '取消',
+		          type: 'warning'
+		        }).then(() => {
+		          this.dialogPay.loading = true
+		          this.$$api.customer.payOrder(this.dialogPay.data).then(_ => {
+		          	this.getOrderInfo()
+		          	this.dialogPay.visible = false
+		            this.$message.success('支付成功')
+		          }).finally(_ => {
+		            this.dialogPay.loading = false
+		          })
+		        })
+        	}else{
+        		this.dialogPay.loading = true
+	          this.$$api.customer.payOrder(this.dialogPay.data).then(({data}) => {
+	            this.qrcode.visible = true
+							this.qrcode.opts = Object.assign({}, this.$$config.qrcodeOption, { data })
+	          }).finally(_ => {
+	            this.dialogPay.loading = false
+	          })
+        	}
+        }else {
+        	this.$message({
+						type: 'error',
+						message: '请完善表单信息'
+					})
+        }
+      })
+		},
+		closeQrpay(done) {
+			if(done){
+				done()
+			}else{
+				this.qrcode.visible = false
+			}
+			this.getOrderInfo().then(data => {
+				if((this.dialogPay.type === 1 && this.data.orderState > 1) || this.data.orderState > 7) {
+					this.dialogPay.visible = false
+				}
+			})
+		},
+		bankPass() { // 银行贷款通过
+			let loading = this.$loading()
+			this.$$api.customer.bankPass(this.data.customerOrderId).then(_ => {
+				this.data.orderState = 5
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		fullPay() { // 银行贷款不通过，改成全款支付尾款
+			let loading = this.$loading()
+			this.$$api.customer.fullPay(this.data.customerOrderId).then(_ => {
+				this.data.orderState = 5
+			}).finally(_ => {
+				loading.close()
+			})
+		},
+		giveCar() {
+			if(this.$refs.dialogGiveUpload.waiting > 0) {
+				this.$message.error('图片正在上传中...')
+				return
+			}
+			if(this.dialogGive.uploadList.length === 0) {
+				this.$message.error('请上传人车合照')
+				return
+			}
+			this.dialogGive.data.extractCarImage = this.dialogGive.uploadList[0].src
+			this.dialogGive.data.customerOrderId = this.data.customerOrderId
+			this.dialogGive.loading = true
+			this.$$api.customer.giveCar(this.dialogGive.data).then(_ => {
+				this.$message.success('交付车辆成功')
+				this.dialogGive.visible = false
+				this.getOrderInfo()
+			}).finally(_ => {
+				this.dialogGive.loading = false
+			})
 		}
 	}
 }
@@ -361,4 +585,10 @@ export default {
 .l-form1-row .el-form-item__label{width: auto !important;}
 .l-form1-row .el-form-item__content{width: auto !important;}
 .l-form1-row .el-input__suffix{padding: 0 5px;}
+.l-dialog-give{position: relative; min-height: 150px;}
+.l-dialog-give .el-upload--picture-card{position: absolute; top:0; left: 0;}
+.l-dialog-give .el-upload-list__item, 
+.l-dialog-give .el-upload--picture-card{
+	width: 100% !important; height: auto !important; min-height: 150px; line-height: 150px !important; text-align: center;}
+.l-dialog-give .el-upload-list__item .el-upload-list__item-thumbnail{height: auto !important;}
 </style>
