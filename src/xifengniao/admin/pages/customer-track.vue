@@ -74,6 +74,9 @@
 					  <el-tab-pane label="车辆资料">
 					  	<customer-carinfo :data="viewInfo.car"></customer-carinfo>
 					  </el-tab-pane>
+					  <el-tab-pane label="客户备注">
+					  	<customer-remarks :parent="this" :data="viewInfo.remarks"></customer-remarks>
+					  </el-tab-pane>
 					</el-tabs>
   			</div>
   		</div>
@@ -85,12 +88,20 @@ import { mapGetters } from 'vuex'
 import customerInfo from './customer-info'
 import customerCarinfo from './customer-carinfo'
 import customerProgress from './customer-progress'
+import customerRemarks from './customer-remarks'
 export default {
 	name: 'customer-track',
+	props: {
+		type: {
+			type: String,
+			default: 'track'
+		}
+	},
 	components: {
 		customerInfo,
 		customerCarinfo,
-		customerProgress
+		customerProgress,
+		customerRemarks
 	},
 	data() {
 		return {
@@ -112,7 +123,8 @@ export default {
 			viewInfo: {
 				base: {},
 				user: {},
-				car: {}
+				car: {},
+				remarks: []
 			},
 			dialogInfo: {
 				visible: false,
@@ -135,8 +147,13 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.customer.getTrackList(this.list.filter, page, rows)
-			.then(({data}) => {
+			let listPromise = null
+			if(this.type === 'track') {
+				listPromise = this.$$api.customer.getTrackList(this.list.filter, page, rows)
+			}else{
+				listPromise = this.$$api.customer.getList(this.list.filter, page, rows)
+			}
+			listPromise.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
         this.list.rows = data.rows
@@ -168,6 +185,10 @@ export default {
 				this.viewInfo.base = data.customerOrgMap
 				this.viewInfo.car = data.customerCarMap
 				this.viewInfo.user = data.userMap
+				this.viewInfo.remarks = {
+					customerUsersId: data.userMap.customerUsersId,
+					list: data.remarksMap.list
+				}
 				this.viewInfo.order =  Object.assign({
 					customerOrderId: data.orderMap.customerOrderId || '',
 					orderState:  data.orderMap.orderState || '',
@@ -182,7 +203,7 @@ export default {
 	mounted() {
 		this.$$event.$on('customer:tab', (activeName, that) => {
 			this.$$parent = that
-			if(activeName === 'track' && this.list.data.length === 0) {
+			if(activeName === this.type && this.list.data.length === 0) {
 				this.getList()
 				this.$store.dispatch('getZuzhiList')
 			}

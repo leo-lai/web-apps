@@ -351,6 +351,9 @@ const api = {
     giveCar(formData = {}) {
       return fetch.post('/turnOverVehicle', formData)
     },
+    saveRemark(formData = {}) {
+      return fetch.post('/addCustomerRemarks', formData)
+    },
     add(formData = {}) { // 新增客户
       return fetch.post('/addCustomerUsersr', formData)
     }, // 跟踪列表

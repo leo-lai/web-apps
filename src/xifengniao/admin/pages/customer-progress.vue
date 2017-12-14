@@ -55,7 +55,7 @@
 				</p>
 			</div>
 		</div>
-		<div class="l-margin l-text-center"><el-button class="l-text-link" type="text">查看购车历程</el-button></div>
+		<div class="l-margin l-text-center"><el-button class="l-text-link" type="text" @click="showDialogBuy">查看购车历程</el-button></div>
 
 		<!-- 开单 -->
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
@@ -156,6 +156,28 @@
 				<el-button @click="closeDialogInfo()">取消</el-button>
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">生成订单</el-button>
 		  </span>
+		</el-dialog>
+
+		<!-- 查看订单详情 -->
+
+
+		<!-- 查看购车历程 -->
+		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" title="购车历程" :visible.sync="dialogBuy.visible" width="500px">
+			<div class="l-steps">
+				<ul>
+					<li v-for="item in dialogBuy.list" :class="{'_done': item.done}">
+						<i class="_icon el-icon-circle-check-outline"></i>
+						<h4 class="_tit">{{item.title}}</h4>
+						<div class="_desc">
+							<p>{{item.content}}</p>
+							<p class="l-text-gray">{{item.time}}</p>
+							<p v-if="item.image.length > 0" v-for="image in item.image">
+								<img :src="image">
+							</p>
+						</div>
+					</li>
+				</ul>
+			</div>
 		</el-dialog>
 
 		<!-- 支付定金 -->
@@ -345,6 +367,10 @@ export default {
 					customerOrderId: '',
 					extractCarImage: ''
 				}
+			},
+			dialogBuy: {
+				visible: false,
+				list: [],
 			}
 		}
 	},
@@ -575,11 +601,44 @@ export default {
 			}).finally(_ => {
 				this.dialogGive.loading = false
 			})
+		},
+		showDialogBuy() { // 购车历程
+			let loading = this.$loading()
+			this.$$api.customer.getInfo({
+				customerUsersId: this.data.customerUsersId,
+				customerUsersOrgId: this.data.customerUsersOrgId
+			}).then(({data}) => {
+				let list = ['开单', '落定', '银行贷款审批', '车辆出库', '完款', '加装/上牌', '交车']
+				this.dialogBuy.list = list.map((item, index) => {
+					let _item = data.orderMap.list[index]
+					if(_item) {
+						item = {
+							title: item,
+							content: _item.trackContent,
+							time: _item.createDate,
+							image: _item.image ? _item.image.split(',') : [],
+							done: true
+						}						
+					}else {
+						item = {
+							title: item,
+							content: '',
+							time: '',
+							image: [],
+							done: false
+						}
+					}
+					return item
+				})
+				this.dialogBuy.visible = true
+			}).finally(_ => {
+				loading.close()
+			})
 		}
 	}
 }
 </script>
-<style>
+<style lang="less">
 .l-form1-row ._tit{padding: 5px 0; border-bottom: 1px solid #e5e9f2; margin-top: -10px;}
 .l-form1-row ._cont{padding-top: 15px;}
 .l-form1-row .el-form-item__label{width: auto !important;}
@@ -591,4 +650,18 @@ export default {
 .l-dialog-give .el-upload--picture-card{
 	width: 100% !important; height: auto !important; min-height: 150px; line-height: 150px !important; text-align: center;}
 .l-dialog-give .el-upload-list__item .el-upload-list__item-thumbnail{height: auto !important;}
+
+.l-steps{
+	ul,li{margin:0; padding: 0; list-style: none;}
+	li{display: flex; padding-bottom: 30px; position: relative; opacity: 0.3;}
+	li._done{opacity: 1;}
+	li:before{content: ''; border-left: 2px solid #39b94d; top: 25px; left: 14px; bottom: 0; position: absolute;}
+	li:last-of-type:before{display: none;}
+	li._done:last-of-type::before{opacity: 0.3;}
+	._icon{font-size: 30px; height: 28px;  position: relative; z-index: 1; line-height: 1; color: #39b94d; margin-top: -3px;}
+	._tit{width: 80px; margin-left: 20px; margin-right: 50px;}
+	._desc{flex: 1;}
+	.l-text-gray{font-size: 12px;}
+	img {width: 100px; height: 60px; margin: 10px 10px 0 0;}
+}
 </style>
