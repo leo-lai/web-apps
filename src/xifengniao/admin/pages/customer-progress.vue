@@ -1,54 +1,54 @@
 <template>
 	<div>
 		<div class="l-margin l-text-center l-order-state" style="padding: 110px 0 0 0;">
-			<div v-if="!data.orderState">
+			<div v-if="!orderState">
 				<el-button style="width: 120px;" type="primary" @click="showDialogInfo('new')">开单</el-button>
 			</div>
-			<div v-else-if="data.orderState === 1">
+			<div v-else-if="orderState === 1">
 				<p class="l-fs">待客户支付定金</p>
 				<p style="margin-top: 50px;">
 					<el-button style="width: 120px;" @click="showDialogInfo('edit')">编辑订单</el-button>
 					<el-button style="width: 120px;" type="primary" @click="showDialogPay(1)">支付定金</el-button>
 				</p>
 			</div>
-			<div v-else-if="data.orderState === 3">
+			<div v-else-if="orderState === 3">
 				<p class="l-fs">客户已支付定金，待银行审批贷款方案</p>
 				<p class="l-margin-t">农业银行可以在员工端提交审核材料，其他银行在银行审批通过后点击“银行审批通过按钮”</p>
 				<p style="margin-top: 50px;">
-					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+					<el-button style="width: 120px;" @click="showDialogInfo('view')">查看订单</el-button>
 					<el-button style="width: 120px;" type="primary" @click="bankPass">银行审批通过</el-button>
 				</p>
 				<p class="l-margin-t">
 					<el-button style="width: 255px;" @click="fullPay">审批不通过，全额支付尾款</el-button>
 				</p>
 			</div>
-			<div v-else-if="data.orderState === 5">
-				<p class="l-fs">待仓库出库车辆</p>
+			<div v-else-if="orderState === 5">
+				<p class="l-fs">等待仓库出库车辆</p>
 				<p style="margin-top: 50px;">
-					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+					<el-button style="width: 120px;" @click="showDialogInfo('view')">查看订单</el-button>
 				</p>
 			</div>
-			<div v-else-if="data.orderState === 7">
+			<div v-else-if="orderState === 7">
 				<p class="l-fs">仓库已出库车辆，待客户验车并支付尾款</p>
 				<p style="margin-top: 50px;">
-					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+					<el-button style="width: 120px;" @click="showDialogInfo('view')">查看订单</el-button>
 					<el-button style="width: 120px;" type="primary" @click="showDialogPay(2)">支付尾款</el-button>
 				</p>
 			</div>
-			<div v-else-if="data.orderState === 9">
+			<div v-else-if="orderState === 9">
 				<p class="l-fs">客户已支付尾款，待加装精品及上牌</p>
 				<p class="l-margin-t">请在完成加装及上牌后，在员工端点击“完成”操作</p>
 				<p style="margin-top: 50px;">
-					<el-button style="width: 120px;" @click="showDialogInfo('edit')">查看订单</el-button>
+					<el-button style="width: 120px;" @click="showDialogInfo('view')">查看订单</el-button>
 				</p>
 			</div>
-			<div v-else-if="data.orderState === 11">
+			<div v-else-if="orderState === 11">
 				<p class="l-fs">加装及上牌完成，待客户提车</p>
 				<p style="margin-top: 50px;">
 					<el-button style="width: 120px;" type="primary" @click="dialogGive.visible = true">交付车辆</el-button>
 				</p>
 			</div>
-			<div v-else-if="data.orderState === 13">
+			<div v-else-if="orderState === 13">
 				<p class="l-fs">已交付车辆</p>
 				<p style="margin-top: 50px;">
 					<el-button style="width: 120px;" type="primary" @click="showDialogInfo('new')">再次开单</el-button>
@@ -59,9 +59,13 @@
 
 		<!-- 开单 -->
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
-  		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
+  		<el-form ref="infoForm" inline class="l-form1" :class="{'_disabled': dialogInfo.disabled }" label-width="100px" 
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
   			<div class="l-form1-row">
+  				<el-form-item v-if="dialogInfo.data.customerOrderCode" style="margin-right: 50px;">
+						<b slot="label">订单号</b>
+				  	<el-input disabled :value="dialogInfo.data.customerOrderCode"></el-input>
+				  </el-form-item>
 					<el-form-item prop="systemUserId" >
 						<b slot="label">销售顾问</b>
 				  	<el-select filterable v-model="dialogInfo.data.systemUserId" placeholder="请选择">
@@ -101,15 +105,17 @@
 						    <el-radio :label="2">贷款购车</el-radio>
 						  </el-radio-group>
 					  </el-form-item>
-					  <el-form-item label="首付" prop="downPayments" style="margin-left: 38px;">
-					  	<el-input style="width: 150px;" v-model="dialogInfo.data.downPayments" :maxlength="10"><i slot="suffix">元</i></el-input>
-					  </el-form-item>
-					  <el-form-item label="贷款" prop="loan" style="margin-left: 30px;">
-					  	<el-input style="width: 150px;" v-model="dialogInfo.data.loan" :maxlength="10"><i slot="suffix">元</i></el-input>
-					  </el-form-item>
-					  <el-form-item label="还款期数" prop="loanPayBackStages" style="margin-left: 30px;">
-					  	<el-input style="width: 150px;" v-model="dialogInfo.data.loanPayBackStages" :maxlength="10"><i slot="suffix">期</i></el-input>
-					  </el-form-item>
+					  <template v-if="dialogInfo.data.paymentWay === 2">
+						  <el-form-item label="首付" prop="downPayments" style="margin-left: 38px;">
+						  	<el-input style="width: 150px;" v-model="dialogInfo.data.downPayments" :maxlength="10"><i slot="suffix">元</i></el-input>
+						  </el-form-item>
+						  <el-form-item label="贷款" prop="loan" style="margin-left: 30px;">
+						  	<el-input style="width: 150px;" v-model="dialogInfo.data.loan" :maxlength="10"><i slot="suffix">元</i></el-input>
+						  </el-form-item>
+						  <el-form-item label="还款期数" prop="loanPayBackStages" style="margin-left: 30px;">
+						  	<el-input style="width: 150px;" v-model="dialogInfo.data.loanPayBackStages" :maxlength="10"><i slot="suffix">期</i></el-input>
+						  </el-form-item>
+					  </template>
   				</div>
   			</div>
 
@@ -152,14 +158,11 @@
 			   </el-form-item>
   			</div>
 			</el-form>
-			<span slot="footer" class="l-margin-r-m">
+			<span slot="footer" class="l-margin-r-m" v-if="dialogInfo.type !== 'view'">
 				<el-button @click="closeDialogInfo()">取消</el-button>
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">生成订单</el-button>
 		  </span>
 		</el-dialog>
-
-		<!-- 查看订单详情 -->
-
 
 		<!-- 查看购车历程 -->
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" title="购车历程" :visible.sync="dialogBuy.visible" width="500px">
@@ -236,6 +239,9 @@ export default {
 			default() {
 				return {}
 			}
+		},
+		parent: {
+			type: Object
 		}
 	},
 	data() {
@@ -264,6 +270,7 @@ export default {
 			}
 		}
 		return {
+			orderState: '',
 			cascader: {
 				value: [],
 				data: [],
@@ -281,9 +288,10 @@ export default {
 				colorList: [],
 				neishiList: [],
 				salesList: [],
+				disabled: false,
 				rules: {
 					systemUserId: [
-						{ required: true, message: '必填项', trigger: 'change' }
+						{ type:'number', message: '必填项', trigger: 'change' }
 					],
 					carsId: [
 						{ required: true, validator: validateCarModel, trigger: 'change' }
@@ -315,6 +323,7 @@ export default {
 				},
 				data: {
 					customerOrderId: '',
+					customerOrderCode: '',
 					customerUsersId: '',
 					systemUserId: '',
 					brandId: '',
@@ -374,6 +383,13 @@ export default {
 			}
 		}
 	},
+	watch: {
+		data(val) {
+			if(val) {
+				this.orderState = val.orderState	
+			}
+		}
+	},
 	methods: {
 		formatterState(row, column, cellValue) {
 			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
@@ -419,12 +435,11 @@ export default {
 		},
 		getOrderInfo() {
 			return this.$$api.customer.getOrderInfo(this.data.customerOrderId).then(({data}) => {
-				this.data.orderState = data.customerOrderState
+				this.orderState = data.customerOrderState
 				return data
 			})
 		},
 		showDialogInfo(type = 'new') {
-			
 			let promises = []
 
 			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
@@ -444,8 +459,13 @@ export default {
 
 			this.$$utils.copyObj(this.dialogInfo.data, this.data)
 			this.dialogInfo.type = type
-			if(type === 'edit') {
-				this.dialogInfo.title = '修改订单信息'
+			if(type === 'new') {
+				this.dialogInfo.title = '新增订单'
+				this.dialogInfo.data.customerOrderId = ''
+				this.dialogInfo.disabled = false
+			} else {
+				this.dialogInfo.disabled = type === 'view'
+				this.dialogInfo.title = type === 'view' ? '查看订单信息' : '修改订单信息'
 				let infoPromise = this.getOrderInfo().then(data => {
 					this.$$utils.copyObj(this.dialogInfo.data, data)
 					this.dialogInfo.data.followInformation = data.followInformation ? data.followInformation.split(',') : []
@@ -468,8 +488,6 @@ export default {
 				})
 
 				promises.push(infoPromise)
-			} else {
-				this.dialogInfo.title = '新增订单'
 			}
 
 			const loading = this.$loading()
@@ -499,8 +517,8 @@ export default {
         if (valid) {
           this.dialogInfo.loading = true
           this.$$api.customer.addOrder(this.dialogInfo.data).then(_ => {
+          	this.parent && this.parent.getInfo()
             this.closeDialogInfo()
-            this.$$utils.copyObj(this.data, this.dialogInfo.data)
             this.$message.success((this.dialogInfo.type === 'new' ? '新增' : '修改') + '订单成功')
           }).finally(()=>{
             this.dialogInfo.loading = false
@@ -561,7 +579,7 @@ export default {
 				this.qrcode.visible = false
 			}
 			this.getOrderInfo().then(data => {
-				if((this.dialogPay.type === 1 && this.data.orderState > 1) || this.data.orderState > 7) {
+				if((this.dialogPay.type === 1 && this.orderState > 1) || this.orderState > 7) {
 					this.dialogPay.visible = false
 				}
 			})
@@ -569,7 +587,7 @@ export default {
 		bankPass() { // 银行贷款通过
 			let loading = this.$loading()
 			this.$$api.customer.bankPass(this.data.customerOrderId).then(_ => {
-				this.data.orderState = 5
+				this.orderState = 5
 			}).finally(_ => {
 				loading.close()
 			})
@@ -577,7 +595,7 @@ export default {
 		fullPay() { // 银行贷款不通过，改成全款支付尾款
 			let loading = this.$loading()
 			this.$$api.customer.fullPay(this.data.customerOrderId).then(_ => {
-				this.data.orderState = 5
+				this.orderState = 5
 			}).finally(_ => {
 				loading.close()
 			})
@@ -610,7 +628,7 @@ export default {
 			}).then(({data}) => {
 				let list = ['开单', '落定', '银行贷款审批', '车辆出库', '完款', '加装/上牌', '交车']
 				this.dialogBuy.list = list.map((item, index) => {
-					let _item = data.orderMap.list[index]
+					let _item = data.orderMap && data.orderMap.list ? data.orderMap.list[index] : null
 					if(_item) {
 						item = {
 							title: item,
@@ -635,6 +653,9 @@ export default {
 				loading.close()
 			})
 		}
+	},
+	mounted() {
+		this.orderState = this.data.orderState	
 	}
 }
 </script>
@@ -659,7 +680,7 @@ export default {
 	li:last-of-type:before{display: none;}
 	li._done:last-of-type::before{opacity: 0.3;}
 	._icon{font-size: 30px; height: 28px;  position: relative; z-index: 1; line-height: 1; color: #39b94d; margin-top: -3px;}
-	._tit{width: 80px; margin-left: 20px; margin-right: 50px;}
+	._tit{width: 100px; margin-left: 20px; margin-right: 50px;}
 	._desc{flex: 1;}
 	.l-text-gray{font-size: 12px;}
 	img {width: 100px; height: 60px; margin: 10px 10px 0 0;}

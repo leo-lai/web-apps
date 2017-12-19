@@ -3,13 +3,8 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-  				<el-form-item>
-  					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
-				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
-				    </el-select>
-  				</el-form-item>
 				  <el-form-item prop="dateRange">
-				  	<el-input placeholder="请输入订单号" v-model="list.filter.stockOrderCode"></el-input>
+				  	<el-input placeholder="请输入订单号" v-model="list.filter.customerOrderCode"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -20,19 +15,20 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="订单号" prop="stockOrderCode"></el-table-column>
-	    <el-table-column label="落定客户" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="下单时间" prop="customerUsersName"></el-table-column>
-	    <el-table-column label="预定车辆" prop="carsName"></el-table-column>
-	    <el-table-column label="车身颜色" prop="colourName"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="interiorName"></el-table-column>
-	    <el-table-column label="订单数量" prop="stockOrderNumber"></el-table-column>
-	    <el-table-column label="订单状态" prop="stockOrderState"></el-table-column>
-	    <el-table-column label="出库状态" prop="stockOrderState"></el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column class-name="l-fs-xs" label="订单号" prop="customerOrderCode" min-width="120"></el-table-column>
+	    <el-table-column label="落定客户" prop="customerName" align="center"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="下单时间" prop="createDate" min-width="120"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="预定车辆" prop="carsName" min-width="150"></el-table-column>
+	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
+	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="订单状态" prop="customerOrderState" align="center" min-width="120">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small">出库车辆</el-button>
-	        <!-- <el-button class="l-text-link" type="text" size="small">编辑</el-button> -->
+	    		<p :class="{'l-text-error': scope.row.customerOrderState === 5}">{{formatterState(null, null, scope.row.customerOrderState)}}</p>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="操作" align="center">
+	    	<template slot-scope="scope">
+	    		<el-button v-if="scope.row.customerOrderState === 5" class="l-text-link" type="text" size="small" @click="showOutStockInfo(scope.row)">出库车辆</el-button>
 	        <!-- <el-button class="l-text-link" type="text" size="small">打印单据</el-button> -->
 	      </template>
 	    </el-table-column>
@@ -48,49 +44,98 @@
 			</el-pagination>
 	  </el-row>
 
+	  <!-- 出库车辆 -->
+		<el-dialog class="l-padding-t-0" title="出库车辆" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="outStockInfo.visible" width="995px">
+  		<table class="l-table-info">
+  			<caption>订单基本信息</caption>
+  			<tr>
+  				<td class="_tit" width="50">车辆型号</td>
+  				<td class="_cont" width="350">{{ outStockInfo.data.carsName }}</td>
+  				<td class="_tit" width="50">车身颜色</td>
+  				<td class="_cont" width="50" align="center">{{ outStockInfo.data.colourName }}</td>
+  				<td class="_tit" width="50">内饰颜色</td>
+  				<td class="_cont" width="70" align="center">{{ outStockInfo.data.interiorName }}</td>
+  			</tr>
+  			<tr>
+  				<td class="_tit">订单备注</td>
+  				<td class="_cont" colspan="3">{{ outStockInfo.data.remark }}</td>
+  				<td class="_tit">出库数量</td>
+  				<td class="_cont" align="center">{{ outStockInfo.data.orderNumber }}</td>
+  			</tr>
+  		</table>
+  		<div class="l-block-tit">现有库存</div>
+  		<el-table class="l-table-hdbg" stripe :data="outStockInfo.data.list" @selection-change="outStockSlted" 
+  			empty-text="无该车型库存，请在前往“库存管理”-“订车列表”模块订车">
+  			<el-table-column type="selection" width="55" :selectable="outStockSltable"></el-table-column>
+		    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
+		    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
+		    <el-table-column label="票证号" prop="certificateNumber"></el-table-column>
+		    <el-table-column label="仓位" prop="warehouseName"></el-table-column>
+		    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
+		    <el-table-column label="操作" align="center">
+		    	<template slot-scope="scope">
+		        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
+		      </template>
+		    </el-table-column>
+		  </el-table>
+
+		  <div class="l-margin-t l-text-center">
+		  	<el-button style="width: 200px;" type="primary" :loading="outStockInfo.loading" @click="outStock()">出库车辆</el-button>
+		  </div>
+		</el-dialog>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
+import viewerImages from 'components/viewer-images'
 export default {
-	name: 'customer-bespeak',
+	name: 'customer-out',
+	components: {
+    viewerImages
+  },
 	data() {
 		return {
-			dateOptions: {
-				shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-			},
 			list: {
+				state: [
+				{
+					value: 1,
+					label: '待客户支付定金'
+				},
+				{
+					value: 3,
+					label: '客户已支付定金，待银行审批贷款方案'
+				},
+				{
+					value: 5,
+					label: '等待仓库出库车辆'
+				},
+				{
+					value: 7,
+					label: '仓库已出库车辆，待客户验车并支付尾款'
+				},
+				{
+					value: 9,
+					label: '客户已支付尾款，待加装精品及上牌'
+				},
+				{
+					value: 11,
+					label: '加装精品完成，待上牌'
+				},
+				{
+					value: 12,
+					label: '上牌完成，待客户提车'
+				},
+				{
+					value: 13,
+					label: '已交付车辆'
+				}
+			],
 				filter: {
-					dateRange: '',
-					orgId: ''
+					customerOrderCode: ''
 				},
 				rules: {
-					phoneNumber: [],
-					orgId: []
+					customerOrderCode: []
 				},
 				loading: false,
 				page: 1,
@@ -98,38 +143,23 @@ export default {
 				total: 0,
 				data: []
 			},
-			dialogInfo: {
-				type: 'new',
-				title: '新增客户',
-				visible: false,
+			outStockInfo: {
 				loading: false,
-				rules: {
-					carsName: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					phoneNumber: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					orgId: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
-					]
+				visible: false,
+				stockCarIdArr: [],
+				carSpecs: [],
+				formData: { 
+					customerOrderId: '', 
+					stockCarId: ''
 				},
-				data: {
-					supplierId: '',
-					carsName: '',
-					phoneNumber: '',
-					orgId: '',
-					remark: ''
-				}
+				data: {}
 			}
 		}
 	},
-	computed: {
-		...mapGetters([
-  		'zuzhiList'
-    ])
-	},
 	methods: {
+		formatterState(row, column, cellValue) {
+			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},
@@ -138,7 +168,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.customer.getBespeakList(this.list.filter, page, rows)
+			this.$$api.stock.getOrderList2(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -161,80 +191,73 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', row) { // 新增/修改车型弹出信息
-			this.dialogInfo.type = type
-			if(type === 'edit') {
-				this.dialogInfo.title = '修改客户'
-				this.$$utils.copyObj(this.dialogInfo.data, row)
-			} else {
-				this.dialogInfo.title = '新增客户'
-				this.$$utils.copyObj(this.dialogInfo.data, '')
-			}
-
+		showOutStockInfo(row) { // 出库车辆
 			const loading = this.$loading()
-			Promise.all([
-				this.$store.dispatch('getZuzhiList')
-			]).then(dataArr =>　{
-				this.dialogInfo.visible = true	
+			this.$$api.stock.outStockBefor2(row.customerOrderId).then(({data}) => {
+				this.outStockInfo.formData.customerOrderId = row.customerOrderId
+				this.outStockInfo.data = data
+				this.outStockInfo.data.list = data.list ? data.list.map(item => {
+					if(item.stockCarImages) {
+						item.imagesArr = item.stockCarImages.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						})
+					}
+					return item
+				}) : []
+				this.outStockInfo.visible = true
 			}).finally(_ => {
 				loading.close()
 			})
 		},
-		closeDialogInfo(done) {
-			if(done) {
-				done()
-			}else{
-				this.dialogInfo.visible = false	
+		outStock() { // 出库车辆
+			if(!this.outStockInfo.formData.stockCarId) {
+				this.$message.error('请选择出库车辆')
+				return
 			}
-			this.$$utils.copyObj(this.dialogInfo.data, '')
-			this.$refs.infoForm.resetFields()
+
+			if(this.outStockInfo.stockCarIdArr.length > this.outStockInfo.data.orderNumber){
+				this.$message.error('出库车辆大于订车数量')
+				return	
+			}
+
+			this.outStockInfo.loading = true
+			this.$$api.stock.outStock2(this.outStockInfo.formData).then(_ => {
+				this.$message.success('出库车辆成功')
+				this.outStockInfo.visible = false
+				this.refreshList()
+			}).finally(_ => {
+				this.outStockInfo.loading = false
+			})
 		},
-		submitDialogInfo() { // 提交客户
-			this.$refs.infoForm.validate(valid => {
-        if (valid) {
-          this.dialogInfo.loading = true
-          this.$$api.supplier.add(this.dialogInfo.data).then(_ => {
-            this.closeDialogInfo()
-            this.$message({
-							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '客户成功'
-						})
-            this.refreshList()
-          }).finally(()=>{
-            this.dialogInfo.loading = false
-          })  
-        }else {
-        	this.$message({
-						type: 'error',
-						message: '请完善表单信息'
-					})
-        }
-      })
+		outStockSlted(valArr) {
+			this.outStockInfo.stockCarIdArr = valArr.map(item => item.stockCarId)
+			this.outStockInfo.formData.stockCarId = this.outStockInfo.stockCarIdArr.join(',')
 		},
-		deleteInfo(row) { // 禁用/启用车型
-			this.$confirm('是否确定删除该客户?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(_ => {
-      	row.deling = true
-				this.$$api.supplier.del(row.supplierId).then(_ => {
-					this.$message({
-						type: 'success',
-						message: '删除客户成功'
-					})
-					this.refreshList()
-				}).finally(_ => {
-					row.deling = false
-				})
-      })
+		outStockSltable(row, index) {
+			if(this.outStockInfo.stockCarIdArr.includes(row.stockCarId)) {
+				return true
+			}else{
+				return this.outStockInfo.stockCarIdArr.length < this.outStockInfo.data.orderNumber	
+			}
+		},
+		showCarImages(imagesArr = []) { // 查看验车图片
+			if(imagesArr && imagesArr.length > 0) {
+				this.$refs.viewer.show(0, imagesArr)
+			}else{
+				this.$message.info('没有可查看图片')
+			}
 		}
 	},
 	mounted() {
-		this.$$event.$on('customer:tab', activeName => {
-			if(activeName === 'bespeak' && this.list.data.length === 0) {
+		this.$$event.$on('stock:tab', activeName => {
+			if(activeName === 'out' && this.list.data.length === 0) {
 				this.getList()
-				this.$store.dispatch('getZuzhiList')
 			}
 		})
 	}

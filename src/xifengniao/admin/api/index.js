@@ -283,8 +283,8 @@ const api = {
     getCarsInfo(carId = '') { // 车大类相关信息
       return fetch.post('/carsInfo', { carId })
     },
-    getDepositPrice(carId = '') { // 获取车辆定金
-      return fetch.post('/carDepositPrice', { carId })
+    getDepositPrice(formData = {}) { // 获取车辆定金
+      return fetch.post('/carDepositPrice', formData)
     }
   },
   color: { // 车身颜色内饰管理
@@ -408,11 +408,6 @@ const api = {
     addInCar(formData = {}) { // 新增入库车辆
       return fetch.post('/storageCarEdit', formData)
     },
-    getOrderList(formData = {}, page = 1, rows = 100) { // 订车列表
-      formData.page = page
-      formData.rows = rows
-      return fetch.post('/stockOrderList', formData)
-    },
     addOrder(formData = {}) { // 新增订车单
       return fetch.post('/stockOrderCreate', formData)
     },
@@ -431,11 +426,27 @@ const api = {
     notice(formData = {}) { // 通知有车
       return fetch.post('/stockOrderNotice', formData)
     },
-    outStockBefor(stockOrderId = '') { // 出库车辆前信息
+    getOrderList(formData = {}, page = 1, rows = 100) { // 订车列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/stockOrderList', formData)
+    },
+    outStockBefor(stockOrderId = '') { // 二级出库车辆前信息
       return fetch.post('/stockOrderStorageOutBefor', { stockOrderId })
     },
-    outStock(formData = {}) { // 通知有车
+    outStock(formData = {}) { // 二级车辆出库
       return fetch.post('/stockOrderStorageOut', formData)
+    },
+    getOrderList2(formData = {}, page = 1, rows = 100) { // 三级车辆出库列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/customerOrderList', formData)
+    },
+    outStockBefor2(customerOrderId = '') { // 三级出库车辆前信息
+      return fetch.post('/customerOrderStorageOutBefor', { customerOrderId })
+    },
+    outStock2(formData = {}) { // 三级车辆出库
+      return fetch.post('/customerOrderStorageOut', formData)
     }
   },
   pay: { // 通联支付

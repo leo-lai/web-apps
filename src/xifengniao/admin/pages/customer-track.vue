@@ -66,7 +66,7 @@
   			<div class="_tab">
   				<el-tabs type="border-card">
 					  <el-tab-pane label="购车进度">
-					  	<customer-progress :data="viewInfo.order"></customer-progress>
+					  	<customer-progress :parent="this" :data="viewInfo.order"></customer-progress>
 					  </el-tab-pane>
 					  <el-tab-pane label="个人资料">
 					  	<customer-info :data="viewInfo.user"></customer-info>
@@ -175,11 +175,10 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(row) {
-			let loading = this.$loading()
-			this.$$api.customer.getInfo({
-				customerUsersId: row.customerUsersId,
-				customerUsersOrgId: row.customerUsersOrgId
+		getInfo() {
+			return this.$$api.customer.getInfo({
+				customerUsersId: this.dialogInfo.row.customerUsersId,
+				customerUsersOrgId: this.dialogInfo.row.customerUsersOrgId
 			}).then(({data}) => {
 				data.userMap.isHasDriversLicense = Number(data.userMap.isHasDriversLicense)
 				this.viewInfo.base = data.customerOrgMap
@@ -194,6 +193,13 @@ export default {
 					orderState:  data.orderMap.orderState || '',
 					customerUsersId: data.userMap.customerUsersId
 				}, data.orderMap, data.customerOrgMap)
+				return data
+			})
+		},
+		showDialogInfo(row) {
+			this.dialogInfo.row = row || this.dialogInfo.row
+			let loading = this.$loading()
+			this.getInfo().then(data => {
 				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()

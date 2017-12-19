@@ -111,7 +111,7 @@
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
-  				<td class="_tit">车型</td>
+  				<td class="_tit">车辆型号</td>
   				<td class="_cont">{{ viewInfo.data.carsName }}</td>
   				<td class="_tit">车身颜色</td>
   				<td class="_cont" align="center">{{ viewInfo.data.colourName }}</td>
@@ -173,7 +173,7 @@
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
-  				<td class="_tit" width="50">车型</td>
+  				<td class="_tit" width="50">车辆型号</td>
   				<td class="_cont" width="350">{{ noticeInfo.data.carsName }}</td>
   				<td class="_tit" width="50">车身颜色</td>
   				<td class="_cont" width="50" align="center">{{ noticeInfo.data.colourName }}</td>
@@ -215,7 +215,7 @@
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
-  				<td class="_tit" width="50">车型</td>
+  				<td class="_tit" width="50">车辆型号</td>
   				<td class="_cont" width="350">{{ outStockInfo.data.carsName }}</td>
   				<td class="_tit" width="50">车身颜色</td>
   				<td class="_cont" width="50" align="center">{{ outStockInfo.data.colourName }}</td>
@@ -704,9 +704,8 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('stock:tab', (activeName, that) => {
+		this.$$event.$on('stock:tab', activeName => {
 			if(activeName === 'out-order' && this.list.data.length === 0) {
-				this.$$parent = that
 				this.getList()
 			}
 		})

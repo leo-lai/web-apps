@@ -1,4 +1,3 @@
-
 let config = {
   regexp: {
     int: /^\d{1,10}$/,

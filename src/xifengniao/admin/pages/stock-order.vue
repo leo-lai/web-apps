@@ -27,7 +27,7 @@
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="120"></el-table-column>
-	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="120"></el-table-column>
+	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="150"></el-table-column>
 	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
 	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
 	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
@@ -72,12 +72,12 @@
 			    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 			  </el-form-item>
 			  <el-form-item label="车身颜色" prop="colourId" >
-			  	<el-select v-model="dialogInfo.data.colourId" placeholder="请选择">
+			  	<el-select v-model="dialogInfo.data.colourId" placeholder="请选择" @change='getDepositPrice'>
 				    <el-option v-for="color in dialogInfo.colorList" :key="color.carColourId" :label="color.carColourName" :value="color.carColourId"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="内饰颜色" prop="interiorId" >
-			  	<el-select v-model="dialogInfo.data.interiorId" placeholder="请选择">
+			  	<el-select v-model="dialogInfo.data.interiorId" placeholder="请选择" @change='getDepositPrice'>
 				    <el-option v-for="neishi in dialogInfo.neishiList" :key="neishi.interiorId" :label="neishi.interiorName" :value="neishi.interiorId"></el-option>
 				  </el-select>
 			  </el-form-item>
@@ -112,23 +112,23 @@
   		<table class="l-table-info">
   			<caption>订单基本信息</caption>
   			<tr>
-  				<td class="_tit">车型</td>
+  				<td class="_tit" width="120">车辆型号</td>
   				<td class="_cont">{{ viewInfo.data.carsName }}</td>
-  				<td class="_tit">车身颜色</td>
+  				<td class="_tit" width="120">车身颜色</td>
   				<td class="_cont" align="center">{{ viewInfo.data.colourName }}</td>
-  				<td class="_tit">内饰颜色</td>
+  				<td class="_tit" width="120">内饰颜色</td>
   				<td class="_cont" align="center">{{ viewInfo.data.interiorName }}</td>
   			</tr>
   			<tr>
-  				<td class="_tit">订单状态</td>
+  				<td class="_tit" width="120">订单状态</td>
   				<td class="_cont">{{ formatterState(null, null, viewInfo.data.stockOrderState) }}</td>
-  				<td class="_tit">定金</td>
+  				<td class="_tit" width="120">定金</td>
   				<td class="_cont" align="center">{{ viewInfo.data.depositPrice }}</td>
-  				<td class="_tit">数量</td>
+  				<td class="_tit" width="120">数量</td>
   				<td class="_cont" align="center">{{ viewInfo.data.stockOrderNumber }}</td>
   			</tr>
   			<tr>
-  				<td class="_tit">订单备注</td>
+  				<td class="_tit" width="120">订单备注</td>
   				<td colspan="5" class="_cont">{{ viewInfo.data.remark }}</td>
   			</tr>
   		</table>
@@ -150,11 +150,11 @@
 		  <div class="l-block-tit">资源出库明细</div>
 		  <table class="l-table-info">
   			<tr>
-  				<td class="_tit" width="80">物流方式</td>
+  				<td class="_tit" width="120">物流方式</td>
   				<td class="_cont">
   					<span v-if="viewInfo.data.logisticsMode">{{ viewInfo.data.logisticsMode === 1 ? '随车' : '物流' }}</span>
   				</td>
-  				<td class="_tit" width="80">物流单号</td>
+  				<td class="_tit" width="120">物流单号</td>
   				<td class="_cont">{{ viewInfo.data.logisticsOddNumber }}</td>
   			</tr>
   			<tr>
@@ -172,31 +172,31 @@
 		<el-dialog class="l-padding-t-0" title="支付定金" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="payInfo.visible" width="995px">
   		<table class="l-table-info">
   			<tr>
-  				<td class="_tit">车型</td>
+  				<td class="_tit" width="120">车辆型号</td>
   				<td class="_cont">{{ payInfo.data.carsName }}</td>
-  				<td class="_tit">车身颜色</td>
+  				<td class="_tit" width="120">车身颜色</td>
   				<td class="_cont" align="center">{{ payInfo.data.colourName }}</td>
-  				<td class="_tit">内饰颜色</td>
+  				<td class="_tit" width="120">内饰颜色</td>
   				<td class="_cont" align="center">{{ payInfo.data.interiorName }}</td>
   			</tr>
   			<tr>
-  				<td class="_tit">订单状态</td>
+  				<td class="_tit" width="120">订单状态</td>
   				<td class="_cont">{{ formatterState(null, null, payInfo.data.stockOrderState) }}</td>
-  				<td class="_tit">定金</td>
+  				<td class="_tit" width="120">定金</td>
   				<td class="_cont" align="center">{{ payInfo.data.depositPrice }}</td>
-  				<td class="_tit">数量</td>
+  				<td class="_tit" width="120">数量</td>
   				<td class="_cont" align="center">{{ payInfo.data.stockOrderNumber }}</td>
   			</tr>
   			<tr>
-  				<td class="_tit">订单备注</td>
+  				<td class="_tit" width="120">订单备注</td>
   				<td colspan="5" class="_cont">{{ payInfo.data.remark }}</td>
   			</tr>
   			<tr>
-  				<td class="_tit">门店地址</td>
+  				<td class="_tit" width="120">门店地址</td>
   				<td colspan="5" class="_cont">{{ payInfo.data.address }}</td>
   			</tr>
   			<tr>
-  				<td class="_tit">支付方式</td>
+  				<td class="_tit" width="120">支付方式</td>
   				<td colspan="5" class="_cont">
   					<el-radio-group v-model="payInfo.payWay">
 					    <el-radio :label="1" border>银联支付</el-radio>
@@ -408,8 +408,11 @@ export default {
 		cascaderChange(valArr) {
 			if(!valArr || valArr.length < 2) return
 
+			this.dialogInfo.data.carsId = valArr[2]
 			this.dialogInfo.data.colourId = ''
 			this.dialogInfo.data.interiorId = ''
+			this.dialogInfo.info.depositPrice = ''
+
 			// 获取车身颜色和内饰颜色
 			this.$$api.color.getCheshenList(valArr[1]).then(({data}) => {
     		this.dialogInfo.colorList = data
@@ -421,8 +424,18 @@ export default {
     	this.$$api.car.getCarsInfo(valArr[2]).then(({data}) => {
     		this.dialogInfo.info.price = data.price
     	})
-    	// 获取车辆定金
-    	this.$$api.car.getDepositPrice(valArr[2]).then(({data}) => {
+    	
+		},
+		// 获取车辆定金
+		getDepositPrice() {
+			if(!(this.dialogInfo.data.carsId 
+				&& this.dialogInfo.data.colourId && this.dialogInfo.data.interiorId)) return
+
+    	this.$$api.car.getDepositPrice({
+    		carsId: this.dialogInfo.data.carsId,
+    		colourId: this.dialogInfo.data.colourId,
+    		interiorId: this.dialogInfo.data.interiorId
+    	}).then(({data}) => {
     		this.dialogInfo.info.depositPrice = data.depositPrice || 0
     	})
 		},

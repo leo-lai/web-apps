@@ -44,7 +44,7 @@
 	    	<template slot-scope="scope">
 	    		<span v-show="!scope.row.doing">
 	    			<el-button type="text" size="mini" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-		        <el-button type="text" size="mini" @click="showDialogTrack(scope.row)">转为跟踪客户</el-button>
+		        <el-button type="text" size="mini" @click="showDialogTrack(scope.row)">分配销售顾问</el-button>
 		        <el-button type="text" size="mini" @click="notBuy(scope.row)">标记不购车</el-button>
 	        </span>
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
@@ -112,8 +112,9 @@
 		  </span>
 		</el-dialog>
 
-		<el-dialog title="提醒" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogTrack.visible" width="400px">
-			<p class="l-margin-b">标记到店将自动转为跟踪客户，请在“跟踪客户”中查看</p>
+		<el-dialog title="分配销售顾问" :close-on-click-modal="false" :close-on-press-escape="false" :visible.sync="dialogTrack.visible" width="400px">
+			<!-- <p class="l-margin-b">此操作将自动转为跟踪客户，请在“跟踪客户”中查看</p> -->
+			<p class="l-margin-b">请选择销售顾问</p>
 			<el-select filterable v-model="dialogTrack.data.systemUserId" placeholder="请选择销售顾问">
 		    <el-option v-for="user in salesList" :key="user.systemUserId" :label="user.systemUserName" :value="user.systemUserId"></el-option>
 		  </el-select>

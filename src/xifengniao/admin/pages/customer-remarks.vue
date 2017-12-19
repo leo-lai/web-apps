@@ -29,6 +29,9 @@ export default {
 			default() {
 				return {}
 			}
+		},
+		parent: {
+			type: Object
 		}
 	},
 	data() {
@@ -59,14 +62,13 @@ export default {
 				this.$message.success('保存备注成功')
 				if(data) {
 					this.data.list.push(data)
+				}else{
+					this.parent && this.parent.getInfo()
 				}
 			}).finally(_ => {
 				this.dialogRemark.loading = false
 			})
 		}
-	},
-	mounted() {
-		console.log(this.parent)
 	}
 }
 </script>

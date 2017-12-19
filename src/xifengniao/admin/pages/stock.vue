@@ -4,18 +4,18 @@
 		  <el-tab-pane label="车辆库存" name="list">
 		  	<stock-list></stock-list>
 		  </el-tab-pane>
-		  <el-tab-pane label="车辆入库" name="in">
-		  	<stock-in></stock-in>
-		  </el-tab-pane>
-		  <!-- <el-tab-pane label="出库记录" name="out">
-		  	<stock-out></stock-out>
-		  </el-tab-pane> -->
 		  <template v-if="userInfo.orgLevel === 3">
 			  <el-tab-pane label="订车列表" name="order">
 			  	<stock-order></stock-order>
-			  </el-tab-pane>	
+			  </el-tab-pane>
+			  <el-tab-pane label="车辆出库" name="out">
+			  	<stock-out></stock-out>
+			  </el-tab-pane>
 		  </template>
 		  <template v-if="userInfo.orgLevel < 3">
+		  	<el-tab-pane label="车辆入库" name="in">
+			  	<stock-in></stock-in>
+			  </el-tab-pane>
 			  <el-tab-pane label="批发出库" name="out-order">
 			  	<stock-out-order></stock-out-order>
 			  </el-tab-pane>	
@@ -52,7 +52,7 @@ export default {
 	methods: {
 		tabClick() {
 			this.$$utils.history.replace('?tab=' + this.tabActive)
-			this.$$event.$emit('stock:tab', this.tabActive, this)
+			this.$$event.$emit('stock:tab', this.tabActive)
 		}
 	},
 	mounted() {
