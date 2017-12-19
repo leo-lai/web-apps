@@ -502,6 +502,8 @@ export default {
 		resetDialogInfo() {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 			this.cascader.value = []
+			this.dialogInfo.info.price = ''
+			this.dialogInfo.info.depositPrice = ''
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 提交订车单

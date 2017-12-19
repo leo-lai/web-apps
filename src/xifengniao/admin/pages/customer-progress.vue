@@ -43,7 +43,10 @@
 				</p>
 			</div>
 			<div v-else-if="orderState === 11">
-				<p class="l-fs">加装及上牌完成，待客户提车</p>
+				<p class="l-fs">精品加装完成，待上牌完成</p>
+			</div>
+			<div v-else-if="orderState === 12">
+				<p class="l-fs">上牌完成，待客户提车</p>
 				<p style="margin-top: 50px;">
 					<el-button style="width: 120px;" type="primary" @click="dialogGive.visible = true">交付车辆</el-button>
 				</p>

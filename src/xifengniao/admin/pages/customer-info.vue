@@ -6,11 +6,11 @@
 				<tr>
 					<td class="_tit">姓名</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="50" v-model="data.customerUsersName">
+						<input class="_ipt2" maxlength="50" v-model="data.customerUsersName" placeholder="请填写">
 					</td>
 					<td class="_tit">手机号码</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="11" v-model="data.phoneNumber">
+						<input class="_ipt2" maxlength="11" v-model="data.phoneNumber" placeholder="请填写">
 					</td>
 				</tr>
 				<tr>
@@ -23,13 +23,13 @@
 					</td>
 					<td class="_tit">年收入(万元)</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="50" v-model="data.annualIncome">
+						<input class="_ipt2" maxlength="50" v-model="data.annualIncome" placeholder="请填写">
 					</td>
 				</tr>
 				<tr>
 					<td class="_tit">身份证号</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="18" v-model="data.cardNo">
+						<input class="_ipt2" maxlength="18" v-model="data.cardNo" placeholder="请填写">
 					</td>
 					<td class="_tit">收入来源</td>
 					<td class="_cont">
@@ -69,7 +69,7 @@
 					</td>
 					<td class="_tit">邮箱</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.email">
+						<input class="_ipt2" maxlength="150" v-model="data.email" placeholder="请填写">
 					</td>
 				</tr>
 				<tr>
@@ -81,7 +81,7 @@
 					</td>
 					<td class="_tit">家庭住址</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.address">
+						<input class="_ipt2" maxlength="150" v-model="data.address" placeholder="请填写">
 					</td>
 				</tr>
 			</table>
@@ -90,11 +90,11 @@
 				<tr>
 					<td class="_tit">紧急联系人A</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.emergencyAContact">
+						<input class="_ipt2" maxlength="150" v-model="data.emergencyAContact" placeholder="请填写">
 					</td>
 					<td class="_tit">紧急联系人B</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.emergencyBContact">
+						<input class="_ipt2" maxlength="150" v-model="data.emergencyBContact" placeholder="请填写">
 					</td>
 				</tr>
 				<tr>
@@ -120,11 +120,11 @@
 				<tr>
 					<td class="_tit">联系电话</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="11" v-model="data.emergencyAPhone">
+						<input class="_ipt2" maxlength="11" v-model="data.emergencyAPhone" placeholder="请填写">
 					</td>
 					<td class="_tit">联系电话</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="11" v-model="data.emergencyBPhone">
+						<input class="_ipt2" maxlength="11" v-model="data.emergencyBPhone" placeholder="请填写">
 					</td>
 				</tr>
 			</table>
@@ -133,17 +133,17 @@
 				<tr>
 					<td class="_tit">单位名称</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.workUnit">
+						<input class="_ipt2" maxlength="150" v-model="data.workUnit" placeholder="请填写">
 					</td>
 					<td class="_tit">税后年收入(万元)</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.annualIncomeAfterTax">
+						<input class="_ipt2" maxlength="150" v-model="data.annualIncomeAfterTax" placeholder="请填写">
 					</td>
 				</tr>
 				<tr>
 					<td class="_tit">工作地点</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.workingPlace">
+						<input class="_ipt2" maxlength="150" v-model="data.workingPlace" placeholder="请填写">
 					</td>
 					<td class="_tit">入职时间</td>
 					<td class="_cont">
@@ -153,17 +153,17 @@
 				<tr>
 					<td class="_tit">公司职位</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="150" v-model="data.position">
+						<input class="_ipt2" maxlength="150" v-model="data.position" placeholder="请填写">
 					</td>
 					<td class="_tit">公司电话</td>
 					<td class="_cont">
-						<input class="_ipt2" maxlength="12" v-model="data.companyTelephone">
+						<input class="_ipt2" maxlength="12" v-model="data.companyTelephone" placeholder="请填写">
 					</td>
 				</tr>
 			</table>
 		</div>
 		<div class="l-text-right l-margin-t">
-			<el-button :loading="loading" type="primary" @click="submit">{{loading ? '保存中...' : '保存修改'}}</el-button>
+			<el-button type="primary" :loading="loading" @click="submit">{{loading ? '保存中...' : '保存修改'}}</el-button>
 		</div>
 	</div>
 </template>

@@ -182,7 +182,7 @@ export default {
 			}).then(({data}) => {
 				data.userMap.isHasDriversLicense = Number(data.userMap.isHasDriversLicense)
 				this.viewInfo.base = data.customerOrgMap
-				this.viewInfo.car = data.customerCarMap
+				this.viewInfo.car = data.customerCarMap.list ? data.customerCarMap.list[0] : {}
 				this.viewInfo.user = data.userMap
 				this.viewInfo.remarks = {
 					customerUsersId: data.userMap.customerUsersId,
@@ -238,8 +238,11 @@ export default {
 	.el-dialog{background-color: #efeff4;}
 	.el-dialog__body{padding-top: 5px;}
 	.l-table-info{
-		._tit{width: 140px;}
-		._cont{width: 215px;}
+		*{font-size: 12px !important; }
+		._tit{width: 120px; padding: 5px 10px;}
+		._cont{width: 215px; padding: 5px 10px;}
+		.el-input__inner{height: 30px; line-height: 30px; padding-left:10px; padding-right:10px;}
+		.el-input__icon{line-height: 30px;}
 	}
 }
 </style>
