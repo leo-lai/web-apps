@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="l-main-body l-bg-white">
 		<el-row>
   		<el-col :span="8">
   			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>

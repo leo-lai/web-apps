@@ -11,7 +11,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">刷新</el-button>
+				    <el-button type="danger" @click="clear">刷新</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -73,6 +73,7 @@
 			  	<el-radio-group v-model="dialogInfo.data.orgType">
 			      <el-radio :label="1">直营</el-radio>
     				<el-radio :label="2">加盟</el-radio>
+    				<el-radio :label="3">联盟</el-radio>
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item label="上级组织" prop="parentId">

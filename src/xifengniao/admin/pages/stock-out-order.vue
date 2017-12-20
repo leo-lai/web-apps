@@ -19,7 +19,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">刷新</el-button>
+				    <el-button type="danger" @click="clear">刷新</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -122,7 +122,7 @@
   				<td class="_tit">订单状态</td>
   				<td class="_cont">{{ formatterState(null, null, viewInfo.data.stockOrderState) }}</td>
   				<td class="_tit">定金</td>
-  				<td class="_cont" align="center">3000</td>
+  				<td class="_cont" align="center">{{ viewInfo.data.depositPrice }}</td>
   				<td class="_tit">需要出库量</td>
   				<td class="_cont" align="center">{{ viewInfo.data.stockOrderNumber }}</td>
   			</tr>

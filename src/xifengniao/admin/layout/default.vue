@@ -14,6 +14,7 @@
 					    <el-menu-item index="/base/setting">基本设置</el-menu-item>
 					    <el-menu-item index="/base/data">资料设置</el-menu-item>
 					  </el-submenu>
+					  <el-menu-item index="/bank">银行资料审核</el-menu-item>
 					</el-menu>
     		</div>
     		<div class="l-text-right l-padding-lr">

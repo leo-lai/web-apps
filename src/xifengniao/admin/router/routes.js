@@ -55,6 +55,18 @@ const routes = [
     ], 
   },
   {
+    path: '/bank',
+    component: layout,
+    meta: { hidden: true },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '客户体系' },
+        component: resolve => require(['../pages/bank'], resolve),
+      }
+    ], 
+  },
+  {
     path: '/login',
     meta: { title: '登录', hidden: true },
     component: resolve => require(['../pages/login'], resolve),

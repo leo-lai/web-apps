@@ -18,7 +18,7 @@
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
-				    <el-button @click="clear">刷新</el-button>
+				    <el-button type="danger" @click="clear">刷新</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -210,7 +210,7 @@ export default {
 				title: '新增预约客户',
 				visible: false,
 				loading: false,
-				timeOfAppointment: ['08:00','20-00'],
+				timeOfAppointment: ['08:00','20:00'],
 				rules: {
 					customerUsersName: [
 						{ required: true, message: '必填项', trigger: 'blur' }

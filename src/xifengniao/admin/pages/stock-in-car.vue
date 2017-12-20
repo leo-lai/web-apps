@@ -32,7 +32,7 @@
 		    <el-table-column label="入库仓位" prop="warehouseName" align="center"></el-table-column>
 		    <el-table-column label="操作" align="center">
 		    	<template slot-scope="scope">
-		    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+		    		<!-- <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button> -->
 		        <el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
 		      </template>
 		    </el-table-column>
