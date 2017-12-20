@@ -70,11 +70,11 @@
 			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="性质" prop="orgType">
-			  	<el-radio-group v-model="dialogInfo.data.orgType">
-			      <el-radio :label="1">直营</el-radio>
-    				<el-radio :label="2">加盟</el-radio>
-    				<el-radio :label="3">联盟</el-radio>
-			    </el-radio-group>
+			  	<el-select v-model="dialogInfo.data.orgType" placeholder="请选择">
+			    	<el-option label="直营" :value="1"></el-option>
+			    	<el-option label="加盟" :value="2"></el-option>
+			    	<el-option label="联盟" :value="3"></el-option>
+			    </el-select>
 			  </el-form-item>
 			  <el-form-item label="上级组织" prop="parentId">
 			  	<el-select v-model="dialogInfo.data.parentId" placeholder="请选择" :disabled="!dialogInfo.isParent">
