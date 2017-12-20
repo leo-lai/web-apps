@@ -79,7 +79,7 @@
   			<div class="l-form1-row">
   				<div class="_tit"><b>订单信息</b></div>
   				<div class="_cont">
-  					<el-form-item class="_flex" label="车辆型号" prop="carsId" style="width: 605px;">
+						<el-form-item class="_flex" label="车辆型号" prop="carsId" style="width: 605px;">
 					    <el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderItemChange" @change="cascaderChange"
 					    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
 					  </el-form-item>
@@ -109,14 +109,20 @@
 						  </el-radio-group>
 					  </el-form-item>
 					  <template v-if="dialogInfo.data.paymentWay === 2">
-						  <el-form-item label="首付" prop="downPayments" style="margin-left: 38px;">
-						  	<el-input style="width: 150px;" v-model="dialogInfo.data.downPayments" :maxlength="10"><i slot="suffix">元</i></el-input>
+						  <el-form-item label="首付" prop="downPayments" style="margin-left: 10px;">
+						  	<el-input style="width: 100px;" v-model="dialogInfo.data.downPayments" :maxlength="10"><i slot="suffix">元</i></el-input>
 						  </el-form-item>
-						  <el-form-item label="贷款" prop="loan" style="margin-left: 30px;">
-						  	<el-input style="width: 150px;" v-model="dialogInfo.data.loan" :maxlength="10"><i slot="suffix">元</i></el-input>
+						  <el-form-item label="贷款" prop="loan" style="margin-left: 10px;">
+						  	<el-input style="width: 100px;" v-model="dialogInfo.data.loan" :maxlength="10"><i slot="suffix">元</i></el-input>
 						  </el-form-item>
-						  <el-form-item label="还款期数" prop="loanPayBackStages" style="margin-left: 30px;">
-						  	<el-input style="width: 150px;" v-model="dialogInfo.data.loanPayBackStages" :maxlength="10"><i slot="suffix">期</i></el-input>
+						  <el-form-item label="还款期数" prop="loanPayBackStages" style="margin-left: 10px;">
+						  	<el-input style="width: 80px;" v-model="dialogInfo.data.loanPayBackStages" :maxlength="10"><i slot="suffix">期</i></el-input>
+						  </el-form-item>
+						  <el-form-item prop="isMortgage" label="车辆是否抵押" style="margin-left: 10px;">
+						  	<el-select style="width: 117px;" v-model="dialogInfo.data.isMortgage">
+						      <el-option label="抵押" :value="1"></el-option>
+						      <el-option label="不抵押" :value="0"></el-option>
+						    </el-select>
 						  </el-form-item>
 					  </template>
   				</div>
@@ -317,11 +323,28 @@ export default {
 					loanPayBackStages: [
 						{ validator: paymentWay, message: '必填项（整数）', trigger: 'blur' }
 					],
+					isMortgage: [
+						{ validator: paymentWay, message: '必填项', trigger: 'change' }
+					],
 					licensePlatePriace: [
-						{ pattern: config.regexp.money, message: '必填项（保留两位小数点）', trigger: 'blur' }
+						{ validator: function(rule, value, callback) {
+							if(that.dialogInfo.data.isTakeLicensePlate === 1 && 
+								!config.regexp.money.test(that.dialogInfo.data.licensePlatePriace)) {
+								callback(new Error(rule.message))
+							}else{
+								callback()
+							}
+						}, message: '必填项（保留两位小数点）', trigger: 'blur' }
 					],
 					insurancePriace: [
-						{ pattern: config.regexp.money, message: '必填项（保留两位小数点）', trigger: 'blur' }
+						{ validator: function(rule, value, callback) {
+							if(that.dialogInfo.data.isInsurance === 1 && 
+								!config.regexp.money.test(that.dialogInfo.data.insurancePriace)) {
+								callback(new Error(rule.message))
+							}else{
+								callback()
+							}
+						}, message: '必填项（保留两位小数点）', trigger: 'blur' }
 					]
 				},
 				data: {
@@ -334,6 +357,7 @@ export default {
 					carsId: '',
 					colourId: '',
 					interiorId: '',
+					isMortgage: 1,
 					amount: '',
 					paymentWay: 1,
 					downPayments: '',
@@ -508,14 +532,11 @@ export default {
 			}
 		},
 		submitDialogInfo() {
-			if(this.dialogInfo.data.isTakeLicensePlate === 1 && !this.dialogInfo.data.licensePlatePriace) {
-				this.$message.error('请输入上牌费用')
-				return
+			// 全款购车，不抵押
+			if(this.dialogInfo.data.paymentWay === 1) {
+				this.dialogInfo.data.isMortgage = 0
 			}
-			if(this.dialogInfo.data.isInsurance === 1 && !this.dialogInfo.data.insurancePriace) {
-				this.$message.error('请输入商业保险金额')
-				return
-			}
+
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
