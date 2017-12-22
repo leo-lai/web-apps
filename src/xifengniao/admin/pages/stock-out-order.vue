@@ -27,9 +27,14 @@
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="125"></el-table-column>
-	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="120"></el-table-column>
-	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
+	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="180">
+	    	<template slot-scope="scope">
+	    		<p>{{scope.row.carsName}}</p>
+	    		<p>车身：{{scope.row.colourName}} | 内饰：{{scope.row.interiorName}}</p>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="订车门店" prop="buyOrgName" class-name="l-fs-xs"></el-table-column>
+	    <el-table-column label="下单时间" prop="createDate" class-name="l-fs-xs" width="90" align="center"></el-table-column>
 	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
 	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center"></el-table-column>
 	    <el-table-column label="订单状态" prop="stockOrderState" align="center" class-name="l-fs-xs" min-width="130" >

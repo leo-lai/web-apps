@@ -3,13 +3,14 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-				  <el-form-item prop="carsName">
-				    <el-select filterable v-model="list.filter.brandId" placeholder="请选择审核状态" @change="search()">
-				      <!-- <el-option label="审核状态"></el-option> -->
+				  <el-form-item prop="customerPhoneNumber">
+				    <el-select filterable v-model="list.filter.isPassThrough" placeholder="请选择审核状态" @change="search()">
+				      <el-option label="通过" :value="1"></el-option>
+				      <el-option label="不通过" :value="0"></el-option>
 				    </el-select>
 				  </el-form-item>
-				  <el-form-item prop="carsName">
-				    <el-input placeholder="请输入客户手机号码" auto-complete="on" v-model="list.filter.carsName"></el-input>
+				  <el-form-item prop="customerPhoneNumber">
+				    <el-input placeholder="请输入客户手机号码" :maxlength="11" v-model="list.filter.customerPhoneNumber"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -20,18 +21,29 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="客户手机" prop=""></el-table-column>
-	    <el-table-column label="客户姓名" prop=""></el-table-column>
-	    <el-table-column label="贷款类型" prop=""></el-table-column>
-	    <el-table-column label="门店名称" prop=""></el-table-column>
-	    <el-table-column label="贷款金额" prop=""></el-table-column>
-	    <el-table-column label="还款期数" prop=""></el-table-column>
-	    <el-table-column label="车辆是否抵押" prop=""></el-table-column>
-	    <el-table-column label="提交时间" prop=""></el-table-column>
-	    <el-table-column label="审批状态" prop=""></el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column label="客户手机" prop="customerPhoneNumber"></el-table-column>
+	    <el-table-column label="客户姓名" prop="customerName"></el-table-column>
+	    <el-table-column label="门店名称" prop="orgName"></el-table-column>
+	    <el-table-column label="贷款金额" prop="loan" align="center"></el-table-column>
+	    <el-table-column label="还款期数" prop="loanPayBackStages" align="center"></el-table-column>
+	    <el-table-column label="车辆是否抵押" prop="isMortgage" align="center">
 	    	<template slot-scope="scope">
-	        <el-button class="l-text-link" type="text" size="small">查看资料</el-button>
+	    		<span v-if="scope.row.isMortgage == 1">抵押</span>
+	    		<span v-else>不抵押</span>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="提交时间" prop="createDate" align="center" min-width="120"></el-table-column>
+	    <el-table-column label="审批状态" prop="auditStatus" align="center">
+	    	<template slot-scope="scope">
+	    		<span v-if="scope.row.auditStatus == 0">待审批</span>
+	    		<div class="l-text-success" v-else-if="scope.row.auditStatus === 1">通过</div>
+	    		<span class="l-text-error" v-else-if="scope.row.auditStatus === 2">不通过</span>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="审批时间" prop="auditTime" align="center" min-width="120"></el-table-column>
+	    <el-table-column label="操作" align="center">
+	    	<template slot-scope="scope">
+	        <el-button class="l-text-link" type="text" size="small" @click="showDialogInfo(scope.row)">查看资料</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -47,27 +59,50 @@
 	  </el-row>
 
 	  <!-- 查看资料 -->
-		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
-  		
-			<span slot="footer" class="l-margin-r-m">
-				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
-		  </span>
+		<el-dialog class="l-padding-t-0" :close-on-click-modal="false"
+			:before-close="closeDialogInfo" :visible.sync="dialogInfo.visible" width="470px">
+			<div class="l-flex-hc" slot="title">
+				<span style="line-height: 24px; font-size: 18px; color: #303133;"></span>查看资料
+				<div class="l-rest l-text-error l-text-center" v-show="dialogExamine.loading">
+					<el-button size="mini" :loading="dialogExamine.loading" type="text">审核提交中</el-button>
+				</div>
+			</div>
+  		<div class="l-text-gray">资料照片</div>
+  		<div class="l-bankAuditsImage">
+  			<img v-for="(item,index) in images" key="tick" :src="item.thumb" @click="previewImage(index)">
+  		</div>
+  		<div class="l-text-gray l-margin-t">客户签名视频</div>
+  		<div class="l-bankAuditsvideo">
+  			<d-player ref="dplayer" :video='video' :contextmenu='[]'></d-player>
+  		</div>
+  		<div class="l-text-center l-margin-t">
+  			<el-button :disabled="dialogExamine.loading" @click="examine(0)">不通过</el-button>
+		    <el-button type="primary" :disabled="dialogExamine.loading" @click="examine(1)">审批通过</el-button>
+  		</div>
 		</el-dialog>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
+import viewerImages from 'components/viewer-images'
+import VueDPlayer from 'vue-dplayer'
 export default {
 	name: 'bank',
+	components: {
+		viewerImages,
+    'd-player': VueDPlayer
+  },
 	data() {
 		return {
 			list: {
 				filter: {
-					carsName: ''
+					customerPhoneNumber: '',
+					isPassThrough: ''
 				},
 				rules: {
-					carsName: []
+					customerPhoneNumber: [],
+					isPassThrough: []
 				},
 				loading: false,
 				page: 1,
@@ -75,16 +110,20 @@ export default {
 				total: 0,
 				data: []
 			},
+			images: [],
+			video: {
+				url: '',
+				pic: ''
+			},
 			dialogInfo: {
-				type: 'new',
-				title: '新增车型资料',
-				visible: false,
+				visible: false
+			},
+			dialogExamine: {
 				loading: false,
-				rules: {
-					
-				},
 				data: {
-					
+					customerOrderId: '',
+					isPassThrough: '',
+					refusalReason: ''
 				}
 			}
 		}
@@ -98,7 +137,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.car.getList(this.list.filter, page, rows)
+			this.$$api.bank.getList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -121,78 +160,67 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', row) { // 新增/修改车型弹出信息
-			let brandPromise = this.$$api.car.getBrandList().then(({data}) => {
-				this.cascader.data = data.map(item => {
-					item.children = []
-					return item
-				})
-			})
-			this.dialogInfo.type = type
-			if(type === 'edit') {
-				this.dialogInfo.title = '修改车型资料'
-				this.$$utils.copyObj(this.dialogInfo.data, row)
-				this.cascader.value = [row.brandId, row.familyId, row.styleId]
-
-				if(row.brandId) {
-					brandPromise.then(data => {
-						this.cascaderChange([row.brandId]).then(_ => {
-							if(row.familyId) {
-								this.cascaderChange([row.brandId, row.familyId])
-							}		
-						})
-					})
+		showDialogInfo(row) { // 查看资料
+			this.images = row.bankAuditsImage ? row.bankAuditsImage.split(',').map(img => {
+				return {
+					url: this.$$utils.image.thumb(img, 150), 
+					thumb: this.$$utils.image.thumb(img, 150), 
+					src: img, 
+					name: img,
+					tick: Date.now()
 				}
-			} else {
-				this.dialogInfo.title = '新增车型资料'
-				this.resetDialogInfo()
-			}
-
-			const loading = this.$loading()
-			Promise.all([brandPromise]).then(dataArr =>　{
-				this.dialogInfo.visible = true
-			}).finally(_ => {
-				loading.close()
-			})
+			}) : []
+			this.video.url = row.bankAuditsvideo
+			this.dialogExamine.data.customerOrderId = row.customerOrderId
+			this.dialogInfo.visible = true
 		},
 		closeDialogInfo(done) {
 			if(done) {
 				done()
 			}else{
-				this.dialogInfo.visible = false	
+				this.dialogInfo.visible = false
 			}
-
-			this.$refs.dialogInfoEditor.quill.root.click()
-			this.resetDialogInfo()
+			this.$refs.dplayer.dp.pause()
 		},
-		resetDialogInfo() {
-			this.$refs.infoForm && this.$refs.infoForm.resetFields()
-			this.cascader.value = []
-			this.$$utils.copyObj(this.dialogInfo.data, '')
-		},
-		submitDialogInfo() { // 提交车型资料
-			this.$refs.infoForm.validate(valid => {
-        if (valid) {
-          this.dialogInfo.loading = true
-          this.dialogInfo.data.pl = this.dialogInfo.data.pl.toUpperCase()
-          this.$$api.car.add(this.dialogInfo.data).then(_ => {
-            this.closeDialogInfo()
-            this.$message({
-							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '车型资料成功'
-						})
-            this.refreshList()
-          }).finally(()=>{
-            this.dialogInfo.loading = false
-          })  
-        }else {
-        	this.$message.error('请完善表单信息')
-        }
-      })
-		}
+    previewImage(index = 0) {
+    	this.$refs.viewer.show(index, this.images)
+    },
+    examine(isPass = 1) {
+    	this.dialogExamine.data.isPassThrough = isPass
+    	if(isPass === 1) {
+    		this.examineSubmit()
+    	}else {
+    		this.$prompt('请输入不通过原因', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /^.{1,}$/,
+          inputErrorMessage: '请填写原因'
+        }).then(({ value }) => {
+          this.dialogExamine.data.refusalReason = value
+          this.examineSubmit()
+        })
+    	}
+    },
+    examineSubmit() {
+    	this.dialogExamine.loading = true
+    	this.$$api.bank.examine(this.dialogExamine.data).then(_ => {
+    		this.$message.success('审核操作成功')
+    		this.refreshList()
+    	}).finally(_ => {
+    		this.dialogExamine.loading = false
+    		this.closeDialogInfo()
+    	})
+    }
 	},
 	mounted() {
-		// this.getList()
+		this.getList()
 	}
 }
 </script>
+<style lang="less" scoped>
+.l-bankAuditsImage{
+	overflow: hidden; margin-right: -10px;
+	img {float: left; width: 100px; height: 80px; margin: 10px 10px 0 0;}
+}
+.l-bankAuditsvideo{}
+</style>

@@ -109,18 +109,29 @@
 					<td class="_cont"></td>
 				</tr>
 			</table>
-			<table class="l-table-info l-margin-t">
-	  		<caption>人车合照/车辆照片</caption>
-	  	</table>
+			<template v-if="data.extractCarImage && data.extractCarImage.length > 0">
+				<table class="l-table-info l-margin-t">
+		  		<caption>人车合照/车辆照片</caption>
+		  	</table>
+		  	<div style="overflow:hidden;">
+		  		<img style="float:left; width: 150px; height: 100px; margin: 15px 15px 0 0;" v-for="(img,index) in data.extractCarImage" :src="img.thumb" @click="previewImage(index)">
+		  	</div>
+	  	</template>
 		</div>
 		<div class="l-text-right l-margin-t">
 			<el-button type="primary" :loading="loading" @click="submit">{{loading ? '保存中...' : '保存修改'}}</el-button>
 		</div>
+
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
+import viewerImages from 'components/viewer-images'
 export default {
 	name: 'customer-carinfo',
+	components: {
+		viewerImages
+  },
 	props: {
 		data: {
 			type: Object,
@@ -142,7 +153,10 @@ export default {
 			}).finally(_ => {
 				this.loading = false
 			})
-		}
+		},
+    previewImage(index = 0) {
+    	this.$refs.viewer.show(index, this.data.extractCarImage)
+    }
 	}
 }
 </script>

@@ -31,38 +31,33 @@
 				<el-card>
 				  <div slot="header" class="clearfix">
 				    <b>客户管理</b>
-				    <el-button class="l-fr" type="text">查看全部</el-button>
+				    <router-link class="l-fr l-text-link" to="/customer?tab=track">查看全部</router-link>
 				  </div>
 				  <ul class="l-circle-step">
 				  	<li class="_item">
 				  		<p class="_circle"><b>落定</b></p>
-				  		<p><b class="_num">5</b>个客户落定</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><b class="_num">{{customerOrder.one}}</b>个客户落定</p>
+				  		<p><router-link class="l-text-link" to="/customer?tab=track">查看</router-link></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>车辆出库</b></p>
-				  		<p><b class="_num">5</b>个客户车辆已出库</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><b class="_num">{{customerOrder.two}}</b>个客户车辆已出库</p>
+				  		<p><router-link class="l-text-link" to="/customer?tab=track">查看</router-link></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>完款</b></p>
-				  		<p><b class="_num">5</b>个客户已完款</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><b class="_num">{{customerOrder.three}}</b>个客户已完款</p>
+				  		<p><router-link class="l-text-link" to="/customer?tab=track">查看</router-link></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>加装/上牌</b></p>
-				  		<p><b class="_num">5</b>台车正在加装/上牌</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><b class="_num">{{customerOrder.four}}</b>台车正在加装/上牌</p>
+				  		<p><router-link class="l-text-link" to="/customer?tab=track">查看</router-link></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>交车</b></p>
-				  		<p><b class="_num">5</b>个客户可以交车</p>
-				  		<p><a class="l-text-link">查看</a></p>
-				  	</li>
-				  	<li class="_item">
-				  		<p class="_circle"><b>回访/跟踪</b></p>
-				  		<p><b class="_num">5</b>个客户需要跟踪</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><b class="_num">{{customerOrder.five}}</b>个客户可以交车</p>
+				  		<p><router-link class="l-text-link" to="/customer?tab=track">查看</router-link></p>
 				  	</li>
 				  </ul>
 				</el-card>
@@ -73,29 +68,29 @@
 				<el-card>
 				  <div slot="header" class="clearfix">
 				    <b>订购车辆</b>
-				    <el-button class="l-fr" type="text">查看全部</el-button>
+				    <router-link class="l-fr l-text-link" to="/stock?tab=order">查看全部</router-link>
 				  </div>
 				  <ul class="l-circle-step">
 				  	<li class="_item">
 				  		<p class="_circle"><b>待处理</b></p>
 				  		<p><b class="_num">{{stockOrder.pending}}</b>个订单待处理</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><router-link class="l-text-link" to="/stock?tab=order">查看</router-link></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>待付尾款</b></p>
 				  		<p><b class="_num">{{stockOrder.waitFor}}</b>个订单已处理，待付尾款</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><router-link class="l-text-link" to="/stock?tab=order">查看</router-link></p>
 				  	</li>
 				  	<li class="_item">
 				  		<p class="_circle"><b>待签收入库</b></p>
 				  		<p><b class="_num">{{stockOrder.waitingForStorage}}</b>个订单已出库，待签收</p>
-				  		<p><a class="l-text-link">查看</a></p>
+				  		<p><router-link class="l-text-link" to="/stock?tab=order">查看</router-link></p>
 				  	</li>
 				  </ul>
 				</el-card>
 			</el-col>
 		</el-row>
-		<el-row class="l-margin-t">
+		<!-- <el-row class="l-margin-t">
 			<el-col :span="24">
 				<el-card>
 				  <div slot="header" class="clearfix">
@@ -116,7 +111,7 @@
 				  </ul>
 				</el-card>
 			</el-col>
-		</el-row>
+		</el-row> -->
 	</div>
 </template>
 <script>
@@ -129,7 +124,8 @@ export default {
 			organization: {
 				imageArr: [],
 			},
-			stockOrder: {}
+			stockOrder: {},
+			customerOrder: {}
 		}
 	},
 	mounted() {
@@ -137,6 +133,7 @@ export default {
 			data.organization.imageArr = data.organization.imageUrl ? data.organization.imageUrl.split(',') : []
 			this.organization = data.organization
 			this.stockOrder = data.stockOrder
+			this.customerOrder = data.customerOrderMap
 		})
 	}
 }
@@ -149,7 +146,7 @@ ul,li{margin:0; padding: 0; list-style: none;}
 }
 .l-circle-step{
 	overflow: hidden; text-align: center; 
-	._item{float: left; text-align: center; margin: 0.75rem 0.25rem; min-width: 178px;}
+	._item{float: left; text-align: center; margin: 0.75rem 0.5rem; min-width: 178px;}
 	._circle{
 		border:10px solid #eff2f7; border-radius: 50%; position: relative; color: rgba(71, 86, 105, 0.8);
 		width: 100px; height: 100px; margin: 0 auto 10px; font-size: 0.6rem;

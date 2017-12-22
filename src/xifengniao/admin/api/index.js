@@ -453,6 +453,16 @@ const api = {
     orderPay(formData = {}) {
       return fetch.post('/stockOrderPay', formData)
     }
+  },
+  bank: {
+    getList(formData = {}, page = 1, rows = 100) { // 审核列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/bankToExamineOrderList', formData)
+    },
+    examine(formData = {}) { // 审核
+      return fetch.post('/bankToExamineOrder', formData)
+    }
   }
 }
 

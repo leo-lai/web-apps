@@ -11,7 +11,7 @@
 					<el-button style="width: 120px;" type="primary" @click="showDialogPay(1)">支付定金</el-button>
 				</p>
 			</div>
-			<div v-else-if="orderState === 3">
+			<div v-else-if="orderState === 3 || orderState === 4">
 				<p class="l-fs">客户已支付定金，待银行审批贷款方案</p>
 				<p class="l-margin-t">农业银行可以在员工端提交审核材料，其他银行在银行审批通过后点击“银行审批通过按钮”</p>
 				<p style="margin-top: 50px;">
@@ -196,6 +196,9 @@
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogPay.title" :visible.sync="dialogPay.visible" width="420px">
 			<el-form ref="payForm" style="width: 335px;" label-width="100px" 
 				:model="dialogPay.data" :rules="dialogPay.rules" @keyup.enter.native="submitDialogPay">
+				<el-form-item label="剩余尾款">
+			    <span>{{data.amount}}</span>
+			  </el-form-item>
   			<el-form-item label="支付金额" prop="amount">
 			    <el-input v-model="dialogPay.data.amount" :maxlength="10"><i style="padding: 0 5px;" slot="suffix">元</i></el-input>
 			  </el-form-item>
@@ -559,6 +562,7 @@ export default {
 			this.dialogPay.visible = true
 			this.dialogPay.type = type
 			this.dialogPay.title = type === 1 ? '支付定金' : '支付尾款'
+			this.dialogPay.data.amount = type === 1 ? '' : this.data.amount
 		},
 		submitDialogPay() {
 			this.dialogPay.data.customerOrderId = this.data.customerOrderId
@@ -650,7 +654,7 @@ export default {
 				customerUsersId: this.data.customerUsersId,
 				customerUsersOrgId: this.data.customerUsersOrgId
 			}).then(({data}) => {
-				let list = ['开单', '落定', '银行贷款审批', '车辆出库', '完款', '加装/上牌', '交车']
+				let list = ['开单', '落定', '银行贷款审批', '车辆出库', '完款', '加装', '上牌', '交车']
 				this.dialogBuy.list = list.map((item, index) => {
 					let _item = data.orderMap && data.orderMap.list ? data.orderMap.list[index] : null
 					if(_item) {

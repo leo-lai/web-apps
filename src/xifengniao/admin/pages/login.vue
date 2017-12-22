@@ -2,7 +2,7 @@
   <div class="l-login-container l-flex-vhc">
     <el-form class="l-login-form" ref="loginForm" label-position="left" label-width="0px"
       :model="loginForm.data" :rules="loginForm.rules" @keyup.native.enter="submitForm">
-      <h3 class="_tit">传创金融管理系统</h3>
+      <h3 class="_tit">喜蜂鸟管理系统</h3>
       <el-form-item prop="phoneNumber">
         <el-input type="text" v-model.trim="loginForm.data.phoneNumber" auto-complete="off" placeholder="手机号码"></el-input>
       </el-form-item>

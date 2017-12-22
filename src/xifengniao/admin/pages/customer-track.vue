@@ -181,8 +181,22 @@ export default {
 				customerUsersOrgId: this.dialogInfo.row.customerUsersOrgId
 			}).then(({data}) => {
 				data.userMap.isHasDriversLicense = Number(data.userMap.isHasDriversLicense)
+				let extractCarImage = data.customerCarMap.extractCarImage ? 
+						data.customerCarMap.extractCarImage.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150, 100), 
+								thumb: this.$$utils.image.thumb(img, 150, 100), 
+								src: img, 
+								name: img,
+								tick: Date.now()
+							}
+						}) : []
+
+
+
 				this.viewInfo.base = data.customerOrgMap
-				this.viewInfo.car = data.customerCarMap.list ? data.customerCarMap.list[0] : {}
+				this.viewInfo.car = data.customerCarMap.list ? 
+					Object.assign({}, data.customerCarMap.list[0], { extractCarImage }) : {}
 				this.viewInfo.user = data.userMap
 				this.viewInfo.remarks = {
 					customerUsersId: data.userMap.customerUsersId,
@@ -190,8 +204,9 @@ export default {
 				}
 				this.viewInfo.order =  Object.assign({
 					customerOrderId: data.orderMap.customerOrderId || '',
+					customerUsersId: data.userMap.customerUsersId,
 					orderState:  data.orderMap.orderState || '',
-					customerUsersId: data.userMap.customerUsersId
+					amount: data.orderMap.amount
 				}, data.orderMap, data.customerOrgMap)
 				return data
 			})
