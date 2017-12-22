@@ -8,7 +8,8 @@ let config = {
     base: Object.is(process.env.NODE_ENV, 'production') ? '/' : '/admin'
   },
   api: {
-    baseURL: 'http://111.230.170.36/tauto/management/admin'
+    baseURL: window.location.host === 'admin.xfnauto.com' ? 
+      'https://tomcat.xfnauto.com/tauto/management/admin' : 'http://111.230.170.36/tauto/management/admin'
   },
   pay: {
     url: 'http://ceshi.allinpay.com/gateway/index.do',
