@@ -113,11 +113,6 @@ export default {
             this.$$event.$emit('user:login', userInfo)
           })
         })
-
-        if(this.$f7.mainView.url.indexOf('/pay/') === 0) {
-          this.$f7.mainView.router.reloadPreviousPage('/device/')
-          this.$f7.mainView.history.unshift('#index')
-        }
       })
     })
 	}

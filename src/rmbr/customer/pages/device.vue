@@ -140,7 +140,7 @@ export default {
         this.number = args.no 
         this.getDeviceInfo()
       }else {
-        // this.$f7.alert('该设备不可用，请联系商家。')
+        this.$f7.alert('该设备不可用，请联系商家。')
       }
     })
   }

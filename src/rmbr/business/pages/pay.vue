@@ -1,6 +1,6 @@
 <template>
   <f7-page name="pay">
-    <f7-navbar title="支付确认" sliding>
+    <f7-navbar title="支付确认" back-link="返回" sliding>
     </f7-navbar>
     <f7-list>
       <f7-list-item title="类型" after="充值"></f7-list-item>
@@ -29,7 +29,9 @@ export default {
       }).then(({data}) => {
        this.$$api.wxpay(data).then(_ => {
           this.$store.dispatch('getUserInfo')
-          this.$f7.alert('充值成功')
+          this.$f7.alert('充值成功', _ => {
+            this.$router.back()
+          })
         }).catch(_ => {
           this.$f7.alert('充值失败')
         })

@@ -56,16 +56,6 @@ export default {
       }
     }
   },
-  methods: {
-    openPay(url) {
-      if(this.$$utils.device.isIos){
-        window.location.replace(this.$$utils.url.getRootPath() + url)
-      }else {
-        this.$router.loadPage(url)
-      }
-    }
-  },
-
   mounted() {
     this.$$event.$on('user:login', userInfo => {
       this.userinfo = userInfo

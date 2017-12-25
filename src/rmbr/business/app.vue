@@ -187,10 +187,10 @@ export default {
 
         this.checkLogin()
         
-        // if(this.$f7.mainView.url.indexOf('/pay/') === 0) {
-        //   this.$f7.mainView.router.reloadPreviousPage('/wallet/')
-        //   this.$f7.mainView.history.unshift('#index')
-        // }
+        if(this.$f7.mainView.url.indexOf('/pay/') === 0) {
+          this.$f7.mainView.router.reloadPreviousPage('/wallet/')
+          this.$f7.mainView.history.unshift('#index')
+        }
       })
     })
 	}
