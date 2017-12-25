@@ -29,7 +29,7 @@
 	    <el-table-column label="商户姓名" prop="name"></el-table-column>
 	    <el-table-column label="状态" prop="status" align="center">
 	    	<template slot-scope="scope">
-	    		<el-switch v-model="scope.row.status" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用"></el-switch>
+	    		<el-switch v-model="scope.row.status" @change="disable(scope.row)" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用"></el-switch>
 	      </template>
 	    </el-table-column>
 	    <el-table-column label="拥有设备" prop="" align="center"></el-table-column>
@@ -79,6 +79,13 @@
 			  </el-form-item>
 			  <el-form-item label="银行商户ID" prop="bank_id">
 			    <el-input v-model="dialogInfo.data.bank_id" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item label="终端ID" prop="terminal_id">
+			    <el-input v-model="dialogInfo.data.terminal_id" :maxlength="50"></el-input>
+			  </el-form-item>
+			  <el-form-item prop="access_token">
+			  	<span slot="label" style="font-size:12px;">Access Token</span>
+			    <el-input v-model="dialogInfo.data.access_token" :maxlength="50"></el-input>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -225,7 +232,10 @@ export default {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1
         this.list.row = Number(data.per_page)
-        this.list.data = data.list
+        this.list.data = data.list.map(item => {
+        	item.doing = false
+        	return item
+        })
 			}).finally(_ => {
 				this.list.loading = false
 			})
@@ -277,6 +287,18 @@ export default {
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$refs.infoForm.resetFields()	
 		},
+		disable(row) {
+			let formData = {
+				seller_id: row.id,
+				status: row.status
+			}
+			row.doing = true
+			this.$$api.business.add(formData).then(_ => {
+        this.$message.success(formData.status === 1 ? '启用成功' : '禁用成功')
+      }).finally(_ => {
+      	row.doing = false
+      })
+		},
 		submitInfo() { // 提交商家信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
@@ -290,7 +312,7 @@ export default {
             this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
-          })  
+          }) 
         }
       })
 		}

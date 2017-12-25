@@ -94,7 +94,7 @@ export default {
       })
     },
     test() {
-      window.location.href = this.$$utils.url.getRootPath() + '/pay/?device=232485'
+      window.location.href = this.$$utils.url.getRootPath() + '/device/?no=232485'
     }
 	},
   watch: {
@@ -113,6 +113,11 @@ export default {
             this.$$event.$emit('user:login', userInfo)
           })
         })
+
+        if(this.$f7.mainView.url.indexOf('/pay/') === 0) {
+          this.$f7.mainView.router.reloadPreviousPage('/device/')
+          this.$f7.mainView.history.unshift('#index')
+        }
       })
     })
 	}
@@ -138,4 +143,5 @@ body{font-size: 0.75rem;}
   td:active{background-color: #e2dfdf;}
   .link{display: block;padding: 1rem 0;}
 }
+.list-block select{-webkit-appearance: menulist-button;appearance: menulist-button;}
 </style>

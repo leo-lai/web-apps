@@ -9,7 +9,7 @@
     	<li v-for="item in list" :class="{'_slted': slted.id === item.id}" @click="slt(item)">{{item.name}}</li>
     </ul>
 		<div class="l-padding l-bg-white">
-			<p class="l-fs-l l-text-center">价值：{{slted.price ? (slted.price/100).toFixed(2) : 0}}元</p>
+			<p class="l-fs-l l-text-center">价值：{{slted.priceStr}}元</p>
 			<p class="l-margin-t"><f7-button fill big @click="recharge">确认充值</f7-button></p>
 			<br>
 		</div>
@@ -29,8 +29,11 @@ export default {
   	getList() {
   		this.$f7.showIndicator()
   		this.$$api.wallet.rechargeList().then(({data}) => {
-  			this.list = data
-  			this.slted = data[0]
+  			this.list = data.map(item => {
+          item.priceStr = item.price ? (item.price/100).toFixed(2) : '0.00'
+          return item
+        })
+  			this.slted = this.list[0]
   		}).finally(_ => {
   			this.$f7.hideIndicator()
   		})
@@ -45,19 +48,17 @@ export default {
   		}
 
   		this.$f7.showIndicator()
-  		this.$$api.wallet.rechargeOrder({
-  			recharge_id: this.slted.id,
-  			open_id: this.userInfo.open_id
-  		}).then(({data}) => {
-  			this.$$api.wxpay(data).then(_ => {
-          this.$store.dispatch('getUserInfo')
-          this.$f7.alert('充值成功')
-        }).catch(_ => {
-          this.$f7.alert('支付失败')
-        })
-  		}).finally(_ => {
-  			this.$f7.hideIndicator()
-  		})
+      this.$$api.auth.pay(this.userInfo.id, {
+        _type: 1,
+        _amount: this.slted.priceStr,
+        _id: this.slted.id,
+        _desc: this.slted.name,
+        _cb: window.location.pathname
+      }).then(({data}) => {
+        window.location.replace(data.url)
+      }).finally(_ => {
+        this.$f7.hideIndicator()
+      })
   	},
     back() {
       this.$f7.mainView.router.back({

@@ -15,8 +15,8 @@
               <div class="_tit">
                 <p class="l-text-nowrap">编号：{{item.number}}</p>
                 <p class="l-text-nowrap">别名：{{item.alias}}</p>
-                <p class="l-text-nowrap">启动次数：{{item.start_count}}</p>
-                <p class="l-text-nowrap">剩余次数：{{item.remain_count}}</p>
+                <p class="l-text-nowrap">累计启动次数：{{item.start_count}}</p>
+                <!-- <p class="l-text-nowrap">剩余次数：{{item.remain_count}}</p> -->
               </div>
             </div>
           </div>

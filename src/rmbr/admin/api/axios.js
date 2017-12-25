@@ -36,23 +36,29 @@ export default function createService() {
       case 200:
         return data
     }
-    data.message = data.msg
-    return Promise.reject(data)
+    return Promise.reject({
+      code: data.code,
+      message: data.msg
+    })
   }, error => {
-    let err = { message: '' }
+    let err = { code: '',  message: '' }
     if (error && error.response) {
       switch (error.response.status) {
         case 400:
           err.message = '请求错误'
           break
         case 401:
-          Message({
-            type: 'error',
-            message: err.message || '未授权，请登录',
-            onClose(instance) {
-              api.auth.logout()
-            }
-          })
+          if(!storage.local.get('logout')) {
+            storage.local.get('logout', 1)
+            Message({
+              type: 'error',
+              message: err.message || '登录状态失效，请重新登录',
+              onClose(instance) {
+                
+              }
+            })
+            api.auth.logout()
+          }
           break
         case 403:
           err.message = '拒绝访问'
@@ -84,10 +90,8 @@ export default function createService() {
         default:
           err.message = '服务器连接失败'
       }
-      if(error.response.data.msg) {
-        err.message = error.response.data.msg 
-      }
-      err.message += `(${error.response.status})`
+      err.code = error.response.status
+      err.message = error.response.data ? error.response.data.msg : err.message
     }
     return Promise.reject(err)
   })

@@ -63,6 +63,9 @@ export default {
       }).catch(_ => {
         this.$refs.infinite.$emit('$InfiniteLoading:complete')
       })
+    },
+    back() {
+      this.$router.back()
     }
 	},
   mounted() {

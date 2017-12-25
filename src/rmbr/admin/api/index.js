@@ -43,6 +43,7 @@ const api = {
       return (userinfo && userinfo.token && userinfo.id)
     },
     login(formData = {}) {
+      storage.local.remove('logout')
       formData.type = 'password'
       return fetch.post('/login', formData)
     },

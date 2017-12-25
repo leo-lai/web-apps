@@ -34,10 +34,12 @@ service.interceptors.response.use(response => {
     case 200:
       return data
   }
-  data.message = data.msg
-  return Promise.reject(data)
+  return Promise.reject({
+    code: data.code,
+    message: data.msg
+  })
 }, error => {
-  let err = { message: '' }
+  let err = { code: '',  message: '' }
   if (error && error.response) {
     switch (error.response.status) {
       case 400:
@@ -45,7 +47,8 @@ service.interceptors.response.use(response => {
         break
       case 401:
         store.dispatch('login')
-        err.message = '未授权，请登录'
+        // err.message = '未授权，请登录'
+        err.message = ''
         break
       case 403:
         err.message = '拒绝访问'
@@ -77,10 +80,8 @@ service.interceptors.response.use(response => {
       default:
         err.message = '服务器连接失败'
     }
-    if(error.response.data.msg) {
-      err.message = error.response.data.msg 
-    }
-    err.message += `(${error.response.status})`
+    err.code = error.response.status
+    err.message = error.response.data ? error.response.data.msg : err.message
   }
   return Promise.reject(err)
 })
@@ -96,9 +97,7 @@ const fetch = {
       service({
         url, method, data
       }).then(resolve).catch(error => {
-        if(error && error.message) {
-        	window.f7.alert(error.message)
-        }
+        error && error.message && window.f7.alert(error.message)
         reject(error)
       })
     })
@@ -117,16 +116,14 @@ const api = {
   	let promise = new Promise((resolve, reject) => {
       let onBridgeReady = function(){
         WeixinJSBridge.invoke('getBrandWCPayRequest', payConfig, res => {
-          console.log(res)
           if (res.err_msg === 'get_brand_wcpay_request:ok') {
             resolve('ok')
           } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
             reject('cancel')
           } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
-            // mui.alert('支付失败，如有疑问请联系客服')
             reject('fail')
           } else {
-            reject(res)
+            reject('支付失败')
           }
         })
       }
@@ -144,6 +141,13 @@ const api = {
   	grant(url = location.href) {
   		window.location.replace(config.api.baseURL + '/wechat/login?scopes=base&url=' + url)
   	},
+    pay(seller_id = '', params = {}) {
+      let url = config.host + utils.url.getRootPath() + '/pay/'
+      url = utils.url.setArgs(url, params)
+      return fetch.post('/user/lcsw_auth', {
+        seller_id, url
+      })
+    },
     check() {
       return new Promise((resolve, reject) => {
         let userinfo = storage.local.get('customer_userinfo')

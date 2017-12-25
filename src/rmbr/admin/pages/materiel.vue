@@ -15,10 +15,10 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
+	    <el-table-column label="设备编号" prop="number"></el-table-column>
 	    <el-table-column label="商家" prop="store_name"></el-table-column>
 	    <el-table-column label="手机" prop="tel"></el-table-column>
 	    <el-table-column label="地址" prop="address" min-width="200"></el-table-column>
-	    <el-table-column label="设备编号" prop="number"></el-table-column>
 	    <el-table-column label="剩余次数" prop="remain_count" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">

@@ -14,7 +14,12 @@ const routes = [
     component: require('./pages/coupon')
   },
   {
-    title: '支付',
+    title: '启动设备',
+    path: '/device/',
+    component: require('./pages/device')
+  },
+  {
+    title: '支付确认',
     path: '/pay/',
     component: require('./pages/pay')
   }

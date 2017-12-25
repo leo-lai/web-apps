@@ -14,81 +14,79 @@
         <p><b>{{dashboard.register_seller_count}}</b>家</p>
       </li>
     </ul>
-		<!-- <chart :options="polar"></chart> -->
+		<div class="l-chart">
+      <chart style="width:790px;" :options="bar" ref="bar" theme="ovilia-green" auto-resize/>
+    </div>
 	</div>
 </template>
 <script>
 import ECharts from 'vue-echarts/components/ECharts.vue'
 // import ECharts modules manually to reduce bundle size
-// import 'echarts/lib/chart/bar'
+import 'echarts/lib/component/tooltip'
+import 'echarts/lib/component/legend'
+import 'echarts/lib/component/title'
+import 'echarts/lib/chart/bar'
 // import 'echarts/lib/chart/line'
 // import 'echarts/lib/chart/pie'
 // import 'echarts/lib/chart/map'
 // import 'echarts/lib/chart/radar'
 // import 'echarts/lib/chart/scatter'
 // import 'echarts/lib/chart/effectScatter'
-// import 'echarts/lib/component/tooltip'
 // import 'echarts/lib/component/polar'
 // import 'echarts/lib/component/geo'
-// import 'echarts/lib/component/legend'
-// import 'echarts/lib/component/title'
 // import 'echarts/lib/component/visualMap'
 export default {
 	components: {
 		chart: ECharts
 	},
   data () {
-    let data = []
-
-    for (let i = 0; i <= 360; i++) {
-        let t = i / 180 * Math.PI
-        let r = Math.sin(2 * t) * Math.cos(2 * t)
-        data.push([r, i])
-    }
-
     return {
       dashboard: {
         alter_count: 0,
         recharge_amount: 0,
         register_seller_count: 0
       },
-      polar: {
+      bar: {
         title: {
-          text: '极坐标双数值轴'
+          text: '近7天充值记录'
         },
+        tooltip: {},
         legend: {
-          data: ['line']
+          data: ['充值金额']
         },
-        polar: {
-          center: ['50%', '54%']
+        xAxis: {
+          data: ['2017-12-17', '2017-12-18', '2017-12-19', '2017-12-20', '2017-12-21', '2017-12-22']
         },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'cross'
-          }
+        yAxis: {
+          axisLabel: {show: true}
         },
-        angleAxis: {
-          type: 'value',
-          startAngle: 0
-        },
-        radiusAxis: {
-          min: 0
-        },
-        series: [
-          {
-            coordinateSystem: 'polar',
-            name: 'line',
-            type: 'line',
-            showSymbol: false,
-            data: data
-          }
-        ],
-        animationDuration: 2000
+        series: [{
+          name: '充值金额',
+          type: 'bar',
+          data: [5, 20, 36, 10, 10, 20]
+        }]
       }
     }
   },
   methods: {
+    loadBar () {
+      // // simulating async data from server
+      // this.seconds = 3
+      // let bar = this.$refs.bar
+      // bar.showLoading({
+      //   text: '正在加载',
+      //   color: '#4ea397',
+      //   maskColor: 'rgba(255, 255, 255, 0.4)'
+      // })
+      // let timer = setInterval(() => {
+      //   this.seconds--
+      //   if (this.seconds === 0) {
+      //     clearTimeout(timer)
+      //     bar.hideLoading()
+      //     bar.mergeOptions(this.asyncData)
+      //   }
+      // }, 1000)
+    },
     getCount() {
       this.$$api.dashboard.getCount().then(data => {
         this.dashboard = data
@@ -103,7 +101,7 @@ export default {
 
 <style lang="less">
 .l-index-count{
-  list-style: none; overflow: hidden;
+  list-style: none; overflow: hidden; margin:0; padding: 0;
   li {
     background-color: #409eff; color: #fff;
     float: left; width: 260px; padding: 30px 0; text-align: center;
@@ -115,5 +113,13 @@ export default {
   }
   li:nth-child(2){background-color: #fa5555; }
   li:nth-child(3){background-color: #67c23a; }
+}
+.l-chart{
+  display: inline-block;
+  margin: 20px;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 8px;
+  box-shadow: 0 0 45px rgba(0,0,0,.2);
+  padding: 1.5em 2em;
 }
 </style>

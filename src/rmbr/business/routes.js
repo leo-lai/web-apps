@@ -3,7 +3,12 @@ const routes = [
     title: '首页',
     path: '/'
   },
-	{
+  {
+    title: '支付',
+    path: '/pay/',
+    component: require('./pages/pay')
+  },
+  {
     title: '钱包',
     path: '/wallet/',
     component: require('./pages/wallet')

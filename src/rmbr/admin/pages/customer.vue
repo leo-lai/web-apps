@@ -21,7 +21,8 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="账号" prop="username"></el-table-column>
+	    <!-- <el-table-column label="账号" prop="username"></el-table-column> -->
+	    <el-table-column type="index" width="50"></el-table-column>
 	    <el-table-column label="头像" prop="thumb" align="center">
 	    	<template slot-scope="scope">
 	    		<img width="50" height="50" :src="scope.row.thumb" alt="">

@@ -21,9 +21,10 @@
 	    <el-table-column label="权限集" prop="operations" min-width="140">
 	    	<template slot-scope="scope">
 	    		<el-popover trigger="hover" placement="bottom">
-	    			<ul class="l-permission-list">
+	    			<ul v-if="scope.row.operations && scope.row.operations.length > 0" class="l-permission-list">
 	    				<li v-for="item in scope.row.operations">{{item.operation_name}}</li>
 	    			</ul>
+	    			<div v-else class="l-text-center l-text-gray">无任何权限</div>
 	          <div slot="reference">
 	            <el-tag size="medium">查看权限</el-tag>
 	          </div>
