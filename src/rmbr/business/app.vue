@@ -1,22 +1,34 @@
 <template>
   <div id="app">
-
-    <!-- Statusbar -->
+    <!-- Status bar overlay for full screen mode (Cordova or PhoneGap) -->
     <f7-statusbar></f7-statusbar>
 
-    <!-- Main Views -->
+    <!-- Views -->
     <f7-views theme="lightblue">
-      <f7-view id="main-view" navbar-fixed main :dynamic-navbar="true">
-        <!-- iOS Theme Navbar -->
-        <f7-navbar v-if="$theme.ios">
-          <f7-nav-center sliding>首页</f7-nav-center>
-          <f7-nav-right>
-            <f7-link v-if="userInfo" text="注销" @click="logoutSubmit"></f7-link>
+      <!-- Your main view, should have "view-main" class -->
+      <f7-view main id="main-view" :dynamic-navbar="true">
+        <!-- For iOS theme we use navbar-through layout so the navbar should be a child of the View -->
+        <f7-navbar v-if="$theme.ios" sliding title="首页">
+          <!-- <f7-nav-center sliding>首页</f7-nav-center> -->
+          <f7-nav-right v-if="userInfo">
+            <f7-link text="注销" @click="logoutSubmit"></f7-link>
           </f7-nav-right>
         </f7-navbar>
-        <!-- Pages -->
-        <f7-pages>
+        <!-- Pages container, because we use fixed navbar and toolbar, it has additional appropriate props -->
+        <f7-pages navbar-fixed>
+          <!-- Initial Page -->
           <f7-page name="index">
+            <!-- For Material theme we use navbar-fixed layout so the navbar should be a child of the Page -->
+            <f7-navbar v-if="$theme.material" title="首页">
+              <f7-nav-right v-if="userInfo">
+                <f7-link text="注销" @click="logoutSubmit"></f7-link>
+              </f7-nav-right>
+            </f7-navbar>
+
+            <!-- Top Navbar-->
+            <!-- Toolbar-->
+
+            <!-- Page Content -->
             <table class="l-index-menu">
               <tr>
                 <td colspan="2" style="background: #5ac8fa; color: #fff; height: 6rem;">
@@ -99,6 +111,24 @@
         </f7-pages>
       </f7-view>
     </f7-login-screen>
+
+    <!-- Popup. All modals should be outside of Views -->
+    <f7-popup id="popup">
+      <f7-view>
+        <f7-pages navbar-fixed>
+          <f7-page>
+            <f7-navbar title="Popup">
+              <!-- Link to close popup -->
+              <f7-nav-right>
+                <f7-link close-popup>Close</f7-link>
+              </f7-nav-right>
+            </f7-navbar>
+            <f7-block>
+            </f7-block>
+          </f7-page>
+        </f7-pages>
+      </f7-view>
+    </f7-popup>
   </div>
 </template>
 
@@ -107,7 +137,6 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'index',
 	data() {
-    const that = this
 		return {
       index: {
         all_sum: 0,
@@ -186,11 +215,6 @@ export default {
         })
 
         this.checkLogin()
-        
-        if(this.$f7.mainView.url.indexOf('/pay/') === 0) {
-          this.$f7.mainView.router.reloadPreviousPage('/wallet/')
-          this.$f7.mainView.history.unshift('#index')
-        }
       })
     })
 	}

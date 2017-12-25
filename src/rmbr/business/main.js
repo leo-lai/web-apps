@@ -13,6 +13,7 @@ import app from './app'
 
 // Framework7Vue
 Vue.use(Framework7Vue)
+
 // wilddog 监听版本更新
 // wilddog.initializeApp(config.wilddog)
 

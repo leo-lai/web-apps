@@ -47,8 +47,7 @@ service.interceptors.response.use(response => {
         break
       case 401:
         store.dispatch('login')
-        // err.message = '未授权，请登录'
-        err.message = ''
+        err.message = '登录状态失效，请重新登录'
         break
       case 403:
         err.message = '拒绝访问'
@@ -97,7 +96,9 @@ const fetch = {
       service({
         url, method, data
       }).then(resolve).catch(error => {
-        error && error.message && window.f7.alert(error.message)
+        if(error && error.message && error.code !== 401) {
+          window.f7.alert(error.message)
+        }
         reject(error)
       })
     })

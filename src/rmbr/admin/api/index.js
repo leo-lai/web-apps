@@ -75,6 +75,14 @@ const api = {
         data.seller_recharge_amount = data.seller_recharge_amount ? (data.seller_recharge_amount / 100).toFixed(2) : 0
         return data
       })
+    },
+    getRecharge() {
+      return fetch.post('/recharge/statistics/list').then(({data}) => {
+        return data.map(item => {
+          item.moneyStr = (item.money / 100).toFixed(2)
+          return item
+        })
+      })
     }
   },
   sys: { // 系统管理

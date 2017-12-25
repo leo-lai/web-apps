@@ -123,10 +123,9 @@ const api = {
           } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
             reject('cancel')
           } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
-            // mui.alert('支付失败，如有疑问请联系客服')
             reject('fail')
           } else {
-            reject(res)
+            reject('支付失败')
           }
         })
       }

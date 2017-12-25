@@ -1,6 +1,6 @@
 <template>
   <f7-page name="pay">
-    <f7-navbar title="支付确认" back-link="返回" sliding>
+    <f7-navbar title="支付确认" sliding>
     </f7-navbar>
     <f7-list>
       <f7-list-item title="类型" after="充值"></f7-list-item>
@@ -9,6 +9,9 @@
     </f7-list>
     <div class="l-margin">
       <f7-button big fill @click="payNow">确定支付</f7-button>  
+    </div>
+    <div class="l-margin">
+      <f7-button big fill @click="back" color="green">返回</f7-button>  
     </div>
   </f7-page>
 </template>
@@ -38,6 +41,9 @@ export default {
       }).finally(_ => {
        this.$f7.hideIndicator()
       })
+    },
+    back() {
+      window.location.replace(this.$$config.host + this.$$utils.url.getRootPath() + '/wallet/recharge/')
     }
   },
   mounted() {

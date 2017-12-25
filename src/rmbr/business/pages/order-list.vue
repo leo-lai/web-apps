@@ -74,7 +74,7 @@ export default {
     }
   },
 	mounted() {
-    this.$$event.$on('user:login', userInfo => {
+    this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
       this.resetInfinite()
     })

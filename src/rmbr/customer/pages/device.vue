@@ -132,7 +132,7 @@ export default {
       this.money = val
     })
 
-    this.$$event.$on('user:login', userInfo => {
+    this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
 
       let args = this.$$utils.url.getArgs()

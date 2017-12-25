@@ -55,7 +55,7 @@ export default {
           data: ['充值金额']
         },
         xAxis: {
-          data: ['2017-12-17', '2017-12-18', '2017-12-19', '2017-12-20', '2017-12-21', '2017-12-22']
+          data: []
         },
         yAxis: {
           axisLabel: {show: true}
@@ -63,29 +63,36 @@ export default {
         series: [{
           name: '充值金额',
           type: 'bar',
-          data: [5, 20, 36, 10, 10, 20]
+          data: []
         }]
       }
     }
   },
   methods: {
     loadBar () {
-      // // simulating async data from server
-      // this.seconds = 3
-      // let bar = this.$refs.bar
-      // bar.showLoading({
-      //   text: '正在加载',
-      //   color: '#4ea397',
-      //   maskColor: 'rgba(255, 255, 255, 0.4)'
-      // })
-      // let timer = setInterval(() => {
-      //   this.seconds--
-      //   if (this.seconds === 0) {
-      //     clearTimeout(timer)
-      //     bar.hideLoading()
-      //     bar.mergeOptions(this.asyncData)
-      //   }
-      // }, 1000)
+      // simulating async data from server
+      let bar = this.$refs.bar
+      bar.showLoading({
+        text: '正在加载',
+        color: '#4ea397',
+        maskColor: 'rgba(255, 255, 255, 0.4)'
+      })
+      this.$$api.dashboard.getRecharge().then(data => {
+        bar.mergeOptions({
+          xAxis: {
+            data: data.map(item => item.day)
+          },
+          yAxis: {
+            axisLabel: {show: true}
+          },
+          series: [{
+            name: '充值金额',
+            data: data.map(item => item.moneyStr)
+          }]
+        })
+      }).finally(_ => {
+        bar.hideLoading()
+      })
     },
     getCount() {
       this.$$api.dashboard.getCount().then(data => {
@@ -95,6 +102,7 @@ export default {
   },
   mounted() {
     this.getCount()
+    this.loadBar()
   }
 }
 </script>

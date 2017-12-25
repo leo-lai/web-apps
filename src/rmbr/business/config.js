@@ -1,5 +1,4 @@
 import routes from './routes'
-let isWechat = /micromessenger/i.test(navigator.userAgent)
 let isProd = Object.is(process.env.NODE_ENV, 'production')
 let config = {
 	host: window.location.origin,
@@ -17,7 +16,9 @@ let config = {
 
 	framework7: {
 		root: '#app',
-		swipeBackPage: !isWechat,
+		routes,
+		swipeBackPage: false,
+		animateNavBackIcon: true,
 		pushState: true,
 		pushStateRoot: '/',
 		pushStateSeparator: isProd ? 'wx' : 'business',
@@ -27,8 +28,7 @@ let config = {
 		modalButtonOk: '确定',
 		modalButtonCancel: '取消',
 		modalPreloaderTitle: '加载中...',
-		popupCloseByOutside: false,
-		routes
+		popupCloseByOutside: false
 	}
 }
 

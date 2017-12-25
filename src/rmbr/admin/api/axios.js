@@ -49,7 +49,7 @@ export default function createService() {
           break
         case 401:
           if(!storage.local.get('logout')) {
-            storage.local.get('logout', 1)
+            storage.local.set('logout', 1)
             Message({
               type: 'error',
               message: err.message || '登录状态失效，请重新登录',
