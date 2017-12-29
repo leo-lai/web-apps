@@ -487,11 +487,15 @@ export default {
 
 			promises.push(brandPromise, salesPromise)
 
+
+			this.$$utils.copyObj(this.dialogInfo.data, '')
 			this.$$utils.copyObj(this.dialogInfo.data, this.data)
 			this.dialogInfo.type = type
 			if(type === 'new') {
 				this.dialogInfo.title = '新增订单'
 				this.dialogInfo.data.customerOrderId = ''
+				this.cascader.value =  []
+				this.dialogInfo.data.followInformation = []
 				this.dialogInfo.disabled = false
 			} else {
 				this.dialogInfo.disabled = type === 'view'
@@ -533,6 +537,7 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 		},
 		submitDialogInfo() {
 			// 全款购车，不抵押
