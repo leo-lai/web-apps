@@ -2,7 +2,7 @@
 	<div class="l-main-body">
 		<el-row>
   		<el-col :span="4">
-  			<el-button type="primary" @click="showDialogInfo('new')">录入商户</el-button>
+  			<el-button type="primary" @click="showDialogInfo('new')">录入商家</el-button>
   		</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
@@ -26,15 +26,28 @@
   		</el-col>
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" :data="list.data" v-loading="list.loading">
-	    <el-table-column label="商户姓名" prop="name"></el-table-column>
-	    <el-table-column label="状态" prop="status" align="center">
+	    <el-table-column label="商家姓名" prop="name" min-width="120"></el-table-column>
+	    <el-table-column label="商家地区" min-width="150">
+	    	<template slot-scope="scope">
+	    		<p>{{scope.row.province + scope.row.city + scope.row.district}}</p>
+	    	</template>
+	    </el-table-column>
+	    
+	    <el-table-column label="拥有设备数量" prop="own_device_count" align="center" min-width="150"></el-table-column>
+	    <el-table-column label="启动失败次数" prop="device_failed_count" align="center" min-width="150">
+	    	<template slot-scope="scope">
+	    		<p :class="scope.row.device_failed_count >= 10 ? 'l-text-error' : ''">{{scope.row.device_failed_count}}</p>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="累计使用次数" prop="device_used_count" align="center" min-width="150"></el-table-column>
+	    <el-table-column label="剩余使用次数" prop="rest_device_count" align="center" min-width="150"></el-table-column>
+	    <el-table-column label="手机号码" prop="tel" align="center" min-width="150"></el-table-column>
+	    <el-table-column fixed="right"label="状态" prop="status" align="center" min-width="150">
 	    	<template slot-scope="scope">
 	    		<el-switch v-model="scope.row.status" @change="disable(scope.row)" :active-value="1" active-text="启用" :inactive-value="0" inactive-text="禁用"></el-switch>
 	      </template>
 	    </el-table-column>
-	    <el-table-column label="拥有设备" prop="" align="center"></el-table-column>
-	    <el-table-column label="手机号码" prop="tel" align="center"></el-table-column>
-	    <el-table-column label="操作" align="center">
+	    <el-table-column fixed="right" label="操作" align="center" min-width="100">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 	      </template>
@@ -77,7 +90,7 @@
 			  <el-form-item class="_flex" label="店铺地址" prop="region" @click.native="amapOpts.visible = true">
 			  	<el-input readonly placeholder="请选择" :value="amapAddress"></el-input>
 			  </el-form-item>
-			  <el-form-item label="银行商户ID" prop="bank_id">
+			  <el-form-item label="商家银行ID" prop="bank_id">
 			    <el-input v-model="dialogInfo.data.bank_id" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="终端ID" prop="terminal_id">

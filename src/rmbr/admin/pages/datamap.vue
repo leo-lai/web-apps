@@ -1,7 +1,7 @@
 <template>
 	<div class="l-main-body">
 		<div class="l-dashboard-map">
-			<el-amap :zoom="14" :center="mapCenter">
+			<el-amap :zoom="14" :center="mapCenter" :events="mapEvents">
 	      <el-amap-marker v-for="(marker,index) in markers" :key="index" :position="marker.position" :content="marker.content" :visible="true"></el-amap-marker>
 	    </el-amap>
 		</div>
@@ -17,7 +17,14 @@
 export default {
 	name: 'datamap',
 	data() {
+		let that = this
 		return {
+			mapEvents: {
+				init(map) {
+					that.$map = map
+					that.getMap()
+				}
+			},
 			mapCenter: [121.5273285, 31.21515044],
 			dashboard: {
 				seller_count: 0,
@@ -41,13 +48,16 @@ export default {
 	        })
         })
         avgLng = avgLng / data.map_list.length
-        avgLat = avgLat / data.map_list.length
-        this.mapCenter = [avgLng, avgLat]
+        // avgLat = avgLat / data.map_list.length
+        // this.mapCenter = [avgLng, avgLat]
+       	setTimeout(_ => {
+       		this.$map.setFitView()	
+       	}, 50)
       })
     }
   },
   mounted() {
-    this.getMap()
+    
   }
 }
 </script>

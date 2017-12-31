@@ -33,7 +33,9 @@
 	    		<span>{{ scope.row.seller_id ? scope.row.name : '无' }}</span>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="设备启动次数" prop="start_count" align="center"></el-table-column>
+	    <el-table-column label="商家手机号" prop="tel" align="center"></el-table-column>
+	    <el-table-column label="累计使用次数" prop="start_count" align="center"></el-table-column>
+	    <el-table-column label="剩余使用次数" prop="remain_count" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
 	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>

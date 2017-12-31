@@ -6,13 +6,13 @@
   				<el-form-item prop="region" label="地区搜索">
 				    <el-cascader ref="region" style="width:100%;" change-on-select filterable clearable v-model="list.filter.region" :options="regionData" :props="{label: 'text', value: 'value'}" @change="filterRegionChange"></el-cascader>
 				  </el-form-item>
-				  <el-form-item style="width: 140px;" prop="tel" label="">
-				    <el-input placeholder="商家手机号码" v-model="list.filter.tel"></el-input>
-				  </el-form-item>
 				  <el-form-item prop="dateRange" style="width:360px;">
-				  	<el-date-picker style="width: 100%;" type="datetimerange" value-format="yyyy-MM-dd hh:mm:ss"
+				  	<el-date-picker style="width: 100%;" type="daterange" value-format="yyyy-MM-dd hh:mm:ss"
 				  		range-separator="到" start-placeholder="开始时间" end-placeholder="结束时间"
 				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
+				  </el-form-item>
+				  <el-form-item style="width: 140px;" prop="tel" label="">
+				    <el-input placeholder="商家手机号" v-model="list.filter.tel"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -23,20 +23,20 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="商家名称" prop="store_name"></el-table-column>
-	    <el-table-column label="手机号码" prop="tel" align="center"></el-table-column>
-	    <el-table-column label="地区" align="center">
+	    <el-table-column label="商家手机号" prop="tel" min-width="150"></el-table-column>
+	    <el-table-column label="店铺名称" prop="store_name" min-width="150"></el-table-column>
+	    <el-table-column label="店铺地区" min-width="200">
 	    	<template slot-scope="scope">
 	    		{{scope.row.province + scope.row.city + scope.row.district}}
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="详细地址" prop="detail_address"></el-table-column>
-	    <el-table-column label="消费金额" align="center">
+	    <el-table-column class-name="l-fs-xs" label="详细地址" prop="detail_address" min-width="300"></el-table-column>
+	    <el-table-column label="消费金额(元)" align="center" min-width="150">
 	    	<template slot-scope="scope">
 	    		{{(scope.row.amount ? (scope.row.amount / 100) : 0).toFixed(2) }}
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="日期" prop="create_time" align="center"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="日期" prop="create_time" align="center" min-width="150"></el-table-column>
 	  </el-table>
 	  <el-row class="l-text-center l-margin-t">
 	  	<el-pagination layout="total, sizes, prev, pager, next, jumper"
@@ -87,18 +87,18 @@ export default {
 			list: {
 				filter: {
 					dateRange: [],
-					region: [],
-					tel: '',
 					start_date: '',
 					end_date: '',
+					region: [],
+					tel: '',
 					region_id1: '',
 					region_id2: ''
 				},
 				rules: {
 					dateRange: [],
-					region: [],
 					start_date: [],
 					end_date: [],
+					region: [],
 					region_id1: [],
 					region_id1: []
 				},

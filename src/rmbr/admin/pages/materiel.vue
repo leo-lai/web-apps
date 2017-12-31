@@ -15,12 +15,12 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="设备编号" prop="number"></el-table-column>
-	    <el-table-column label="商家" prop="store_name"></el-table-column>
-	    <el-table-column label="手机" prop="tel"></el-table-column>
-	    <el-table-column label="地址" prop="address" min-width="200"></el-table-column>
-	    <el-table-column label="剩余次数" prop="remain_count" align="center"></el-table-column>
-	    <el-table-column label="操作" align="center">
+	    <el-table-column label="设备编号" prop="number" min-width="150"></el-table-column>
+	    <el-table-column label="商家手机号" prop="tel" min-width="150"></el-table-column>
+	    <el-table-column label="店铺名称" prop="store_name" min-width="150"></el-table-column>
+	    <el-table-column label="店铺地址" prop="address" min-width="200"></el-table-column>
+	    <el-table-column label="剩余使用次数" prop="remain_count" align="center" min-width="150"></el-table-column>
+	    <el-table-column label="操作" align="center" min-width="150">
 	    	<template slot-scope="scope">
 	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">

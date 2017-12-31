@@ -10,14 +10,9 @@
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="姓名" prop="name"></el-table-column>
-	    <el-table-column label="账号" prop="username"></el-table-column>
-	    <el-table-column label="密码" prop="password"></el-table-column>
-	    <el-table-column label="所属地区" prop="region" min-width="120">
-	    	<template slot-scope="scope">
-	    		<span>{{scope.row.province + scope.row.city + scope.row.district}}</span>
-	    	</template>
-	    </el-table-column>
+	    <el-table-column label="姓名" prop="name" min-width="150"></el-table-column>
+	    <el-table-column label="账号" prop="username" min-width="150"></el-table-column>
+	    <el-table-column label="密码" prop="password" min-width="150"></el-table-column>
 	    <el-table-column label="权限集" prop="operations" min-width="140">
 	    	<template slot-scope="scope">
 	    		<el-popover trigger="hover" placement="bottom">
@@ -31,7 +26,12 @@
 	        </el-popover>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="操作">
+	    <el-table-column label="所属地区" prop="region" min-width="200">
+	    	<template slot-scope="scope">
+	    		<span>{{scope.row.province + scope.row.city + scope.row.district}}</span>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column label="操作" align="center" min-width="120">
 	    	<template slot-scope="scope">
 	    		<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
@@ -59,7 +59,7 @@
 	  		<el-form class="l-form1" ref="infoForm" label-width="80px" inline
 	  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitInfo">
 				  <el-form-item label="账号" prop="username">
-				    <el-input v-model="dialogInfo.data.username" :maxlength="50"></el-input>
+				    <el-input :disabled="dialogInfo.type === 'edit'" v-model="dialogInfo.data.username" :maxlength="50"></el-input>
 				  </el-form-item>
 				  <el-form-item label="姓名" prop="name">
 				    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>

@@ -40,7 +40,7 @@
 	    		<div class="l-rest l-text-right l-padding-lr">
 	    			<el-dropdown size="medium" trigger="click">
 						  <span class="el-dropdown-link">
-						    admin<i class="el-icon-setting l-fs-m l-margin-l-s" title="个人设置"></i>
+						    {{userInfo.username}}<i class="el-icon-setting l-fs-m l-margin-l-s" title="个人设置"></i>
 						  </span>
 						  <el-dropdown-menu slot="dropdown">
 						    <!-- <el-dropdown-item @click.native="pwdForm.visible = true">修改密码</el-dropdown-item> -->

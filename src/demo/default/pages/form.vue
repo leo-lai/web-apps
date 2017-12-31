@@ -1,5 +1,5 @@
 <template>
-  <f7-page>
+  <f7-page name="about">
     <f7-navbar title="Form" back-link="返回" sliding></f7-navbar>
     <f7-block-title>Form</f7-block-title>
     <f7-list form>

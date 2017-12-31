@@ -4,10 +4,10 @@
       :model="loginForm.data" :rules="loginForm.rules" @keyup.native.enter="submitForm">
       <h3 class="_tit">新疆瑞曼博尔管理系统</h3>
       <el-form-item prop="username">
-        <el-input type="text" v-model.trim="loginForm.data.username" auto-complete="off" placeholder="手机号码"></el-input>
+        <el-input type="text" v-model.trim="loginForm.data.username" auto-complete="off" placeholder="登录账号"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" v-model.trim="loginForm.data.password" auto-complete="off" placeholder="密码"></el-input>
+        <el-input type="password" v-model.trim="loginForm.data.password" auto-complete="off" placeholder="登录密码"></el-input>
       </el-form-item>
       <!-- <el-checkbox class="_remember" v-model="loginForm.remember" checked>记住密码</el-checkbox> -->
       <el-form-item style="width:100%;">
@@ -29,8 +29,8 @@ export default {
         loading: false, 
         remember: true,
         data: {
-          username: 'admin',
-          password: 'admin'
+          username: '',
+          password: ''
         },
         rules: {
           username: [

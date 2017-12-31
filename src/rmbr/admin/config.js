@@ -3,15 +3,15 @@ let config = {
 		base: Object.is(process.env.NODE_ENV, 'production') ? '/' : '/admin'
 	},
 	api: {
-		baseURL: 'http://api.leolai.cn/api/plat'
+		baseURL: 'http://api.nrmbe.gzmypay.com/api/plat'
 	},
 	shop: {
-		admin: 'http://shop.leolai.cn/admin/'
+		admin: 'http://shop.nrmbe.gzmypay.com/admin/'
 	}
 }
 
-// 正式
-// if (['admin.ushiyihao.com'].indexOf(window.location.host) > -1) {
-//   config.api.baseURL = 'https://api.ushiyihao.com/useeproject02/management/admin'
-// }
+if (window.location.host.indexOf('leolai.cn') > -1) {
+	config.api.baseURL = 'http://api.leolai.cn/api/plat'
+	config.shop.admin = 'http://api.leolai.cn/api/plat'
+}
 export default config

@@ -14,7 +14,7 @@ let config = {
 		pushState: true,
 		pushStateRoot: '/',
 		pushStateSeparator: '!',
-		// pushStateNoAnimation: true,
+		pushStateNoAnimation: true,
 		routes
 	}
 }

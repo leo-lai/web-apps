@@ -30,13 +30,13 @@
     </div>
     <!-- popup -->
     <f7-popup :opened="edit.opened" theme="lightblue">
-      <f7-navbar>
+      <f7-navbar sliding>
         <f7-nav-left>
-          <f7-link text="返回" icon-f7="chevron_left" @click="closeEdit"></f7-link>
+          <!-- <f7-link text="返回" icon-f7="chevron_left" @click="closeEdit"></f7-link> -->
         </f7-nav-left>
         <f7-nav-center>编辑设备</f7-nav-center>
         <f7-nav-right>
-          <f7-link text="保存" :disabled="edit.disabled" icon-f7="check" @click="saveEdit"></f7-link>
+          <!-- <f7-link text="保存" :disabled="edit.disabled" icon-f7="check" @click="saveEdit"></f7-link> -->
         </f7-nav-right>
       </f7-navbar>
 
@@ -50,6 +50,12 @@
           <f7-input type="text" placeholder="请输入设备编号" v-model="edit.data.alias" @input="edit.disabled = false"/>
         </f7-list-item>
       </f7-list>
+      <div class="l-margin">
+        <f7-button big fill :disabled="edit.disabled" @click="saveEdit">保存</f7-button>  
+      </div>
+      <div class="l-margin">
+        <f7-button big fill @click="closeEdit" color="green">返回</f7-button>  
+      </div>
     </f7-popup>
   </f7-page>
 </template>
@@ -140,6 +146,9 @@ export default {
       this.userInfo = userInfo
       this.resetInfinite()
     })
+  },
+  beforeDestroy() {
+    this.closeEdit()
   }
 }
 </script>

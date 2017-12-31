@@ -1,6 +1,6 @@
 <template>
 	<div class="l-main-body">
-		<el-row>
+		<!-- <el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
   				<el-form-item style="width: 140px;" prop="nickname" lalel="">
@@ -18,7 +18,7 @@
 				  </el-form-item>
 				</el-form>
   		</el-col>
-  	</el-row>
+  	</el-row> -->
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <!-- <el-table-column label="账号" prop="username"></el-table-column> -->
@@ -29,15 +29,16 @@
 	    	</template>
 	    </el-table-column>
 	    <el-table-column label="昵称" prop="nickname" align="center"></el-table-column>
-	    <el-table-column label="姓名" prop="name" align="center"></el-table-column>
-	    <el-table-column label="手机号码" prop="tel" align="center"></el-table-column>
-	    <el-table-column label="性别" prop="gender" align="center">
+	    <!-- <el-table-column label="姓名" prop="name" align="center"></el-table-column> -->
+	    <!-- <el-table-column label="手机号码" prop="tel" align="center"></el-table-column> -->
+	    <!-- <el-table-column label="性别" prop="gender" align="center">
 	    	<template slot-scope="scope">
 	    		<span v-if="scope.row.gender === 'male'">男</span>
 	    		<span v-if="scope.row.gender === 'famale'">女</span>
 	    	</template>
-	    </el-table-column>
-	    <el-table-column label="消费金额" prop="amount" align="center"></el-table-column>
+	    </el-table-column> -->
+	    <el-table-column label="累计消费次数" prop="order_count" align="center"></el-table-column>
+	    <el-table-column label="累计消费金额(元)" prop="order_sum_str" align="center"></el-table-column>
 	  </el-table>
 	  <el-row class="l-text-center l-margin-t">
 	  	<el-pagination layout="total, sizes, prev, pager, next, jumper"
@@ -89,7 +90,10 @@ export default {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1
         this.list.row = Number(data.per_page)
-        this.list.data = data.list
+        this.list.data = data.list.map(item => {
+        	item.order_sum_str = (item.order_sum / 100).toFixed(2)
+        	return item
+        })
 			}).finally(_ => {
 				this.list.loading = false
 			})

@@ -1,69 +1,126 @@
-Promise.prototype.done = Promise.prototype.done || function (onFulfilled, onRejected) {
-  this.then(onFulfilled, onRejected)
-      .catch( reason => setTimeout(() => { throw reason }, 0) )
+// es6 es7 polyfill ************************************************************
+if (!Promise.prototype.done) {
+  Promise.prototype.done = function (onFulfilled, onRejected) {
+    this.then(onFulfilled, onRejected)
+      .catch(reason => setTimeout(() => { throw reason }, 0))
+  }
 }
-Promise.prototype.finally = Promise.prototype.finally || function (callback) {
-  let P = this.constructor
-  return this.then(
-    value  => P.resolve(callback()).then(() => value),
-    reason => P.resolve(callback()).then(() => { throw reason })
-  )
+
+if (!Promise.prototype.finally) {
+  Promise.prototype.finally = function (callback) {
+    let P = this.constructor
+    return this.then(
+      value => P.resolve(callback()).then(() => value),
+      reason => P.resolve(callback()).then(() => { throw reason })
+    )
+  }
 }
-Array.prototype.find = Array.prototype.find || function(func) {
-  let returnArray = false
-  for (let i=0; i<this.length; i++) {
-    if (typeof(func) == 'function') {
-      if (func(this[i])) {
-        if (!returnArray) { returnArray = [] }
-        returnArray.push(i)
+
+if (!Array.prototype.includes) {
+  Object.defineProperty(Array.prototype, 'includes', {
+    value: function (searchElement, fromIndex) {
+
+      // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw new TypeError('"this" is null or not defined');
       }
-    } else {
-      if (this[i]===func) {
-        if (!returnArray) { returnArray = [] }
-        returnArray.push(i)
+
+      var o = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      // 3. If len is 0, return false.
+      if (len === 0) {
+        return false;
+      }
+
+      // 4. Let n be ? ToInteger(fromIndex).
+      //    (If fromIndex is undefined, this step produces the value 0.)
+      var n = fromIndex | 0;
+
+      // 5. If n ≥ 0, then
+      //  a. Let k be n.
+      // 6. Else n < 0,
+      //  a. Let k be len + n.
+      //  b. If k < 0, let k be 0.
+      var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+      // 7. Repeat, while k < len
+      while (k < len) {
+        // a. Let elementK be the result of ? Get(O, ! ToString(k)).
+        // b. If SameValueZero(searchElement, elementK) is true, return true.
+        // c. Increase k by 1.
+        // NOTE: === provides the correct "SameValueZero" comparison needed here.
+        if (o[k] === searchElement) {
+          return true;
+        }
+        k++;
+      }
+
+      // 8. Return false
+      return false;
+    }
+  });
+}
+/** 
+ *  对Date的扩展，将 Date 转化为指定格式的String * 月(M)、日(d)、12小时(h)、24小时(H)、分(m)、秒(s)、周(E)、季度(q)
+    可以用 1-2 个占位符 * 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) * eg: * (new
+    Date()).pattern("yyyy-MM-dd hh:mm:ss.S")==> 2006-07-02 08:09:04.423      
+ * (new Date()).pattern("yyyy-MM-dd E HH:mm:ss") ==> 2009-03-10 二 20:09:04      
+ * (new Date()).pattern("yyyy-MM-dd EE hh:mm:ss") ==> 2009-03-10 周二 08:09:04      
+ * (new Date()).pattern("yyyy-MM-dd EEE hh:mm:ss") ==> 2009-03-10 星期二 08:09:04      
+ * (new Date()).pattern("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18      
+ */
+if (!Date.prototype.format) {
+  Date.prototype.format = function (fmt = 'yyyy-MM-dd HH:mm') {
+    var o = {
+      'M+': this.getMonth() + 1, //月份         
+      'd+': this.getDate(), //日         
+      'h+': this.getHours() % 12 == 0 ? 12 : this.getHours() % 12, //小时         
+      'H+': this.getHours(), //小时         
+      'm+': this.getMinutes(), //分         
+      's+': this.getSeconds(), //秒         
+      'q+': Math.floor((this.getMonth() + 3) / 3), //季度         
+      'S': this.getMilliseconds() //毫秒         
+    }
+    var week = {
+      '0': '/u65e5',
+      '1': '/u4e00',
+      '2': '/u4e8c',
+      '3': '/u4e09',
+      '4': '/u56db',
+      '5': '/u4e94',
+      '6': '/u516d'
+    }
+    if (/(y+)/.test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length))
+    }
+    if (/(E+)/.test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? '/u661f/u671f' : '/u5468') : '') + week[this.getDay() + ''])
+    }
+    for (var k in o) {
+      if (new RegExp('(' + k + ')').test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
       }
     }
+    return fmt
   }
-  return returnArray
 }
-Number.prototype.toMoney = function(places, symbol = '', thousand = ',', decimal = '.') {
-  places = !isNaN(places = Math.abs(places)) ? places : 2
-  var number = this,
-    negative = number < 0 ? '-' : '',
-    i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + '',
-    j = (j = i.length) > 3 ? j % 3 : 0
-  return symbol + negative + (j ? i.substr(0, j) + thousand : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : '')
+
+// 货币格式 100000.11 -> 100,000.11
+if (!Number.prototype.currency){
+  Number.prototype.currency = function (places, symbol = '', thousand = ',', decimal = '.') {
+    places = !isNaN(places = Math.abs(places)) ? places : 2
+    var number = this,
+      negative = number < 0 ? '-' : '',
+      i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + '',
+      j = (j = i.length) > 3 ? j % 3 : 0
+    return symbol + negative + (j ? i.substr(0, j) + thousand : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : '')
+  }
+
 }
-/*
-  对Date的扩展，将 Date 转化为指定格式的String * 月(M)、日(d)、12小时(h)、24小时(H)、分(m)、秒(s)、周(E)、季度(q)
-  可以用 1-2 个占位符 * 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
-  eg:
-  (newDate()).pattern("yyyy-MM-dd hh:mm:ss.S")==> 2006-07-02 08:09:04.423      
-  (new Date()).pattern("yyyy-MM-dd E HH:mm:ss") ==> 2009-03-10 二 20:09:04      
-  (new Date()).pattern("yyyy-MM-dd EE hh:mm:ss") ==> 2009-03-10 周二 08:09:04      
-  (new Date()).pattern("yyyy-MM-dd EEE hh:mm:ss") ==> 2009-03-10 星期二 08:09:04      
-  (new Date()).pattern("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18      
-*/
-Date.prototype.format = function (fmt) {
-  var o = {
-    "M+": this.getMonth() + 1, //月份 
-    "d+": this.getDate(), //日 
-    "h+": this.getHours(), //小时 
-    "m+": this.getMinutes(), //分 
-    "s+": this.getSeconds(), //秒 
-    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
-    "S": this.getMilliseconds() //毫秒 
-  }
-  if (/(y+)/.test(fmt)) {
-    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length))
-  }
-  for (var k in o){
-    if (new RegExp('(' + k + ')').test(fmt)){
-      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
-    }
-  }
-  return fmt
-}
+
 
 // 检测设备
 const ua = navigator.userAgent

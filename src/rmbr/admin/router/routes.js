@@ -75,6 +75,18 @@ export let userMenus = [
     ],
   },
   {
+    path: '/customer/order',
+    component: layout,
+    meta: { title: '消费者订单' },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/customer-order'], resolve),
+      }
+    ],
+  },
+  {
     path: '/materiel',
     component: layout,
     meta: { title: '物料提醒' },

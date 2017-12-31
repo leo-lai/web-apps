@@ -49,8 +49,7 @@ const api = {
     },
     logout(toLogin = true) {
       return new Promise((resolve, reject) => {
-        let userinfo = storage.local.get('userinfo')
-        if (this.check()) {
+        if (false && this.check()) {
           fetch.post('/logout').then(resolve, reject)
         } else {
           resolve()
@@ -86,7 +85,7 @@ const api = {
     }
   },
   sys: { // 系统管理
-    getList(formData = {}, page = 1, row = 20) {
+    getList(formData = {}, page = 1, row = 10) {
       formData.per_page = row
       formData.page_number = page - 1      
       return fetch.post('/role/list', formData)
@@ -105,7 +104,7 @@ const api = {
     }
   },
   business: { // 商户管理
-    getList(formData = {}, page = 1, row = 20) {
+    getList(formData = {}, page = 1, row = 10) {
       formData.per_page = row
       formData.page_number = page - 1      
       return fetch.post('/seller/list', formData)
@@ -121,7 +120,7 @@ const api = {
     }
   },
   device: { // 设备管理
-    getList(formData = {}, page = 1, row = 20) {
+    getList(formData = {}, page = 1, row = 10) {
       formData.per_page = row
       formData.page_number = page - 1      
       return fetch.post('/device/list', formData)
@@ -139,7 +138,7 @@ const api = {
     del(number = '') {
       return fetch.post('/device/delete', { number })
     },
-    getRemindList(formData = {}, page = 1, row = 20) { // 物料提醒列表
+    getRemindList(formData = {}, page = 1, row = 10) { // 物料提醒列表
       formData.per_page = row
       formData.page_number = page - 1      
       return fetch.post('/device/alter_list', formData)
@@ -149,10 +148,15 @@ const api = {
     }
   },
   customer: { // 消费者管理
-    getList(formData = {}, page = 1, row = 20) {
+    getList(formData = {}, page = 1, row = 10) {
       formData.per_page = row
       formData.page_number = page - 1      
       return fetch.post('/customer/list', formData)
+    },
+    getOrderList(formData = {}, page = 1, row = 10) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/customer/order/list', formData)
     }
   },
   recharge: { // 充值管理
@@ -185,7 +189,7 @@ const api = {
     }
   },
   finance: { // 财务管理
-    getList(formData = {}, page = 1, row = 20) {
+    getList(formData = {}, page = 1, row = 10) {
       formData.per_page = row
       formData.page_number = page - 1      
       return fetch.post('/order/statistics/list', formData)
