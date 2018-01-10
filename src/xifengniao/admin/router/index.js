@@ -22,13 +22,14 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   store.dispatch('checkLogin').then(_ => {
   	if(to.path === '/login') {
-      next({path: '/'})
+      // next({path: '/'})
+      next()
     }else {
       if(!store.getters.userMenus){
         store.dispatch('getUserMenus')
         next(to)
       } else {
-        next()  
+        next()
       }
     }
   }).catch(_ => {

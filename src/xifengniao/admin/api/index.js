@@ -149,19 +149,19 @@ const api = {
       return fetch.post('/login', formData)
     },
     logout(toLogin = true) {
-      return new Promise((resolve, reject) => {
-        if (storage.local.get('sessionId')) {
-          fetch.post('/loginOut').then(resolve, reject)
-        } else {
-          resolve()
-        }
-      }).finally(_ => {
+      // return new Promise((resolve, reject) => {
+      //   if (storage.local.get('sessionId')) {
+      //     fetch.post('/loginOut').then(resolve, reject)
+      //   } else {
+      //     resolve()
+      //   }
+      // }).finally(_ => {
         storage.local.remove('sessionId')
         storage.local.remove('usermenus')
         storage.local.remove('userinfo')
-        // toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
-        toLogin && router.replace(`/login?to=` + location.href)
-      })
+        toLogin && location.replace(window.location.origin + `${config.router.base}login?to=` + location.href)
+        // toLogin && router.replace(`/login?to=` + location.href)
+      // })
     },
     changePwd(formData = {}) {
       return fetch.post('/changePassword', formData)
@@ -342,6 +342,12 @@ const api = {
     payOrder(formData = {}) { // 支付定金
       return fetch.post('/payInOrder', formData)
     },
+    orderPrice(customerOrderId = '') { // 订单费用
+      return fetch.post('/orderPriceList', { customerOrderId })
+    },
+    payHistory(customerOrderId = '') { // 收款历史
+      return fetch.post('/orderPayList', { customerOrderId })
+    },
     bankPass(customerOrderId = '') { // 银行审核通过
       return fetch.post('/bankApprovalPass', { customerOrderId })
     },
@@ -452,6 +458,9 @@ const api = {
   pay: { // 通联支付
     orderPay(formData = {}) {
       return fetch.post('/stockOrderPay', formData)
+    },
+    finish(customerOrderId = '') { // 完款交车
+      return fetch.post('/endOrder', { customerOrderId })
     }
   },
   bank: {

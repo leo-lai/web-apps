@@ -19,7 +19,7 @@
   		</el-col>
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
-  		:data="list.data" v-loading="list.loading">
+  		:data="list.data" v-loading="list.loading" highlight-current-row>
 	    <el-table-column label="客户姓名" prop="customerUsersName"></el-table-column>
 	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
 	    <el-table-column class-name="l-fs-xs" label="意向/购置车辆" prop="intentionCarInfo" min-width="150"></el-table-column>
@@ -65,7 +65,7 @@
   			</div>
   			<div class="_tab">
   				<el-tabs type="border-card">
-					  <el-tab-pane label="购车进度">
+					  <el-tab-pane class="l-scroll" label="购车进度">
 					  	<customer-progress :parent="this" :data="viewInfo.order"></customer-progress>
 					  </el-tab-pane>
 					  <el-tab-pane label="个人资料">
@@ -191,8 +191,6 @@ export default {
 								tick: Date.now()
 							}
 						}) : []
-
-
 
 				this.viewInfo.base = data.customerOrgMap
 				this.viewInfo.car = data.customerCarMap.list ? 

@@ -100,35 +100,43 @@ export default {
 				state: [
 				{
 					value: 1,
-					label: '待客户支付定金'
+					label: '待交定金'
 				},
 				{
 					value: 3,
-					label: '客户已支付定金，待银行审批贷款方案'
+					label: '等待银行审核'
+				},
+				{
+					value: 4,
+					label: '银行审核不通过'
 				},
 				{
 					value: 5,
-					label: '等待仓库出库车辆'
+					label: '等待车辆出库'
 				},
 				{
 					value: 7,
-					label: '仓库已出库车辆，待客户验车并支付尾款'
+					label: '等待加装精品'
 				},
 				{
 					value: 9,
-					label: '客户已支付尾款，待加装精品及上牌'
+					label: '等待上牌'
 				},
 				{
 					value: 11,
-					label: '加装精品完成，待上牌'
-				},
-				{
-					value: 12,
-					label: '上牌完成，待客户提车'
+					label: '等待贴膜'
 				},
 				{
 					value: 13,
-					label: '已交付车辆'
+					label: '等待交付车辆'
+				},
+				{
+					value: 15,
+					label: '等待支付尾款'
+				},
+				{
+					value: 17,
+					label: '订单完成'
 				}
 			],
 				filter: {
@@ -158,7 +166,7 @@ export default {
 	},
 	methods: {
 		formatterState(row, column, cellValue) {
-			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
+			return cellValue === undefined ? '' : (this.list.state.filter(item => item.value === cellValue)[0] || {}).label
 		},
 		sizeChange(size = 100) {
 			this.getList(1, size)

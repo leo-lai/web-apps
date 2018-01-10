@@ -9,7 +9,7 @@
 							<h3>{{organization.shortName}}</h3>
 							<p class="l-margin-tb-m l-text-gray">{{$$config.baseData.orgLevel[organization.orgLevel-1]}}</p>
 							<p class="l-margin-tb-m l-text-gray">{{organization.address}}</p>
-							<p><a class="l-text-link">更改基础设置</a></p>
+							<p><router-link class="l-text-link" to="/base/setting?tab=zuzhi">更改基础设置</router-link></p>
 						</div>
 					</div>
 				</el-card>
@@ -18,10 +18,10 @@
 				<el-card style="height:190px;">
 				  <div slot="header" class="clearfix">
 				    <b>公告/通知</b>
-				    <el-button class="l-fr" type="text">查看全部</el-button>
+				    <!-- <el-button class="l-fr" type="text">查看全部</el-button> -->
 				  </div>
 				  <ul class="l-list-text">
-				  	<li>系统使用说明及操作文档下载</li>
+				  	<!-- <li>系统使用说明及操作文档下载</li> -->
 				  </ul>
 				</el-card>
 			</el-col>
@@ -152,9 +152,9 @@ ul,li{margin:0; padding: 0; list-style: none;}
 		width: 100px; height: 100px; margin: 0 auto 10px; font-size: 0.6rem;
 		display: flex; align-items: center; justify-content: center;
 	}
-	._circle::before, ._circle::after{content: ''; border-top: 1px solid #eff2f7; width: 50%; position: absolute; top: 50%;}
-	._circle::before{ left: -50%; }
-	._circle::after{ right: -50%; }
+	._circle::before, ._circle::after{content: ''; border-top: 1px solid #eff2f7; width: 100%; position: absolute; top: 50%;}
+	._circle::before{ left: -100%; }
+	._circle::after{ right: -100%; }
 	._num{font-size: 1rem; color: rgb(33, 160, 255); margin-right: 2px; font-weight: 600;}
 	._item:first-child ._circle::before, ._item:last-child ._circle::after{visibility: hidden;}
 }

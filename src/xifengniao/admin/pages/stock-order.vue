@@ -26,27 +26,34 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="120"></el-table-column>
-	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="150"></el-table-column>
-	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
+	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="150"></el-table-column>
+	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="250">
+	    	<template slot-scope="scope">
+	    		<p>{{scope.row.carsName}}</p>
+	    		<p>车身颜色：{{scope.row.colourName}} <span class="l-text-gray">|</span> 内饰颜色：{{scope.row.interiorName}}</p>
+	    	</template>
+	    </el-table-column>
 	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
 	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center"></el-table-column>
     	<el-table-column label="订单状态" prop="stockOrderState" align="center" class-name="l-fs-xs" min-width="130" >
 	    	<template slot-scope="scope">
 	    		<p>{{formatterState(null, null, scope.row.stockOrderState)}}</p>
-	    		<p class="l-text-error" v-if="scope.row.stockOrderState === 5">（尾款金额：{{scope.row.balancePrice}}）</p>
+	    	</template>
+	    </el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="支付状态" prop="payBrief" align="center" min-width="200">
+	    	<template slot-scope="scope">
+	    		<p v-for="item in scope.row.payBrief.split('。')">{{item}}</p>
 	    	</template>
 	    </el-table-column>
 	    <el-table-column label="操作" min-width="130" align="center">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button v-if="scope.row.stockOrderState === 1" class="l-text-error" type="text" size="small" @click="showPayInfo(scope.row)">支付定金</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 5" class="l-text-link" type="text" size="small" @click="showPayInfo(scope.row)">支付尾款</el-button>
+	        	<el-button class="l-text-error" type="text" size="small" @click="showPayInfo(scope.row, 1)">支付定金</el-button>
+		        <el-button class="l-text-warn" type="text" size="small" @click="showPayInfo(scope.row, 0)">支付尾款</el-button>
 		        <el-button v-if="scope.row.stockOrderState === 9" class="l-text-link" type="text" size="small" @click="signOrder(scope.row)">签收并自动入库</el-button>
 		        <el-button class="l-text-link" type="text" size="small" @click="showViewInfo(scope.row)">查看明细</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 1" class="l-text-default" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
+		        <el-button v-if="scope.row.stockOrderState < 5" class="l-text-default" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
 	        </span>
 	      </template>
 	    </el-table-column>
@@ -84,8 +91,10 @@
 			  <el-form-item label="合格证时间" prop="certificateDate" >
 			  	<el-select v-model="dialogInfo.data.certificateDate" placeholder="请选择">
 				    <el-option label="随车" :value="1"></el-option>
-				    <el-option label="3天内" :value="2"></el-option>
-				    <el-option label="7天内" :value="3"></el-option>
+				    <el-option label="3个工作日内" :value="2"></el-option>
+				    <el-option label="7个工作日内" :value="3"></el-option>
+				    <el-option label="10个工作日内" :value="4"></el-option>
+				    <el-option label="15个工作日内" :value="5"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="指导价" >
@@ -99,6 +108,9 @@
 			  </el-form-item>
 			  <el-form-item class="_flex" label="备注" prop="stockOrderRemarks">
 			  	<el-input type="textarea" v-model="dialogInfo.data.stockOrderRemarks" :maxlength="500"></el-input>
+			  </el-form-item>
+			  <el-form-item class="_flex" label="附件照片" prop="templateImage">
+			  	<uploader ref="dialogInfoUpload" :file-list.sync="dialogInfo.uploadList"></uploader>
 			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
@@ -131,6 +143,14 @@
   				<td class="_tit" width="120">订单备注</td>
   				<td colspan="5" class="_cont">{{ viewInfo.data.remark }}</td>
   			</tr>
+  			<tr>
+  				<td class="_tit" width="120">附件照片</td>
+  				<td colspan="5" class="_cont">
+  					<div style="margin: -10px -10px 0 0;">
+  						<img style="margin: 10px 10px 0 0; width: 60px; height:60px;" v-for="(item,index) in viewInfo.uploadList" :src="item.thumb" @click="showCarImages(viewInfo.uploadList, index)">
+  					</div>
+  				</td>
+  			</tr>
   		</table>
   		<template v-if="viewInfo.data.list && viewInfo.data.list.length > 0">
 	  		<div class="l-block-tit">资源到货明细</div>
@@ -142,7 +162,7 @@
 			    <el-table-column label="入库时间" prop="createDate"  class-name="l-fs-xs"></el-table-column>
 			    <el-table-column label="操作">
 			    	<template slot-scope="scope">
-			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
+			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gray'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
 			      </template>
 			    </el-table-column>
 			  </el-table>
@@ -250,10 +270,11 @@
 <script>
 import Qrcanvas from 'qrcanvas-vue'
 import viewerImages from 'components/viewer-images'
+import uploader from 'components/uploader'
 export default {
 	name: 'stock-order',
 	components: {
-    Qrcanvas, viewerImages
+    Qrcanvas, viewerImages, uploader
   },
 	data() {
 		let that = this
@@ -264,6 +285,15 @@ export default {
       	that.dialogInfo.data.carsId = that.cascader.value[2] || ''
         callback()
       }
+		}
+		// 附件上传
+		let validateUpload = function(rule, value, callback) {
+			if(that.$refs.dialogInfoUpload.waiting > 0) {
+				callback(new Error('图片正在上传中'))
+			}else {
+				that.dialogInfo.data.templateImage = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
+				callback()
+			}
 		}
 		return {
 			qrcode: {
@@ -283,27 +313,27 @@ export default {
 				state: [
 					{
 						value: 1,
-						label: '未支付定金'
+						label: '待寻车'
 					},
-					{
-						value: 3,
-						label: '已支付定金，待处理'
-					},
+					// {
+					// 	value: 3,
+					// 	label: '已支付定金，待处理'
+					// },
 					{
 						value: 5,
-						label: '已处理，待支付尾款'
+						label: '已寻车，待出库'
 					},
-					{
-						value: 7,
-						label: '已支付尾款，待资源出库'
-					},
+					// {
+					// 	value: 7,
+					// 	label: '已支付尾款，待资源出库'
+					// },
 					{
 						value: 9,
 						label: '已出库，待签收'
 					},
 					{
 						value: 11,
-						label: '已签收并自动入库'
+						label: '已签收入库'
 					},
 					{
 						value: 0,
@@ -331,6 +361,7 @@ export default {
 				title: '新增订车单',
 				visible: false,
 				loading: false,
+				uploadList: [],
 				colorList: [],
 				neishiList: [],
 				rules: {
@@ -348,6 +379,9 @@ export default {
 					],
 					stockOrderNumber: [
 						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
+					],
+					templateImage: [
+						{ validator: validateUpload, trigger: 'change' },
 					]
 				},
 				data: {
@@ -356,7 +390,8 @@ export default {
 					interiorId: '',
 					stockOrderNumber: '',
 					stockOrderRemarks: '',
-					certificateDate: ''
+					certificateDate: '',
+					templateImage: ''
 				},
 				info: {
 					price: '',
@@ -365,6 +400,7 @@ export default {
 			},
 			viewInfo: {
 				visible: false,
+				uploadList: {},
 				data: {}
 			},
 			payInfo: {
@@ -378,7 +414,7 @@ export default {
 	},
 	methods: {
 		formatterState(row, column, cellValue) {
-			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
+			return cellValue === undefined ? '' : (this.list.state.filter(item => item.value === cellValue)[0] || {}).label
 		},
 		cascaderItemChange(valArr) {
 			let promise = Promise.resolve()
@@ -497,6 +533,7 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.dialogInfo.uploadList = []
 			this.resetDialogInfo()
 		},
 		resetDialogInfo() {
@@ -582,21 +619,31 @@ export default {
 					}
 					return item
 				}) : []
+				this.viewInfo.uploadList = data.templateImage ? data.templateImage.split(',').map(img => {
+					return {
+						url: this.$$utils.image.thumb(img, 150), 
+						thumb: this.$$utils.image.thumb(img, 150), 
+						src: img, 
+						name: img, 
+						status: 'success'
+					}
+				}) : []
 				this.viewInfo.visible = true
 			}).finally(_ => {
 				loading.close()
 			})
 		},
-		showCarImages(imagesArr = []) { // 查看验车图片
+		showCarImages(imagesArr = [], index = 0) { // 查看验车图片
 			if(imagesArr && imagesArr.length > 0) {
-				this.$refs.viewer.show(0, imagesArr)
+				this.$refs.viewer.show(index, imagesArr)
 			}else{
 				this.$message.info('没有可查看图片')
 			}
 		},
-		showPayInfo(row) { // 支付订车单定金
+		showPayInfo(row, type = 0) { // 支付订车单定金
 			const loading = this.$loading()
 			this.$$api.stock.getOrderInfo(row.stockOrderId).then(({data}) => {
+				data.isDeposit = type
 				this.payInfo.data = data
 				this.payInfo.visible = true
 			}).finally(_ => {
@@ -608,6 +655,7 @@ export default {
 			this.$$api.pay.orderPay({
 				payWay: this.payInfo.payWay,
 				stockOrderId: this.payInfo.data.stockOrderId,
+				isDeposit: this.payInfo.data.isDeposit,
 				pickupUrl: location.href
 			}).then(({data}) => {
 				this.payInfo.formData = data

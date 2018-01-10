@@ -195,7 +195,7 @@ export default {
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
 					engineNumber: [
-						{ required: true, message: '必填项', trigger: 'blur' }
+						{ required: false, message: '必填项', trigger: 'blur' }
 					],
 					upload: [
 						{ required: true, validator: validateUpload, trigger: 'change' },

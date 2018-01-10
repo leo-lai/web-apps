@@ -56,12 +56,13 @@ export default {
       }
 
       this.$nextTick(_ => {
-        setTimeout(_ => {
+        clearTimeout(this.timeid)
+        this.timeid = setTimeout(_ => {
           if(this.$viewer) {
             this.$viewer.index = index
             this.$viewer.show()
           }
-        }, 100)
+        }, 200)
       })
     },
     destroy() {

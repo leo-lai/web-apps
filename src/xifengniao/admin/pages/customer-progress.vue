@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="l-margin l-text-center l-order-state" style="padding: 110px 0 0 0;">
+<!-- 		<div class="l-margin l-text-center l-order-state" style="padding: 110px 0 0 0;">
 			<div v-if="!orderState">
 				<el-button style="width: 120px;" type="primary" @click="showDialogInfo('new')">开单</el-button>
 			</div>
@@ -59,6 +59,34 @@
 			</div>
 		</div>
 		<div class="l-margin l-text-center"><el-button class="l-text-link" type="text" @click="showDialogBuy">查看购车历程</el-button></div>
+ -->
+
+	 	<div class="l-steps l-rel l-margin">
+			<ul>
+				<li v-for="(item,index) in dialogBuy.list" :class="{'_done': item.done}">
+					<i class="_icon el-icon-circle-check-outline"></i>
+					<h4 class="_tit">{{item.title}}</h4>
+					
+					<div class="_desc">
+						<p>{{item.content}}</p>
+						<p v-if="item.done && index === 1 && orderState < 4 && data.paymentWay == 2">
+							<el-button size="mini" type="text" @click="bankPass">银行审批通过</el-button>
+							<el-button size="mini" type="text" @click="fullPay">银行审核不通过，改成全款支付尾款</el-button>
+						</p>
+						<p class="l-text-gray">{{item.time}}</p>
+						<p v-if="item.image.length > 0" v-for="image in item.image" :key="image">
+							<img :src="image">
+						</p>
+					</div>
+				</li>
+			</ul>
+			<div v-if="orderState" style="position: absolute; top:0; right:0;">
+				<el-button size="mini" type="primary" @click="showDialogInfo('view')">订单明细</el-button>
+				<el-button v-if="orderState === 1" size="mini" type="primary" @click="showDialogPay(1)">收定金</el-button>
+				<el-button v-if="orderState > 1 && orderState < 17" size="mini" type="primary" @click="showDialogPay(2)">收尾款</el-button>
+				<el-button v-if="orderState > 13 && orderState < 17" size="mini" type="primary" @click="finishPay()">完款交车</el-button>
+			</div>
+		</div>
 
 		<!-- 开单 -->
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
@@ -173,8 +201,61 @@
 		  </span>
 		</el-dialog>
 
+		<!-- 收款历史，订单费用 -->
+		<el-dialog class="l-padding-t-0" append-to-body :title="dialogOther.title" :visible.sync="dialogOther.visible" width="500px">
+			<template v-if="dialogOther.type === 1">
+				<div class="l-margin-b-m">{{dialogOther.data1.carsName}} 指导价：{{dialogOther.data1.guidingPrice}}元</div>
+				<table class="l-order-paylist">
+					<thead>
+						<tr>
+							<th>订单收费项目</th>
+							<th style="text-align:center;">对应费用（元）</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>车辆最终成交价</td>
+							<td style="text-align:center;">{{dialogOther.data1.carUnitPrice}}</td>
+						</tr>
+						<tr>
+							<td>车辆购置税</td>
+							<td style="text-align:center;">{{dialogOther.data1.purchaseTaxPriace}}</td>
+						</tr>
+						<tr>
+							<td>上牌费</td>
+							<td style="text-align:center;">{{dialogOther.data1.licensePlatePriace}}</td>
+						</tr>
+						<tr>
+							<td>商业保险费</td>
+							<td style="text-align:center;">{{dialogOther.data1.insurancePriace}}</td>
+						</tr>
+						<tr>
+							<td>按揭费用</td>
+							<td style="text-align:center;">{{dialogOther.data1.mortgagePriace}}</td>
+						</tr>
+						<tr>
+							<td>精品加装费用</td>
+							<td style="text-align:center;">{{dialogOther.data1.boutiquePriace}}</td>
+						</tr>
+						<tr>
+							<td>车船税</td>
+							<td style="text-align:center;">{{dialogOther.data1.vehicleAndVesselTax}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</template>
+			<template v-if="dialogOther.type === 2">
+				<div class="l-scroll" style="max-height: 300px;">
+					<div class="l-margin-b" v-for="item in dialogOther.data2" :key="item.createDate">
+						<p><span class="l-margin-r">{{item.createDate}}</span>收款：{{item.amount}}元</p>
+						<p class="l-text-gray">{{item.remarks}}</p>
+					</div>
+				</div>
+			</template>
+		</el-dialog>
+
 		<!-- 查看购车历程 -->
-		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" title="购车历程" :visible.sync="dialogBuy.visible" width="500px">
+		<!-- <el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" title="购车历程" :visible.sync="dialogBuy.visible" width="500px">
 			<div class="l-steps">
 				<ul>
 					<li v-for="item in dialogBuy.list" :class="{'_done': item.done}">
@@ -190,17 +271,27 @@
 					</li>
 				</ul>
 			</div>
-		</el-dialog>
+		</el-dialog> -->
 
 		<!-- 支付定金 -->
-		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogPay.title" :visible.sync="dialogPay.visible" width="420px">
-			<el-form ref="payForm" style="width: 335px;" label-width="100px" 
-				:model="dialogPay.data" :rules="dialogPay.rules" @keyup.enter.native="submitDialogPay">
-				<el-form-item label="剩余尾款">
-			    <span>{{data.amount}}</span>
-			  </el-form-item>
+		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogPay.title" :visible.sync="dialogPay.visible" width="620px">
+			<div v-if="dialogPay.type === 1" class="l-margin">
+				订单中定金金额：{{data.depositPrice}}元，定金只能收取一次
+			</div>
+			<div v-if="dialogPay.type === 2" class="l-margin">
+				<p>合计应收费用：{{data.totalAmount}}元，当前已收费用：{{(data.totalAmount - data.amount).toFixed(2)}}元，剩余{{data.amount}}元未收。</p>
+				<p>
+					<a class="l-text-link l-margin-r" @click="showDialogOther(1)">查看订单费用</a>
+					<a class="l-text-link" @click="showDialogOther(2)">查看收款历史</a>
+				</p>
+			</div>
+			<el-form ref="payForm" style="width: 555px;" label-width="100px" 
+				:model="dialogPay.data" :rules="dialogPay.rules">
   			<el-form-item label="支付金额" prop="amount">
-			    <el-input v-model="dialogPay.data.amount" :maxlength="10"><i style="padding: 0 5px;" slot="suffix">元</i></el-input>
+			    <el-input style="width: 200px;" :disabled="dialogPay.type === 1" v-model="dialogPay.data.amount" :maxlength="10"><i style="padding: 0 5px;" slot="suffix">元</i></el-input>
+			  </el-form-item>
+			  <el-form-item label="收款备注" prop="remarks">
+			    <el-input type="textarea" :rows="2" v-model="dialogPay.data.remarks"></el-input>
 			  </el-form-item>
 			  <el-form-item label="支付方式" prop="isCash">
 			  	<el-radio-group v-model="dialogPay.data.isCash">
@@ -222,7 +313,7 @@
 	    </div>
 		</el-dialog>
 
-		<!-- 交付车辆 -->
+		<!-- 提车车辆 -->
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogGive.title" :visible.sync="dialogGive.visible" width="420px">
 			<div class="l-form1-row">
 				<div class="_tit"><b>上传人车合照</b> <i class="l-text-error">*</i></div>
@@ -230,7 +321,7 @@
 			    <uploader class="l-dialog-give" ref="dialogGiveUpload" :limit="1" :file-list.sync="dialogGive.uploadList"></uploader>
 				</div>
 				<div class="l-text-center l-margin-t">
-					<el-button type="primary" :loading="dialogGive.loading" @click="giveCar">确认交付</el-button>
+					<el-button type="primary" :loading="dialogGive.loading" @click="giveCar">确认提车</el-button>
 				</div>
 			</div>
 		</el-dialog>
@@ -395,6 +486,8 @@ export default {
 				data: {
 					customerOrderId: '',
 					amount: '',
+					remarks: '',
+					isDepositPrice: 1,
 					isCash: 0
 				}
 			},
@@ -410,19 +503,41 @@ export default {
 			dialogBuy: {
 				visible: false,
 				list: [],
-			}
-		}
-	},
-	watch: {
-		data(val) {
-			if(val) {
-				this.orderState = val.orderState	
+			},
+			dialogOther: {
+				type: 1,
+				visible: false,
+				title: '订单费用',
+				data1: {},
+				data2: {}
 			}
 		}
 	},
 	methods: {
+		showDialogOther(type = 1) { // 显示订单费用，收款历史
+			let loading = this.$loading()
+			this.dialogOther.type = type
+			if(type === 1) {
+				this.dialogOther.title = '订单费用'
+				this.$$api.customer.orderPrice(this.data.customerOrderId).then(({data}) => {
+					this.dialogOther.data1 = data
+					this.dialogOther.visible = true
+				}).finally(_ => {
+					loading.close()
+				})
+			}else if(type === 2) {
+				this.dialogOther.title = '收款历史'
+				this.$$api.customer.payHistory(this.data.customerOrderId).then(({data}) => {
+					this.dialogOther.data2 = data
+					this.dialogOther.visible = true
+				}).finally(_ => {
+					loading.close()
+				})
+			}
+		},
 		formatterState(row, column, cellValue) {
-			return cellValue === undefined ? '' : this.list.state.filter(item => item.value === cellValue)[0].label
+			return cellValue === undefined ? '' : 
+				(this.list.state.filter(item => item.value === cellValue)[0] || {}).label
 		},
 		cascaderItemChange(valArr) {
 			let promise = Promise.resolve()
@@ -466,6 +581,7 @@ export default {
 		getOrderInfo() {
 			return this.$$api.customer.getOrderInfo(this.data.customerOrderId).then(({data}) => {
 				this.orderState = data.customerOrderState
+				// Object.assign(this.data, {orderState: data.customerOrderState}, data)
 				return data
 			})
 		},
@@ -567,7 +683,8 @@ export default {
 			this.dialogPay.visible = true
 			this.dialogPay.type = type
 			this.dialogPay.title = type === 1 ? '支付定金' : '支付尾款'
-			this.dialogPay.data.amount = type === 1 ? '' : this.data.amount
+			this.dialogPay.isDepositPrice = type === 1 ? 1 : 0
+			this.dialogPay.data.amount = type === 1 ? this.data.depositPrice : this.data.amount
 		},
 		submitDialogPay() {
 			this.dialogPay.data.customerOrderId = this.data.customerOrderId
@@ -581,7 +698,8 @@ export default {
 		        }).then(() => {
 		          this.dialogPay.loading = true
 		          this.$$api.customer.payOrder(this.dialogPay.data).then(_ => {
-		          	this.getOrderInfo()
+		          	// this.getOrderInfo()
+		          	this.parent && this.parent.getInfo()
 		          	this.dialogPay.visible = false
 		            this.$message.success('支付成功')
 		          }).finally(_ => {
@@ -620,7 +738,7 @@ export default {
 		bankPass() { // 银行贷款通过
 			let loading = this.$loading()
 			this.$$api.customer.bankPass(this.data.customerOrderId).then(_ => {
-				this.orderState = 5
+				this.parent && this.parent.getInfo()
 			}).finally(_ => {
 				loading.close()
 			})
@@ -628,7 +746,7 @@ export default {
 		fullPay() { // 银行贷款不通过，改成全款支付尾款
 			let loading = this.$loading()
 			this.$$api.customer.fullPay(this.data.customerOrderId).then(_ => {
-				this.orderState = 5
+				this.parent && this.parent.getInfo()
 			}).finally(_ => {
 				loading.close()
 			})
@@ -646,7 +764,7 @@ export default {
 			this.dialogGive.data.customerOrderId = this.data.customerOrderId
 			this.dialogGive.loading = true
 			this.$$api.customer.giveCar(this.dialogGive.data).then(_ => {
-				this.$message.success('交付车辆成功')
+				this.$message.success('操作成功')
 				this.dialogGive.visible = false
 				this.getOrderInfo()
 			}).finally(_ => {
@@ -654,41 +772,91 @@ export default {
 			})
 		},
 		showDialogBuy() { // 购车历程
-			let loading = this.$loading()
-			this.$$api.customer.getInfo({
-				customerUsersId: this.data.customerUsersId,
-				customerUsersOrgId: this.data.customerUsersOrgId
-			}).then(({data}) => {
-				let list = ['开单', '落定', '银行贷款审批', '车辆出库', '完款', '加装', '上牌', '交车']
-				this.dialogBuy.list = list.map((item, index) => {
-					let _item = data.orderMap && data.orderMap.list ? data.orderMap.list[index] : null
-					if(_item) {
-						item = {
-							title: item,
-							content: _item.trackContent,
-							time: _item.createDate,
-							image: _item.image ? _item.image.split(',') : [],
-							done: true
-						}						
-					}else {
-						item = {
-							title: item,
-							content: '',
-							time: '',
-							image: [],
-							done: false
-						}
+			// let loading = this.$loading()
+			// this.$$api.customer.getInfo({
+			// 	customerUsersId: this.data.customerUsersId,
+			// 	customerUsersOrgId: this.data.customerUsersOrgId
+			// }).then(({data}) => {
+			// 	let list = ['开单', '落定', '银行贷款审批', '车辆出库', '加装', '上牌', '贴膜', '提车', '交车']
+			// 	this.dialogBuy.list = list.map((item, index) => {
+			// 		let _item = data.orderMap && data.orderMap.list ? data.orderMap.list[index] : null
+			// 		if(_item) {
+			// 			item = {
+			// 				title: item,
+			// 				content: _item.trackContent,
+			// 				time: _item.createDate,
+			// 				image: _item.image ? _item.image.split(',') : [],
+			// 				done: true
+			// 			}						
+			// 		}else {
+			// 			item = {
+			// 				title: item,
+			// 				content: '',
+			// 				time: '',
+			// 				image: [],
+			// 				done: false
+			// 			}
+			// 		}
+			// 		return item
+			// 	})
+			// 	this.dialogBuy.visible = true
+			// }).finally(_ => {
+			// 	loading.close()
+			// })
+		},
+		initShow(data) {
+			this.orderState = data.orderState
+			let list = ['开单', '落定', '银行贷款审批', '车辆出库', '加装', '上牌', '贴膜', '提车', '交车']
+			this.dialogBuy.list = list.map((item, index) => {
+				let _item = data && data.list ? data.list[index] : null
+				if(_item) {
+					item = {
+						title: item,
+						content: _item.trackContent,
+						time: _item.createDate,
+						image: _item.image ? _item.image.split(',') : [],
+						done: true
+					}						
+				}else {
+					item = {
+						title: item,
+						content: '',
+						time: '',
+						image: [],
+						done: false
 					}
-					return item
-				})
-				this.dialogBuy.visible = true
-			}).finally(_ => {
-				loading.close()
+				}
+				return item
 			})
+		},
+		finishPay() { // 完款交车
+			this.$confirm('是否确定收齐全款?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+      	let loading = this.$loading()
+				this.$$api.pay.finish(this.data.customerOrderId).then(_ => {
+					this.parent && this.parent.getInfo()
+					this.$message({
+						type: 'success',
+						message: '操作成功'
+					})
+				}).finally(_ => {
+					loading.close()
+				})
+      })
+		}
+	},
+	watch: {
+		data(val) {
+			if(val) {
+				this.initShow(val)
+			}
 		}
 	},
 	mounted() {
-		this.orderState = this.data.orderState	
+		this.initShow(this.data)
 	}
 }
 </script>
@@ -705,6 +873,14 @@ export default {
 	width: 100% !important; height: auto !important; min-height: 150px; line-height: 150px !important; text-align: center;}
 .l-dialog-give .el-upload-list__item .el-upload-list__item-thumbnail{height: auto !important;}
 
+.l-order-paylist{
+	width: 100%; border-collapse: collapse;
+	th,td{padding: 12px 10px; text-align: left;}
+	th{background-color: #e5e9f2;}
+	td{border-top: 1px solid #ebeef5;}
+	tr:nth-child(even) td{background-color: rgba(239, 239, 244, 0.6);}
+}
+
 .l-steps{
 	ul,li{margin:0; padding: 0; list-style: none;}
 	li{display: flex; padding-bottom: 30px; position: relative; opacity: 0.3;}
@@ -713,7 +889,7 @@ export default {
 	li:last-of-type:before{display: none;}
 	li._done:last-of-type::before{opacity: 0.3;}
 	._icon{font-size: 30px; height: 28px;  position: relative; z-index: 1; line-height: 1; color: #39b94d; margin-top: -3px;}
-	._tit{width: 100px; margin-left: 20px; margin-right: 50px;}
+	._tit{width: 100px; margin-left: 20px; margin-right: 30px;}
 	._desc{flex: 1;}
 	.l-text-gray{font-size: 12px;}
 	img {width: 100px; height: 60px; margin: 10px 10px 0 0;}
