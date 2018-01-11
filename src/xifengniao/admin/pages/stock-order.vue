@@ -90,11 +90,7 @@
 			  </el-form-item>
 			  <el-form-item label="合格证时间" prop="certificateDate" >
 			  	<el-select v-model="dialogInfo.data.certificateDate" placeholder="请选择">
-				    <el-option label="随车" :value="1"></el-option>
-				    <el-option label="3个工作日内" :value="2"></el-option>
-				    <el-option label="7个工作日内" :value="3"></el-option>
-				    <el-option label="10个工作日内" :value="4"></el-option>
-				    <el-option label="15个工作日内" :value="5"></el-option>
+				    <el-option v-for="(item, index) in $$config.baseData.carTime" :key="index" :label="item" :value="index+1"></el-option>
 				  </el-select>
 			  </el-form-item>
 			  <el-form-item label="指导价" >
