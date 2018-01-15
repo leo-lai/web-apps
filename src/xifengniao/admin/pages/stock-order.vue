@@ -26,34 +26,34 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="150"></el-table-column>
+	    <el-table-column label="订车单号" prop="stockOrderCode" class-name="l-fs-xs" min-width="160"></el-table-column>
 	    <el-table-column label="预定车型" prop="carsName" class-name="l-fs-xs" min-width="250">
 	    	<template slot-scope="scope">
 	    		<p>{{scope.row.carsName}}</p>
 	    		<p>车身颜色：{{scope.row.colourName}} <span class="l-text-gray">|</span> 内饰颜色：{{scope.row.interiorName}}</p>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="官方指导价" prop="guidingPrice" align="center"></el-table-column>
-	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center"></el-table-column>
-    	<el-table-column label="订单状态" prop="stockOrderState" align="center" class-name="l-fs-xs" min-width="130" >
+	    <el-table-column label="官方指导价" prop="guidingPrice" align="center" width="110"></el-table-column>
+	    <el-table-column label="订车数量" prop="stockOrderNumber" align="center" width="110"></el-table-column>
+    	<el-table-column label="订单状态" prop="stockOrderState" class-name="l-fs-xs" align="center" width="120" >
 	    	<template slot-scope="scope">
 	    		<p>{{formatterState(null, null, scope.row.stockOrderState)}}</p>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="支付状态" prop="payBrief" align="center" min-width="200">
+	    <el-table-column label="支付状态" prop="payBrief" class-name="l-fs-xs" align="center" min-width="180">
 	    	<template slot-scope="scope">
-	    		<p v-for="item in scope.row.payBrief.split('。')">{{item}}</p>
+	    		<p v-for="item in scope.row.payBrief.split('。')" :key="item">{{item}}</p>
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="操作" min-width="130" align="center">
+	    <el-table-column label="操作" header-align="center" align="right" min-width="160">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
-	        	<el-button class="l-text-error" type="text" size="small" @click="showPayInfo(scope.row, 1)">支付定金</el-button>
-		        <el-button class="l-text-warn" type="text" size="small" @click="showPayInfo(scope.row, 0)">支付尾款</el-button>
-		        <el-button v-if="scope.row.stockOrderState === 9" class="l-text-link" type="text" size="small" @click="signOrder(scope.row)">签收并自动入库</el-button>
+	        	<el-button v-if="scope.row.stockOrderState < 5" class="l-text-default" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
+						<el-button v-if="scope.row.paystate === 1" class="l-text-error" type="text" size="small" @click="showPayInfo(scope.row)">支付定金</el-button>
+		        <el-button v-if="scope.row.paystate === 2" class="l-text-error" type="text" size="small" @click="showPayInfo(scope.row)">支付尾款</el-button>
+		        <el-button v-if="scope.row.paystate === 3 && scope.row.stockOrderState === 9" class="l-text-link" type="text" size="small" @click="signOrder(scope.row)">签收入库</el-button>
 		        <el-button class="l-text-link" type="text" size="small" @click="showViewInfo(scope.row)">查看明细</el-button>
-		        <el-button v-if="scope.row.stockOrderState < 5" class="l-text-default" type="text" size="small" @click="cancelOrder(scope.row)">取消</el-button>
 	        </span>
 	      </template>
 	    </el-table-column>
@@ -143,7 +143,7 @@
   				<td class="_tit" width="120">附件照片</td>
   				<td colspan="5" class="_cont">
   					<div style="margin: -10px -10px 0 0;">
-  						<img style="margin: 10px 10px 0 0; width: 60px; height:60px;" v-for="(item,index) in viewInfo.uploadList" :src="item.thumb" @click="showCarImages(viewInfo.uploadList, index)">
+  						<img style="margin: 10px 10px 0 0; width: 60px; height:60px;" v-for="(item,index) in viewInfo.uploadList" :key="item" :src="item.thumb" @click="showCarImages(viewInfo.uploadList, index)">
   					</div>
   				</td>
   			</tr>
@@ -177,7 +177,7 @@
   				<td class="_tit">随车资料</td>
   				<td class="_cont" colspan="3">
   					<ul class="l-gou-list" v-if="viewInfo.data.followInformation">
-	  					<li v-for="item in viewInfo.data.followInformation.split(',')"><i>√</i>{{item}}</li>
+	  					<li v-for="item in viewInfo.data.followInformation.split(',')" :key="item"><i>√</i>{{item}}</li>
   					</ul>
   				</td>
   			</tr>
@@ -223,15 +223,15 @@
   		</table>
   		<br>
   		<div class="l-text-center l-margin-t">
-  			<b class="l-fs-s l-margin-r" v-if="payInfo.data.stockOrderState === 1">需要支付定金：：￥{{payInfo.data.depositPrice}}</b>
-  			<b class="l-fs-s l-margin-r" v-else>需要支付尾款：：￥{{payInfo.data.balancePrice}}</b>
+  			<b class="l-fs-s l-margin-r" v-if="payInfo.data.paystate === 1">需要支付定金：：￥{{payInfo.data.depositPrice}}</b>
+  			<b class="l-fs-s l-margin-r" v-if="payInfo.data.paystate === 2">需要支付尾款：：￥{{payInfo.data.balancePrice}}</b>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<el-button type="primary" @click="payNow">立即支付</el-button>
   		</div>
   		<div class="l-hidden-box">
 	  		<form ref="payForm" target="payWin" method='post' :action="$$config.pay.url">
 	  			<table>
-	  				<tr v-for="(value, name) in payInfo.formData">
+	  				<tr v-for="(value, name) in payInfo.formData" :key="value">
 	  					<td>{{name}}</td>
 	  					<td><input  type="text" :name="name" :value="value">	</td>
 	  				</tr>
@@ -636,11 +636,11 @@ export default {
 				this.$message.info('没有可查看图片')
 			}
 		},
-		showPayInfo(row, type = 0) { // 支付订车单定金
+		showPayInfo(row) { // 订车单付款(定金/尾款)
 			const loading = this.$loading()
 			this.$$api.stock.getOrderInfo(row.stockOrderId).then(({data}) => {
-				data.isDeposit = type
-				this.payInfo.data = data
+				data.isDeposit = data.paystate === 1
+				this.payInfo.data = datadata
 				this.payInfo.visible = true
 			}).finally(_ => {
 				loading.close()
