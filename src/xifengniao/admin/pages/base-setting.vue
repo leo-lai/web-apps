@@ -10,6 +10,9 @@
 		  <el-tab-pane label="角色及权限" name="role">
 		  	<base-setting-role></base-setting-role>
 		  </el-tab-pane>
+			<el-tab-pane label="人员分组" name="group">
+		  	<base-setting-group></base-setting-group>
+		  </el-tab-pane>
 		</el-tabs>
 	</div>
 </template>
@@ -17,12 +20,14 @@
 import baseSettingZuzhi from './base-setting-zuzhi'
 import baseSettingUser from './base-setting-user'
 import baseSettingRole from './base-setting-role'
+import baseSettingGroup from './base-setting-group'
 export default {
 	name: 'base-setting',
 	components: {
 		baseSettingZuzhi,
 		baseSettingUser,
-		baseSettingRole
+		baseSettingRole,
+		baseSettingGroup
 	},
 	data() {
 		return {

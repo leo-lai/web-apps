@@ -640,7 +640,7 @@ export default {
 			const loading = this.$loading()
 			this.$$api.stock.getOrderInfo(row.stockOrderId).then(({data}) => {
 				data.isDeposit = data.paystate === 1
-				this.payInfo.data = datadata
+				this.payInfo.data = data
 				this.payInfo.visible = true
 			}).finally(_ => {
 				loading.close()

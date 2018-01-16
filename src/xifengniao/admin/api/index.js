@@ -232,6 +232,31 @@ const api = {
       return fetch.post('/setRoleMenu', formData)
     }
   },
+  group: { // 分组管理
+    getList(formData = {}, page = 1, rows = 100) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/systemGroupingList', formData)
+    },
+    add(formData = {}) {
+      return fetch.post('/systemGroupingEdit', formData)
+    },
+    del(groupingId = '') { // 删除分组
+      return fetch.post('/systemGroupingDalete', { groupingId })
+    },
+    getUserList(groupingId = '') { // 已分配人员列表
+      return fetch.post('/systemUserGroupingList', { groupingId })
+    },
+    getSltUserList() { // 待分配人员列表
+      return fetch.post('/orgOneSelfList')
+    },
+    addUser(formData = {}) { // 添加人员
+      return fetch.post('/systemUserGroupingEdit', formData)
+    },
+    delUser(userGroupingId = '') { // 删除人员
+      return fetch.post('/systemUserGroupingDalete', { userGroupingId })
+    }
+  },
   menu: {
     add(formData = {}) {
       return fetch.post('/editMenu', formData)

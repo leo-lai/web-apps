@@ -2,7 +2,7 @@
 	<div class="l-flex-v" style="height: 100%;">
 		<div class="l-rest l-scroll">
 			<div class="l-padding">
-				<div class="l-flex-h l-margin-b" v-for="item in data.list">
+				<div class="l-flex-h l-margin-b" v-for="item in data.list" :key="item.systemUserId">
 					<div class="l-text-gray" style="width: 180px; font-size:12px;">{{item.createDate}}</div>
 					<div class="l-text-gray" style="width: 100px; font-size:12px;">{{item.systemUserName}}</div>
 					<div>{{item.remarksContent}}</div>
