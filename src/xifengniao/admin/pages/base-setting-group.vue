@@ -120,10 +120,10 @@ export default {
 				visible: false,
 				loading: false,
 				rules: {
-					roleName: [
+					groupingName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
-					remark: []
+					remarks: []
 				},
 				data: {
 					groupingId: '',

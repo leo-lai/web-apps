@@ -639,7 +639,7 @@ export default {
 		showPayInfo(row) { // 订车单付款(定金/尾款)
 			const loading = this.$loading()
 			this.$$api.stock.getOrderInfo(row.stockOrderId).then(({data}) => {
-				data.isDeposit = data.paystate === 1
+				data.isDeposit = Number(data.paystate === 1)
 				this.payInfo.data = data
 				this.payInfo.visible = true
 			}).finally(_ => {
