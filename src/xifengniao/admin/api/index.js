@@ -403,6 +403,9 @@ const api = {
     },
     track(formData = {}) { // 标记为已到店
       return fetch.post('/systenUserChangeCustomerOrg', formData)
+    },
+    getContractInfo(customerOrderId = '') { // 合同信息
+      return fetch.post('/customerOrderPrint', { customerOrderId })
     }
   },
   stock: { // 库存管理

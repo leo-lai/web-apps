@@ -3,7 +3,12 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-				  <el-form-item prop="dateRange">
+				  <el-form-item prop="customerOrderState">
+  					<el-select v-model="list.filter.customerOrderState" placeholder="订单状态" @change="search()">
+				      <el-option v-for="item in list.state" :key="item.value" :label="item.label" :value="item.value"></el-option>
+				    </el-select>
+  				</el-form-item>
+					<el-form-item prop="dateRange">
 				  	<el-input placeholder="请输入订单号" v-model="list.filter.customerOrderCode"></el-input>
 				  </el-form-item>
 				  <el-form-item>
@@ -88,186 +93,212 @@
 	</div>
 </template>
 <script>
-import viewerImages from 'components/viewer-images'
+import viewerImages from "components/viewer-images";
 export default {
-	name: 'customer-out',
-	components: {
+  name: "customer-out",
+  components: {
     viewerImages
   },
-	data() {
-		return {
-			list: {
-				state: [
-				{
-					value: 1,
-					label: '待交定金'
-				},
-				{
-					value: 3,
-					label: '等待银行审核'
-				},
-				{
-					value: 4,
-					label: '银行审核不通过'
-				},
-				{
-					value: 5,
-					label: '等待车辆出库'
-				},
-				{
-					value: 7,
-					label: '等待加装精品'
-				},
-				{
-					value: 9,
-					label: '等待上牌'
-				},
-				{
-					value: 11,
-					label: '等待贴膜'
-				},
-				{
-					value: 13,
-					label: '等待交付车辆'
-				},
-				{
-					value: 15,
-					label: '等待支付尾款'
-				},
-				{
-					value: 17,
-					label: '订单完成'
-				}
-			],
-				filter: {
-					customerOrderCode: ''
-				},
-				rules: {
-					customerOrderCode: []
-				},
-				loading: false,
-				page: 1,
-				rows: 100,
-				total: 0,
-				data: []
-			},
-			outStockInfo: {
-				loading: false,
-				visible: false,
-				stockCarIdArr: [],
-				carSpecs: [],
-				formData: { 
-					customerOrderId: '', 
-					stockCarId: ''
-				},
-				data: {}
-			}
-		}
-	},
-	methods: {
-		formatterState(row, column, cellValue) {
-			return cellValue === undefined ? '' : (this.list.state.filter(item => item.value === cellValue)[0] || {}).label
-		},
-		sizeChange(size = 100) {
-			this.getList(1, size)
-		},
-		pageChange(page = 1) {
-			this.getList(page)
-		},
-		getList(page = 1, rows) {
-			this.list.loading = true
-			this.$$api.stock.getOrderList2(this.list.filter, page, rows)
-			.then(({data}) => {
-				this.list.total = data.total
-        this.list.page = data.page
-        this.list.rows = data.rows
-        this.list.data = data.list.map(item => {
-        	item.deling = false
-        	return item
+  data() {
+    return {
+      list: {
+        state: [
+          {
+            value: 1,
+            label: "待交定金"
+          },
+          {
+            value: 3,
+            label: "等待银行审核"
+          },
+          {
+            value: 4,
+            label: "银行审核不通过"
+          },
+          {
+            value: 5,
+            label: "等待车辆出库"
+          },
+          {
+            value: 7,
+            label: "等待加装精品"
+          },
+          {
+            value: 9,
+            label: "等待上牌"
+          },
+          {
+            value: 11,
+            label: "等待贴膜"
+          },
+          {
+            value: 13,
+            label: "等待交付车辆"
+          },
+          {
+            value: 15,
+            label: "等待支付尾款"
+          },
+          {
+            value: 17,
+            label: "订单完成"
+          }
+        ],
+        filter: {
+					customerOrderState: '',
+          customerOrderCode: ''
+        },
+        rules: {
+					customerOrderState: [],
+          customerOrderCode: []
+        },
+        loading: false,
+        page: 1,
+        rows: 100,
+        total: 0,
+        data: []
+      },
+      outStockInfo: {
+        loading: false,
+        visible: false,
+        stockCarIdArr: [],
+        carSpecs: [],
+        formData: {
+          customerOrderId: "",
+          stockCarId: ""
+        },
+        data: {}
+      }
+    };
+  },
+  methods: {
+    formatterState(row, column, cellValue) {
+      return cellValue === undefined
+        ? ""
+        : (this.list.state.filter(item => item.value === cellValue)[0] || {})
+            .label;
+    },
+    sizeChange(size = 100) {
+      this.getList(1, size);
+    },
+    pageChange(page = 1) {
+      this.getList(page);
+    },
+    getList(page = 1, rows) {
+      this.list.loading = true;
+      this.$$api.stock
+        .getOrderList2(this.list.filter, page, rows)
+        .then(({ data }) => {
+          this.list.total = data.total;
+          this.list.page = data.page;
+          this.list.rows = data.rows;
+          this.list.data = data.list.map(item => {
+            item.deling = false;
+            return item;
+          });
         })
-			}).finally(_ => {
-				this.list.loading = false
-			})
-		},
-		refreshList() {
-			this.getList(this.list.page)
-		},
-		search() {
-			this.getList()
-		},
-		clear() {
-			this.$refs.listFilter && this.$refs.listFilter.resetFields()
-			this.getList()
-		},
-		showOutStockInfo(row) { // 出库车辆
-			const loading = this.$loading()
-			this.$$api.stock.outStockBefor2(row.customerOrderId).then(({data}) => {
-				this.outStockInfo.formData.customerOrderId = row.customerOrderId
-				this.outStockInfo.data = data
-				this.outStockInfo.data.list = data.list ? data.list.map(item => {
-					if(item.stockCarImages) {
-						item.imagesArr = item.stockCarImages.split(',').map(img => {
-							return {
-								url: this.$$utils.image.thumb(img, 150), 
-								thumb: this.$$utils.image.thumb(img, 150), 
-								src: img, 
-								name: img, 
-								status: 'success'
-							}
-						})
-					}
-					return item
-				}) : []
-				this.outStockInfo.visible = true
-			}).finally(_ => {
-				loading.close()
-			})
-		},
-		outStock() { // 出库车辆
-			if(!this.outStockInfo.formData.stockCarId) {
-				this.$message.error('请选择出库车辆')
-				return
-			}
+        .finally(_ => {
+          this.list.loading = false;
+        });
+    },
+    refreshList() {
+      this.getList(this.list.page);
+    },
+    search() {
+      this.getList();
+    },
+    clear() {
+      this.$refs.listFilter && this.$refs.listFilter.resetFields();
+      this.getList();
+    },
+    showOutStockInfo(row) {
+      // 出库车辆
+      const loading = this.$loading();
+      this.$$api.stock
+        .outStockBefor2(row.customerOrderId)
+        .then(({ data }) => {
+          this.outStockInfo.formData.customerOrderId = row.customerOrderId;
+          this.outStockInfo.data = data;
+          this.outStockInfo.data.list = data.list
+            ? data.list.map(item => {
+                if (item.stockCarImages) {
+                  item.imagesArr = item.stockCarImages.split(",").map(img => {
+                    return {
+                      url: this.$$utils.image.thumb(img, 150),
+                      thumb: this.$$utils.image.thumb(img, 150),
+                      src: img,
+                      name: img,
+                      status: "success"
+                    };
+                  });
+                }
+                return item;
+              })
+            : [];
+          this.outStockInfo.visible = true;
+        })
+        .finally(_ => {
+          loading.close();
+        });
+    },
+    outStock() {
+      // 出库车辆
+      if (!this.outStockInfo.formData.stockCarId) {
+        this.$message.error("请选择出库车辆");
+        return;
+      }
 
-			if(this.outStockInfo.stockCarIdArr.length > this.outStockInfo.data.orderNumber){
-				this.$message.error('出库车辆大于订车数量')
-				return	
-			}
+      if (
+        this.outStockInfo.stockCarIdArr.length >
+        this.outStockInfo.data.orderNumber
+      ) {
+        this.$message.error("出库车辆大于订车数量");
+        return;
+      }
 
-			this.outStockInfo.loading = true
-			this.$$api.stock.outStock2(this.outStockInfo.formData).then(_ => {
-				this.$message.success('出库车辆成功')
-				this.outStockInfo.visible = false
-				this.refreshList()
-			}).finally(_ => {
-				this.outStockInfo.loading = false
-			})
-		},
-		outStockSlted(valArr) {
-			this.outStockInfo.stockCarIdArr = valArr.map(item => item.stockCarId)
-			this.outStockInfo.formData.stockCarId = this.outStockInfo.stockCarIdArr.join(',')
-		},
-		outStockSltable(row, index) {
-			if(this.outStockInfo.stockCarIdArr.includes(row.stockCarId)) {
-				return true
-			}else{
-				return this.outStockInfo.stockCarIdArr.length < this.outStockInfo.data.orderNumber	
-			}
-		},
-		showCarImages(imagesArr = []) { // 查看验车图片
-			if(imagesArr && imagesArr.length > 0) {
-				this.$refs.viewer.show(0, imagesArr)
-			}else{
-				this.$message.info('没有可查看图片')
-			}
-		}
-	},
-	mounted() {
-		this.$$event.$on('stock:tab', activeName => {
-			if(activeName === 'out' && this.list.data.length === 0) {
-				this.getList()
-			}
-		})
-	}
-}
+      this.outStockInfo.loading = true;
+      this.$$api.stock
+        .outStock2(this.outStockInfo.formData)
+        .then(_ => {
+          this.$message.success("出库车辆成功");
+          this.outStockInfo.visible = false;
+          this.refreshList();
+        })
+        .finally(_ => {
+          this.outStockInfo.loading = false;
+        });
+    },
+    outStockSlted(valArr) {
+      this.outStockInfo.stockCarIdArr = valArr.map(item => item.stockCarId);
+      this.outStockInfo.formData.stockCarId = this.outStockInfo.stockCarIdArr.join(
+        ","
+      );
+    },
+    outStockSltable(row, index) {
+      if (this.outStockInfo.stockCarIdArr.includes(row.stockCarId)) {
+        return true;
+      } else {
+        return (
+          this.outStockInfo.stockCarIdArr.length <
+          this.outStockInfo.data.orderNumber
+        );
+      }
+    },
+    showCarImages(imagesArr = []) {
+      // 查看验车图片
+      if (imagesArr && imagesArr.length > 0) {
+        this.$refs.viewer.show(0, imagesArr);
+      } else {
+        this.$message.info("没有可查看图片");
+      }
+    }
+  },
+  mounted() {
+    this.$$event.$on("stock:tab", activeName => {
+      if (activeName === "out" && this.list.data.length === 0) {
+        this.getList();
+      }
+    });
+  }
+};
 </script>
