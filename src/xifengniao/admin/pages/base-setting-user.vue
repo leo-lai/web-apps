@@ -2,7 +2,7 @@
 	<div>
 		<el-row>
   		<el-col :span="8">
-  			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
+  			<el-button type="primary" @click="showDialogInfo('new')">新增用户</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">

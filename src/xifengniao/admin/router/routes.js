@@ -14,6 +14,11 @@ const routes = [
     ], 
   },
   {
+    path: '/contract',
+    meta: { hidden: true },
+    component: resolve => require(['../pages/contract'], resolve),
+  },
+  {
     path: '/base',
     component: layout,
     meta: { hidden: true },

@@ -44,7 +44,7 @@
 	  </el-row>
 
 	  <!-- 新增/编辑车型 -->
-		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
+		<el-dialog class="l-padding-tb-0" :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
   		<el-form class="l-form1" ref="infoForm" label-width="100px" inline :model="dialogInfo.data" :rules="dialogInfo.rules">
   			<el-form-item class="_flex" label="车辆型号" prop="carModel" style="width: 622px;">
@@ -521,3 +521,10 @@ export default {
 	}
 }
 </script>
+<style lang="less">
+.l-padding-tb-0 .el-dialog__body{padding-top: 15px; padding-bottom: 0;}
+.quill-editor:not(.bubble) .ql-container, .quill-editor:not(.bubble) .ql-container .ql-editor {
+    height: 10rem;
+    padding-bottom: 0;
+}
+</style>

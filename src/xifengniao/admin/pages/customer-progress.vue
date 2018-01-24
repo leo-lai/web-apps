@@ -63,15 +63,16 @@
 
 	 	<div class="l-steps l-rel l-margin">
 			<ul>
-				<li v-for="(item,index) in dialogBuy.list" :class="{'_done': item.done}">
+				<li v-for="(item,index) in dialogBuy.list" :key="item.title" :class="{'_done': item.done}">
 					<i class="_icon el-icon-circle-check-outline"></i>
 					<h4 class="_tit">{{item.title}}</h4>
 					
 					<div class="_desc">
 						<p>{{item.content}}</p>
 						<p v-if="item.done && index === 1 && orderState < 4 && data.paymentWay == 2">
-							<el-button size="mini" type="text" @click="bankPass">银行审批通过</el-button>
-							<el-button size="mini" type="text" @click="fullPay">银行审核不通过，改成全款支付尾款</el-button>
+							<!-- <el-button size="mini" type="text" @click="bankPass">银行审批通过</el-button> -->
+							<!-- <el-button size="mini" type="text" @click="fullPay">银行审核不通过</el-button> -->
+							<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + data.customerOrderId" target="_blank">购车合同</a>
 						</p>
 						<p class="l-text-gray">{{item.time}}</p>
 						<p v-if="item.image.length > 0" v-for="image in item.image" :key="image">

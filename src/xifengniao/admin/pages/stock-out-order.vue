@@ -45,7 +45,7 @@
 	    </el-table-column>
 	    <el-table-column class-name="l-fs-xs" label="支付状态" prop="payBrief" min-width="120" align="center">
 	    	<template slot-scope="scope">
-	    		<p v-for="item in scope.row.payBrief.split('。')">{{item}}</p>
+	    		<p v-for="item in scope.row.payBrief.split('。')" :key="item">{{item}}</p>
 	    	</template>
 	    </el-table-column>
 	    <el-table-column label="操作" header-align="center" align="center" min-width="120">

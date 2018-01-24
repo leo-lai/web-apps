@@ -1,6 +1,5 @@
 var path = require('path')
 var webpack = require('webpack')
-var glob = require('glob')
 
 var utils = require('./utils')
 var config = require('../config')
@@ -52,6 +51,14 @@ var webpackConfig = {
         query: {
           limit: 10000,
           name: utils.assetsPath('images/[name].[ext]')
+        }
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: utils.assetsPath('media/[name].[ext]')
         }
       },
       {

@@ -2,7 +2,7 @@
 	<div>
 		<el-row class="l-margin-b">
   		<el-col :span="8">
-  			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
+  			<el-button type="primary" @click="showDialogInfo('new')">新增角色</el-button>
   		</el-col>
   		<el-col :span="16" class="l-text-right">
   			
@@ -64,7 +64,6 @@
 	</div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 function getCheckedKeys(nodeArray = []) {
 	let keys = []
 	nodeArray.forEach(node => {

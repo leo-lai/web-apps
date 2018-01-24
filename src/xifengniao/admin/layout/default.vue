@@ -6,15 +6,17 @@
     		<div class="l-rest l-header-nav">
     			<el-menu class="l-menu" :default-active="$route.path" mode="horizontal" :router="true"
     				background-color="#334057" text-color="#b7c3d1" active-text-color="#21a0ff">
-    				<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
-					  <el-menu-item index="/stock">库存管理</el-menu-item>
-					  <el-menu-item index="/customer">客户体系</el-menu-item>
-					  <el-submenu index="/base">
-					    <template slot="title">基础设置</template>
-					    <el-menu-item index="/base/setting">基本设置</el-menu-item>
-					    <el-menu-item index="/base/data">资料设置</el-menu-item>
-					  </el-submenu>
-					  <el-menu-item index="/bank">银行资料审核</el-menu-item>
+						<template v-if="userInfo.orgLevel < 4">
+							<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
+							<el-menu-item index="/stock">库存管理</el-menu-item>
+							<el-menu-item index="/customer">客户体系</el-menu-item>
+							<el-submenu index="/base">
+								<template slot="title">基础设置</template>
+								<el-menu-item index="/base/setting">基本设置</el-menu-item>
+								<el-menu-item v-if="userInfo.orgLevel < 3" index="/base/data">资料设置</el-menu-item>
+							</el-submenu>
+						</template>
+					  <el-menu-item v-if="userInfo.orgLevel === 4" index="/bank">银行资料审核</el-menu-item>
 					</el-menu>
     		</div>
     		<div class="l-text-right l-padding-lr">
