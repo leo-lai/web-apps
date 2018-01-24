@@ -25,7 +25,7 @@
               </tr>
               <tr>
                 <td>
-                  <!-- <f7-link :href="`${$$config.shopURL}?rtoken=${userInfo.token}&uid=${userInfo.id}`" external>
+                  <!-- <f7-link :href="`${$$config.shopURL}?rtoken=${userInfo.token}&uid=${userInfo.id}&openid=${userInfo.open_id`" external>
                     <f7-icon f7="briefcase_fill"></f7-icon>
                     <p>商城</p>
                   </f7-link> -->
