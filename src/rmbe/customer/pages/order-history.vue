@@ -2,7 +2,7 @@
   <f7-page name="order-history">
     <f7-navbar title="消费记录" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
-      <f7-list-item v-for="item in list.data" key="order_id">
+      <f7-list-item v-for="item in list.data" :key="item.order_id">
         <div slot="inner" style="width: 100%;">
           <div>
             <p>单号：{{item.order_id}}</p>

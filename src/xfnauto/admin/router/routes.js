@@ -40,12 +40,24 @@ const routes = [
     component: layout,
     meta: { hidden: true },
     children: [
-      { 
-        path: '', 
+      {
+        path: '',
         meta: { title: '库存管理' },
         component: resolve => require(['../pages/stock'], resolve),
       }
-    ], 
+    ],
+  },
+  {
+    path: '/order',
+    component: layout,
+    meta: { hidden: true },
+    children: [
+      {
+        path: '',
+        meta: { title: '代购管理' },
+        component: resolve => require(['../pages/order'], resolve),
+      }
+    ],
   },
   {
     path: '/customer',

@@ -300,7 +300,7 @@
 			      <el-radio :label="1" border>现金支付</el-radio>
 			    </el-radio-group>
 			  </el-form-item>
-			  <el-form-item style="margin-top: 50px;" label="" prop="isCash">
+			  <el-form-item style="margin-top: 50px;" label="">
 			  	<el-button type="primary" :loading="dialogPay.loading" @click="submitDialogPay">立即支付</el-button>
 			  </el-form-item>
   		</el-form>

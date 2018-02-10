@@ -16,14 +16,14 @@
 		</f7-buttons>
     <f7-tabs>
 		  <f7-tab id="tab-1" active>
-				<div class="l-padding l-bg-white l-border-b" v-for="item in full_cut.list">
+				<div class="l-padding l-bg-white l-border-b" v-for="item in full_cut.list" :key="item.id">
 					<p>{{item.title}}</p>
 					<p>{{item.create_time}}</p>
 				</div>
 				<div class="l-padding l-text-gray l-text-center" v-if="full_cut.isAjax && full_cut.list.length === 0">暂无满减券</div>
 		  </f7-tab>
 		  <f7-tab id="tab-2">
-				<div class="l-padding l-bg-white l-border-b" v-for="item in times.list">
+				<div class="l-padding l-bg-white l-border-b" v-for="item in times.list" :key="item.id">
 					<p>{{item.title}}</p>
 					<p>{{item.create_time}}</p>
 				</div>

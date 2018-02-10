@@ -31,19 +31,16 @@ export default {
       this.formData.open_id = this.data.openid
       this.$f7.showIndicator()
       this.$$api.pay.create(this.formData).then(({data}) => {
-        if(this.formData.coupon_type !== 'times'){
+        if(this.formData.coupon_type !== 'times' && this.formData.coupon_type !== 'plat_times'){
           this.$$api.wxpay(data).then(_ => {
-            // this.$f7.alert('支付成功，设备启动成功', _ => {
-              
-            // })
             this.$router.loadPage('/video')
           }).catch(_ => {
-            this.$f7.alert('支付失败，设备启动失败')
+            this.$f7.alert('支付失败，设备启动失败', _ => {
+              this.back()
+            })
           })
         }else {
-          this.$f7.alert('该设备启动成功', _ => {
-            this.back()
-          })
+          this.$router.loadPage('/video')
         }
       }).finally(_ => {
         this.$f7.hideIndicator()

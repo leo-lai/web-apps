@@ -23,7 +23,7 @@
         </f7-list-item>
       </f7-list>
       <f7-list class="l-scroll" form style="margin:0; max-height: 15.0rem;">
-        <f7-list-item radio name="coupon" :title="item.title + (item.type === 'times' ? '（剩余次数：'+ item.device_count +'）' : '')" v-for="item in couponList" key="id" @click="couponSlt(item)"></f7-list-item>
+        <f7-list-item radio name="coupon" :title="item.title + (item.type === 'times' ? '（剩余次数：'+ item.device_count +'）' : '')" v-for="item in couponList" :key="item.id" @click="couponSlt(item)"></f7-list-item>
       </f7-list>
       <div v-if="couponList.length === 0" class="l-padding l-text-gray l-text-center">暂无可用{{couponText[couponType]}}</div>
     </div>
@@ -110,7 +110,7 @@ export default {
         formData.type = 'buy'
       }
 
-      if(formData.coupon_type !== 'times'){
+      if(formData.coupon_type !== 'times' && formData.coupon_type !== 'plat_times'){
         if(!this.money) {
           this.$$utils.toptip('请输入支付金额')
           return

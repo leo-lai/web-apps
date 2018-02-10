@@ -179,7 +179,7 @@ const api = {
     }
   },
   zuzhi: { // 组织架构管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/organizationList', formData)
@@ -201,7 +201,7 @@ const api = {
     }
   },
   user: { // 系统用户管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/userList', formData)
@@ -217,7 +217,7 @@ const api = {
     }
   },
   role: { // 角色管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/roleList', formData)
@@ -233,7 +233,7 @@ const api = {
     }
   },
   group: { // 分组管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/systemGroupingList', formData)
@@ -266,7 +266,7 @@ const api = {
     }
   },
   supplier: { // 供应商管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/supplierList', formData)
@@ -282,7 +282,7 @@ const api = {
     }
   },
   car: { // 车型管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/carsList', formData)
@@ -313,7 +313,7 @@ const api = {
     }
   },
   color: { // 车身颜色内饰管理
-    getList(formData = {}, page = 1, rows = 100) { // 车系列表(分页)
+    getList(formData = {}, page = 1, rows = 50) { // 车系列表(分页)
       formData.page = page
       formData.rows = rows
       return fetch.post('/carsFamilyListPage', formData)
@@ -344,7 +344,7 @@ const api = {
     }
   },
   customer: { // 客户管理
-    getList(formData = {}, page = 1, rows = 100) {
+    getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/customerOrgList', formData)
@@ -388,12 +388,12 @@ const api = {
     add(formData = {}) { // 新增客户
       return fetch.post('/addCustomerUsersr', formData)
     }, // 跟踪列表
-    getTrackList(formData = {}, page = 1, rows = 100) {
+    getTrackList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/trackCustomerOrgList', formData)
     }, // 预约列表
-    getBespeakList(formData = {}, page = 1, rows = 100) {
+    getBespeakList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/bespeakCustomerOrgList', formData)
@@ -409,7 +409,7 @@ const api = {
     }
   },
   stock: { // 库存管理
-    getList(formData = {}, page = 1, rows = 100) { // 车辆库存列表
+    getList(formData = {}, page = 1, rows = 50) { // 车辆库存列表
       formData.page = page
       formData.rows = rows
       return fetch.post('/stockCarList', formData)
@@ -420,7 +420,7 @@ const api = {
     editInfo(formData = {}) { // 编辑车辆库存详情
       return fetch.post('/stockCarEdit', formData)
     },
-    getInList(formData = {}, page = 1, rows = 100) { // 入库单列表
+    getInList(formData = {}, page = 1, rows = 50) { // 入库单列表
       formData.page = page
       formData.rows = rows
       return fetch.post('/storageList', formData)
@@ -434,7 +434,7 @@ const api = {
     getInInfo(storageId = '') { // 入库单详情
       return fetch.post('/storageInfo', { storageId })
     },
-    getInCarList(formData = {}, page = 1, rows = 100) {
+    getInCarList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
       return fetch.post('/storageCarList', formData)
@@ -460,7 +460,7 @@ const api = {
     notice(formData = {}) { // 通知有车
       return fetch.post('/stockOrderNotice', formData)
     },
-    getOrderList(formData = {}, page = 1, rows = 100) { // 订车列表
+    getOrderList(formData = {}, page = 1, rows = 50) { // 订车列表
       formData.page = page
       formData.rows = rows
       return fetch.post('/stockOrderList', formData)
@@ -471,7 +471,7 @@ const api = {
     outStock(formData = {}) { // 二级车辆出库
       return fetch.post('/stockOrderStorageOut', formData)
     },
-    getOrderList2(formData = {}, page = 1, rows = 100) { // 三级车辆出库列表
+    getOrderList2(formData = {}, page = 1, rows = 50) { // 三级车辆出库列表
       formData.page = page
       formData.rows = rows
       return fetch.post('/customerOrderList', formData)
@@ -483,6 +483,28 @@ const api = {
       return fetch.post('/customerOrderStorageOut', formData)
     }
   },
+  order: { // 代购管理
+    getList(formData = {}, page = 1, rows = 50) { // 代购单列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/ConsumerOrder/listOrders', formData)
+    },
+    getInfo(orderId = '') {
+      return fetch.post('/ConsumerOrder/getOrderDetail', { orderId })
+    },
+    getPayInfo(orderId = '') { // 获取支付信息
+      return fetch.post('/ConsumerOrder/getPaymentInfo', { orderId })
+    },
+    pay(formData = {}) { // 上传支付凭证
+      return fetch.post('/ConsumerOrderPayment/create', formData)
+    },
+    tickPic(formData = {}) { // 上传票证图片
+      return fetch.post('/ConsumerOrderCar/uploadTickPic', formData)
+    },
+    tickDone(orderId = '') { // 所有上传票证图片
+      return fetch.post('/ConsumerOrder/finishOrder', { orderId })
+    }
+  },
   pay: { // 通联支付
     orderPay(formData = {}) {
       return fetch.post('/stockOrderPay', formData)
@@ -492,7 +514,7 @@ const api = {
     }
   },
   bank: {
-    getList(formData = {}, page = 1, rows = 100) { // 审核列表
+    getList(formData = {}, page = 1, rows = 50) { // 审核列表
       formData.page = page
       formData.rows = rows
       return fetch.post('/bankToExamineOrderList', formData)

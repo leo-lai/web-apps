@@ -9,12 +9,15 @@
 						<template v-if="userInfo.orgType < 4">
 							<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
 							<el-menu-item index="/stock">库存管理</el-menu-item>
+							<el-menu-item v-if="userInfo.orgLevel < 3" index="/order">代购管理</el-menu-item>
 							<el-menu-item index="/customer">客户体系</el-menu-item>
-							<el-submenu index="/base">
+							<el-menu-item index="/base/setting">基本设置</el-menu-item>
+							<el-menu-item index="/base/data">资料设置</el-menu-item>
+							<!-- <el-submenu index="/base">
 								<template slot="title">基础设置</template>
 								<el-menu-item index="/base/setting">基本设置</el-menu-item>
-								<el-menu-item v-if="userInfo.orgLevel < 3" index="/base/data">资料设置</el-menu-item>
-							</el-submenu>
+								<el-menu-item index="/base/data">资料设置</el-menu-item>
+							</el-submenu> -->
 						</template>
 					  <el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
 					</el-menu>

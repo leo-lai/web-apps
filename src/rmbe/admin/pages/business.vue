@@ -100,6 +100,10 @@
 			  	<span slot="label" style="font-size:12px;">Access Token</span>
 			    <el-input v-model="dialogInfo.data.access_token" :maxlength="50"></el-input>
 			  </el-form-item>
+				<el-form-item prop="rest_device_count">
+			  	<span slot="label">设备次数</span>
+			    <el-input v-model="dialogInfo.data.rest_device_count" :maxlength="10"></el-input>
+			  </el-form-item>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
@@ -217,7 +221,8 @@ export default {
 					city: '',
 					district: '',
 					bank_id: '',
-					detail_address: ''
+					detail_address: '',
+					rest_device_count: ''
 				}
 			}
 		}
