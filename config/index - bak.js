@@ -5,7 +5,7 @@ var path = require('path')
 // 对应编译后部署到服务器的路径是 http://192.168.0.100:8085/apps/default/index.html
 var host = 'localhost'
 var port = 8090
-var moduleName = 'xifengniao'
+var moduleName = 'rmbe'
 
 
 module.exports = {
