@@ -84,13 +84,13 @@
 			  	<el-input v-model="dialogInfo.data.unitPrice" :maxlength="10"></el-input>
 			  </el-form-item>
 			  <el-form-item label="车架号" prop="frameNumber" >
-			  	<el-input v-model="dialogInfo.data.frameNumber" :maxlength="10"></el-input>
+			  	<el-input v-model="dialogInfo.data.frameNumber" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="发动机号" prop="engineNumber" >
-			  	<el-input v-model="dialogInfo.data.engineNumber" :maxlength="10"></el-input>
+			  	<el-input v-model="dialogInfo.data.engineNumber" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="票证号" prop="certificateNumber" >
-			  	<el-input v-model="dialogInfo.data.certificateNumber" :maxlength="10"></el-input>
+			  	<el-input v-model="dialogInfo.data.certificateNumber" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="验车照片" prop="upload">
 			  	<uploader ref="dialogInfoUpload" :file-list.sync="dialogInfo.uploadList"></uploader>

@@ -142,7 +142,7 @@
   				<td class="_tit" width="120">附件照片</td>
   				<td colspan="5" class="_cont">
   					<div style="margin: -10px -10px 0 0;">
-  						<img style="margin: 10px 10px 0 0; width: 60px; height:60px;" v-for="(item,index) in viewInfo.uploadList" :src="item.thumb" @click="showCarImages(viewInfo.uploadList, index)">
+  						<img style="margin: 10px 10px 0 0; width: 60px; height:60px;" v-for="(item,index) in viewInfo.uploadList" :key="item" :src="item.thumb" @click="showCarImages(viewInfo.uploadList, index)">
   					</div>
   				</td>
   			</tr>
