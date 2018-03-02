@@ -40,14 +40,14 @@
                     <p>消费记录</p>
                   </f7-link>
                 </td>
-                <tr>
-                  <td colspan="2" height="100">
-                    <div class="l-margin">
-                      <f7-button big fill @click="test">测试设备</f7-button>
-                    </div>
-                  </td>
-                </tr>
               </tr>
+              <!-- <tr>
+                <td colspan="2" height="100">
+                  <div class="l-margin">
+                    <f7-button big fill @click="test">测试设备</f7-button>
+                  </div>
+                </td>
+              </tr> -->
             </table>
           </f7-page>
         </f7-pages>
