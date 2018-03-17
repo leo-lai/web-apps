@@ -503,6 +503,9 @@ const api = {
     },
     tickDone(orderId = '') { // 所有上传票证图片
       return fetch.post('/ConsumerOrder/finishOrder', { orderId })
+    },
+    getContractInfo(orderId = '') { // 合同信息
+      return fetch.post('/ConsumerOrder/getContractInfo', { orderId })
     }
   },
   pay: { // 通联支付

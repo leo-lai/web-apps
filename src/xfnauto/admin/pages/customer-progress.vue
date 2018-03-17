@@ -69,14 +69,14 @@
 					
 					<div class="_desc">
 						<p>{{item.content}}</p>
-						<p v-if="item.done && index === 1">
-							<!-- <el-button size="mini" type="text" @click="bankPass">银行审批通过</el-button> -->
-							<!-- <el-button size="mini" type="text" @click="fullPay">银行审核不通过</el-button> -->
-							<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + data.customerOrderId" target="_blank">购车合同</a>
-						</p>
 						<p class="l-text-gray">{{item.time}}</p>
 						<p v-if="item.image.length > 0" v-for="image in item.image" :key="image">
 							<img :src="image">
+						</p>
+						<p v-if="item.done && index === 0">
+							<!-- <el-button size="mini" type="text" @click="bankPass">银行审批通过</el-button> -->
+							<!-- <el-button size="mini" type="text" @click="fullPay">银行审核不通过</el-button> -->
+							<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + data.customerOrderId" target="_blank">购车合同</a>
 						</p>
 					</div>
 				</li>
@@ -294,10 +294,11 @@
 			  <el-form-item label="收款备注" prop="remarks">
 			    <el-input type="textarea" :rows="2" v-model="dialogPay.data.remarks"></el-input>
 			  </el-form-item>
-			  <el-form-item label="支付方式" prop="isCash">
-			  	<el-radio-group v-model="dialogPay.data.isCash">
-			      <el-radio :label="0" border>POS刷卡</el-radio>
-			      <el-radio :label="1" border>现金支付</el-radio>
+			  <el-form-item label="支付方式" prop="payMethod">
+			  	<el-radio-group v-model="dialogPay.data.payMethod">
+			      <el-radio :label="5" border>POS刷卡</el-radio>
+			      <el-radio :label="6" border>现金支付</el-radio>
+			      <el-radio :label="14" border>其他POS机刷卡</el-radio>
 			    </el-radio-group>
 			  </el-form-item>
 			  <el-form-item style="margin-top: 50px;" label="">
@@ -480,7 +481,7 @@ export default {
 					amount: [
 						{ required: true, pattern: config.regexp.money, message: '必填项（保留两位小数点）', trigger: 'blur' }
 					],
-					isCash: [
+					payMethod: [
 						{ required: true, type: 'number', message: '必填项', trigger: 'change' }
 					]
 				},
@@ -489,7 +490,7 @@ export default {
 					amount: '',
 					remarks: '',
 					isDepositPrice: 1,
-					isCash: 0
+					payMethod: 5
 				}
 			},
 			dialogGive: {
@@ -691,8 +692,16 @@ export default {
 			this.dialogPay.data.customerOrderId = this.data.customerOrderId
 			this.$refs.payForm.validate(valid => {
         if (valid) {
-        	if(this.dialogPay.data.isCash === 1) {
-        		this.$confirm('确定收到了现金再继续此操作，是否继续?', '提示', {
+        	if(this.dialogPay.data.payMethod === 5) { // 通联pos支付
+						this.dialogPay.loading = true
+	          this.$$api.customer.payOrder(this.dialogPay.data).then(({data}) => {
+	            this.qrcode.visible = true
+							this.qrcode.opts = Object.assign({}, this.$$config.qrcodeOption, { data })
+	          }).finally(_ => {
+	            this.dialogPay.loading = false
+						})
+        	}else{
+        		this.$confirm('您必须确定收到款项金额再继续此操作，是否继续?', '提示', {
 		          confirmButtonText: '确定',
 		          cancelButtonText: '取消',
 		          type: 'warning'
@@ -707,14 +716,6 @@ export default {
 		            this.dialogPay.loading = false
 		          })
 		        })
-        	}else{
-        		this.dialogPay.loading = true
-	          this.$$api.customer.payOrder(this.dialogPay.data).then(({data}) => {
-	            this.qrcode.visible = true
-							this.qrcode.opts = Object.assign({}, this.$$config.qrcodeOption, { data })
-	          }).finally(_ => {
-	            this.dialogPay.loading = false
-	          })
         	}
         }else {
         	this.$message({

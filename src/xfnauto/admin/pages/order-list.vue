@@ -3,6 +3,9 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+					<el-form-item prop="keywords">
+				    <el-input placeholder="请输入客户姓名/车架号" v-model="list.filter.keywords"></el-input>
+				  </el-form-item>
   				<el-form-item prop="orgId">
   					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
@@ -22,19 +25,29 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderCode" width="140"></el-table-column>
-	    <el-table-column label="订购门店" prop="orgName" align="center"></el-table-column>
-			<el-table-column label="订购员" prop="orgLinker" align="center"></el-table-column>
-	    <el-table-column label="数量" prop="number" align="center"></el-table-column>
-	    <el-table-column label="建单员" prop="" align="center"></el-table-column>
-			<el-table-column label="建单日期" prop="createTime" align="center"></el-table-column>
-			<el-table-column label="订单状态" prop="orderStateName" align="center"></el-table-column>
-	    <el-table-column label="操作" align="center" width="200">
+	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderCode" width="120"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="订购门店" prop="orgName"></el-table-column>
+			<el-table-column label="订购员" prop="orgLinker" align="center" width="100"></el-table-column>
+			<el-table-column class-name="l-fs-xs" label="客户姓名 | 手机号 | 车架号" align="center" width="360" :render-header="columnHeader">
+				<template slot-scope="scope">
+					<p class="l-text-wrap1" v-for="item in scope.row.customers" :key="item.id">
+						<span style="display:inline-block; min-width: 60px; text-align: center;">{{item.userName || '--'}}</span>
+						<span style="margin: 0 3px; color: #ccc;">|</span>
+						<span style="display:inline-block; min-width: 80px; text-align: center;">{{item.userPhone || '--'}}</span>
+						<span style="margin: 0 3px; color: #ccc;">|</span>
+						<span style="display:inline-block; min-width: 155px; text-align: center;">--</span>
+					</p>
+	      </template>
+			</el-table-column>
+	    <el-table-column label="建单员" prop="creator" align="center" width="110"></el-table-column>
+			<el-table-column class-name="l-fs-xs" label="建单日期" prop="createTime" align="center" width="100"></el-table-column>
+			<el-table-column class-name="l-fs-xs" label="订单状态" prop="orderStateName" align="center" width="100"></el-table-column>
+	    <el-table-column label="操作" align="center" width="130">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo(scope.row)">查看</el-button>
-	    		<el-button class="l-text-error" v-if="scope.row.state == 5" type="text" size="small" @click="showDialogPay(1, scope.row)">收定金</el-button>
-	    		<el-button class="l-text-error" v-if="scope.row.state == 35" type="text" size="small" @click="showDialogPay(2, scope.row)">收尾款</el-button>
-	    		<!-- <el-button class="l-text-link" type="text" size="small" >电子合同</el-button> -->
+	    		<el-button class="l-text-link" type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
+					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'order/contract?id=' + scope.row.id" target="_blank">打印合同</a>
+	    		<el-button class="l-text-error" v-if="scope.row.state == 5" type="text" size="mini" @click="showDialogPay(1, scope.row)">收定金</el-button>
+	    		<el-button class="l-text-error" v-if="scope.row.state == 35" type="text" size="mini" @click="showDialogPay(2, scope.row)">收尾款</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -85,8 +98,8 @@
 							</div>
 							<div>身份证照片：</div>
 							<div>
-								<img style="width: 100px; height: 50px;" :src="item.idCardPicOn">
-								<img style="width: 100px; height: 50px; margin-left: 10px;" :src="item.idCardPicOff">
+								<img @click="showImages(0, [item.idCardPicOn, item.idCardPicOff])" style="width: 100px; height: 50px;" :src="item.idCardPicOn">
+								<img @click="showImages(1, [item.idCardPicOn, item.idCardPicOff])" style="width: 100px; height: 50px; margin-left: 10px;" :src="item.idCardPicOff">
 							</div>
 						</div>
 						<div class="_car l-margin" v-for="carItem in item.infos" :key="carItem.id">
@@ -118,7 +131,7 @@
 									<div class="l-flex-h">
 										<span>验车照片</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.checkCarPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.checkCarPicArr" :key="img" :src="img" @click="showImages(index, frame.checkCarPicArr)">
 										</div>
 									</div>
 									
@@ -126,37 +139,37 @@
 									<div class="l-flex-h">
 										<span>车身发票</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.ticketPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.ticketPicArr" :key="img" :src="img" @click="showImages(index, frame.ticketPicArr)">
 										</div>
 									</div>
 									<div class="l-flex-h">
 										<span>合格证</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.certificationPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.certificationPicArr" :key="img" :src="img" @click="showImages(index, frame.certificationPicArr)">
 										</div>
 									</div>
 									<div class="l-flex-h">
 										<span>交强险</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.tciPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.tciPicArr" :key="img" :src="img" @click="showImages(index, frame.tciPicArr)">
 										</div>
 									</div>
 									<div class="l-flex-h">
 										<span>快递单</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.expressPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.expressPicArr" :key="img" :src="img" @click="showImages(index, frame.expressPicArr)">
 										</div>
 									</div>
 									<div class="l-flex-h">
 										<span>商业险</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.ciPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.ciPicArr" :key="img" :src="img" @click="showImages(index, frame.ciPicArr)">
 										</div>
 									</div>
 									<div class="l-flex-h">
 										<span>其他</span>
 										<div class="l-rest">
-											<img class="_img" v-for="img in frame.otherPicArr" :key="img" :src="img">
+											<img class="_img" v-for="(img, index) in frame.otherPicArr" :key="img" :src="img" @click="showImages(index, frame.otherPicArr)">
 										</div>
 									</div>
 								</div>
@@ -261,16 +274,17 @@
   		</el-form>
 		</el-dialog>
 
-
+		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
 import uploader from 'components/uploader'
+import viewerImages from 'components/viewer-images'
 export default {
 	name: 'order-list',
 	components: {
-		uploader
+		uploader, viewerImages
 	},
 	data() {
 		let that = this
@@ -316,11 +330,13 @@ export default {
 			list: {
 				filter: {
 					dateRange: [],
+					keywords: '',
 					startDate: '',
 					endDate: '',
 					orgId: ''
 				},
 				rules: {
+					keywords: [],
 					dateRange: [],
 					startDate: [],
 					endDate: [],
@@ -388,6 +404,17 @@ export default {
     ])
 	},
 	methods: {
+		columnHeader(h, { column, $index }) {
+			return (
+				<p class="l-text-center" style="font-size:12px; font-weight: 500;">
+					<span style="display:inline-block; width: 60px;">客户姓名</span>
+					<span style="margin: 0 3px; color: #ccc;">|</span>
+					<span style="display:inline-block; width: 88px;">手机号码</span>
+					<span style="margin: 0 3px; color: #ccc;">|</span>
+					<span style="display:inline-block; width: 155px;">车架号</span>
+				</p>
+      )
+		},
 		filterDateChange(value) {
 			if(value) {
 				this.list.filter.startDate = value[0] || ''
@@ -599,6 +626,18 @@ export default {
 			}).finally(_ => {
 				this.dialogInfo.loading = false
 			})
+		},
+		showImages(index = 0, imagesArr = []) {
+			if(imagesArr.length > 0){
+				imagesArr = imagesArr.map(img => {
+					return {
+						url: this.$$utils.image.thumb(img, 150), 
+						thumb: this.$$utils.image.thumb(img, 150), 
+						src: img
+					}
+				})
+				this.$refs.viewer.show(index, imagesArr)
+			}
 		}
 	},
 	mounted() {

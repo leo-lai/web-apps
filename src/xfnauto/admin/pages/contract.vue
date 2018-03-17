@@ -59,24 +59,24 @@
         <tr>
           <td>车辆最终成交价</td>
           <td>¥ {{info.carUnitPrice}}</td>
-          <td>车辆购置税</td>
-          <td>¥ {{info.purchaseTaxPriace}}</td>
+          <td><span :class="{'l-hidden': !info.purchaseTaxPriace}">车辆购置税</span></td>
+          <td><span :class="{'l-hidden': !info.purchaseTaxPriace}">¥ {{info.purchaseTaxPriace}}</span></td>
         </tr>
         <tr>
-          <td>上牌费</td>
-          <td>¥ {{info.licensePlatePriace}}</td>
-          <td>商业保险费用</td>
-          <td>¥ {{info.insurancePriace}}</td>
+          <td><span :class="{'l-hidden': !info.licensePlatePriace}">上牌费</span></td>
+          <td><span :class="{'l-hidden': !info.licensePlatePriace}">¥ {{info.licensePlatePriace}}</span></td>
+          <td><span :class="{'l-hidden': !info.insurancePriace}">商业保险费用</span></td>
+          <td><span :class="{'l-hidden': !info.insurancePriace}">¥ {{info.insurancePriace}}</span></td>
         </tr>
         <tr>
-          <td>按揭费用</td>
-          <td>¥ {{info.mortgagePriace}}</td>
-          <td>精品选装费</td>
-          <td>¥ {{info.boutiquePriace}}</td>
+          <td><span :class="{'l-hidden': !info.mortgagePriace}">按揭费用</span></td>
+          <td><span :class="{'l-hidden': !info.mortgagePriace}">¥ {{info.mortgagePriace}}</span></td>
+          <td><span :class="{'l-hidden': !info.boutiquePriace}">精品选装费</span></td>
+          <td><span :class="{'l-hidden': !info.boutiquePriace}">¥ {{info.boutiquePriace}}</span></td>
         </tr>
         <tr>
-          <td>车船税</td>
-          <td>¥ {{info.vehicleAndVesselTax}}</td>
+          <td><span :class="{'l-hidden': !info.vehicleAndVesselTax}">车船税</span></td>
+          <td><span :class="{'l-hidden': !info.vehicleAndVesselTax}">¥ {{info.vehicleAndVesselTax}}</span></td>
           <td></td>
           <td></td>
         </tr>
@@ -175,6 +175,7 @@ export default {
 };
 </script>
 <style scoped lang="less">
+.l-hidden{visibility: hidden;}
 .l-contract {
   -webkit-print-color-adjust: exact;
   width: 210mm;

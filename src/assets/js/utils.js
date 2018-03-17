@@ -233,7 +233,12 @@ const class2type = (function(){
   })
   return ret
 })()
+
+const str2date = (dateStr = '') => {
+  return dateStr ? new Date(Date.parse(dateStr.replace(/-/gi, '/'))) : new Date()
+}
 export let utils = {
+  str2date,
   device: { 
     isAndroid,
     isIpad,
