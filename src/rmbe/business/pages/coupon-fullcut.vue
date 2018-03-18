@@ -125,7 +125,7 @@ export default {
         return
       }
 
-      let formData = Object.assign(this.coupon.data)
+      let formData = Object.assign({}, this.coupon.data)
 
       formData.full_money = formData.full_money * 100
       formData.cut_money = formData.cut_money * 100

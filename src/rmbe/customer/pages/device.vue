@@ -1,10 +1,14 @@
 <template>
-  <f7-page name="device">
+  <f7-page class="l-bg-white" name="device">
     <f7-navbar :title="title" sliding></f7-navbar>
+    <div class="l-padding l-text-center">
+      <img style="width: 6.75rem; height: 6.75rem;" src="../../assets/20180318001.jpg" alt="">
+    </div>
+
     <div class="l-panel-pay">
       <p class="l-text-gray l-fs-m">支付金额</p>
       <div class="_ipt _ipt2 l-flex-hc">
-        <b style="margin: 0.25rem 0.75rem 0 0 ;">￥</b>
+        <b style="margin: 0.25rem 0.75rem 0 0 ;">RMB</b>
         <div class="l-rest">
           <span v-show="!money">点击这里输入金额</span>
           <input ref="money" v-model="money" readonly @click="showKeyboard($event.target)" placeholder="">  
@@ -12,23 +16,26 @@
       </div>
     </div>
   
-    <div class="l-margin">
-      <f7-list form style="margin:0;">
-        <f7-list-item>
-          <f7-label style="width:auto;">选择优惠券：</f7-label>
-          <f7-input type="select" v-model="couponType" @change="getCouponList">
+    <div class="l-panel-coupon">
+      <div class="l-flex-hc">
+        <span>选择优惠券：</span>
+        <div class="l-rest">
+          <select style="width:100%; padding: 5px;" name="" id="" v-model="couponType" @change="getCouponList">
             <option value="full_cut">满减券</option>
             <option value="times">次数券</option>
-          </f7-input>
-        </f7-list-item>
-      </f7-list>
+          </select>
+        </div>
+      </div>
       <f7-list class="l-scroll" form style="margin:0; max-height: 15.0rem;">
         <f7-list-item radio name="coupon" :title="item.title + (item.type === 'times' ? '（剩余次数：'+ item.device_count +'）' : '')" v-for="item in couponList" :key="item.id" @click="couponSlt(item)"></f7-list-item>
       </f7-list>
       <div v-if="couponList.length === 0" class="l-padding l-text-gray l-text-center">暂无可用{{couponText[couponType]}}</div>
     </div>
-    <div style="margin: 2rem 1rem;">
-      <f7-button big fill @click="pay">启动设备</f7-button>
+    <div style="margin: 1rem;">
+      <f7-button style="background-color:#323232;" big fill @click="pay">开&nbsp;&nbsp;启</f7-button>
+      <div class="l-text-center l-margin" style="font-size: 1rem;">
+        蜕&nbsp;变&nbsp;之&nbsp;旅
+      </div>
     </div>
 
     <number-keyboard ref="numberKeyboard" :nk-length="10"></number-keyboard>
@@ -148,8 +155,11 @@ export default {
 </script>
 
 <style scoped lang="less">
+.l-panel-coupon{
+  margin: 0.75rem; background-color: #fff; padding: 1rem; border: 1px solid #ccc; border-radius: 5px;
+}
 .l-panel-pay{
-  margin: 0.75rem; background-color: #fff; padding: 1rem;
+  margin: 0.75rem; background-color: #fff; padding: 1rem; border: 1px solid #ccc; border-radius: 5px;
   ._ipt2{
     input::-webkit-input-placeholder{
       /* font-size: 0.85rem; */ color: #333;
