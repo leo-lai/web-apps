@@ -274,6 +274,9 @@ const api = {
     send(formData = {}) {
       return fetch.post('/seller/coupon/send', formData)
     },
+    update(formData = {}) {
+      return fetch.post('/seller/coupon/update_customer', formData)
+    },
     getCustomerList(formData = {}, page = 1, rows = 50) {
       formData.per_page = rows
       formData.page_number = page - 1      
@@ -293,6 +296,11 @@ const api = {
         data.rows = rows
         return data
       })
+    }
+  },
+  customer: {
+    update(formData = {}) {
+      return fetch.post('/seller/customer/update', formData)
     }
   },
   order: {

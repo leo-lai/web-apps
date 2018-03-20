@@ -31,7 +31,7 @@
             <!-- Page Content -->
             <table class="l-index-menu">
               <tr>
-                <td colspan="2" style="background: #5ac8fa; color: #fff; height: 6rem;">
+                <td colspan="2" style="background: #5ac8fa; color: #fff; height: 4rem;">
                   <p class="l-fs-s">今日收益</p>
                   <p class="l-fs-xl">￥<b>{{index.today_sum}}</b></p>
                 </td>
@@ -77,6 +77,17 @@
                     <f7-icon f7="ticket_fill"></f7-icon>
                     <p>优惠券</p>
                   </f7-link>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <f7-link href="/customer/list/">
+                    <f7-icon f7="persons_fill"></f7-icon>
+                    <p>消费者列表</p>
+                  </f7-link>
+                </td>
+                <td>
+                  
                 </td>
               </tr>
             </table>

@@ -30,16 +30,6 @@
     </div>
     <!-- popup -->
     <f7-popup :opened="edit.opened" theme="lightblue">
-      <!-- <f7-navbar>
-        <f7-nav-left>
-          <f7-link text="返回" icon-f7="chevron_left" @click="closeEdit"></f7-link>
-        </f7-nav-left>
-        <f7-nav-center>编辑设备</f7-nav-center>
-        <f7-nav-right>
-          <f7-link text="保存" :disabled="edit.disabled" icon-f7="check" @click="saveEdit"></f7-link>
-        </f7-nav-right>
-      </f7-navbar> -->
-
       <div class="navbar l-text-center" style="line-height: 44px;">编辑设备</div>
       <f7-list form>
         <f7-list-item>

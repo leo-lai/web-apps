@@ -46,6 +46,7 @@
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
 					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'order/contract?id=' + scope.row.id" target="_blank">打印合同</a>
+					<el-button class="l-text-warn" v-if="scope.row.countermandApply == 1" type="text" size="mini" @click="showDialogRefund(scope.row)">退款审核</el-button>
 	    		<el-button class="l-text-error" v-if="scope.row.state == 5" type="text" size="mini" @click="showDialogPay(1, scope.row)">收定金</el-button>
 	    		<el-button class="l-text-error" v-if="scope.row.state == 35" type="text" size="mini" @click="showDialogPay(2, scope.row)">收尾款</el-button>
 	      </template>
@@ -280,6 +281,25 @@
   		</el-form>
 		</el-dialog>
 
+		<!-- 退款审核 -->
+		<el-dialog class="l-padding-t-0" :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogRefund.title" :visible.sync="dialogRefund.visible" width="620px">
+			<el-form ref="refundForm" style="width: 555px;" label-width="100px" :model="dialogRefund.data" :rules="dialogRefund.rules">
+				<el-form-item label="申请退款原因">
+					<span>{{dialogRefund.countermandReason || '无'}}</span>
+					<a v-if="dialogRefund.countermandPic.length > 0" class="l-btn-link" @click="showImages(0, dialogRefund.countermandPic)">查看退款附件</a>
+				</el-form-item>
+				<el-form-item class="_flex" label="退款凭证">
+					<uploader ref="dialogRefundUpload" :file-list.sync="dialogRefund.uploadList"></uploader>
+			  </el-form-item>
+			  <el-form-item label="退款备注" prop="remarks">
+			    <el-input type="textarea" :rows="2" v-model="dialogRefund.data.remarks"></el-input>
+			  </el-form-item>
+			  <el-form-item style="margin-top: 50px;" label="">
+			  	<el-button type="primary" :loading="dialogRefund.loading" @click="submitDialogRefund">同意退款</el-button>
+			  </el-form-item>
+  		</el-form>
+		</el-dialog>
+
 		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
@@ -380,6 +400,25 @@ export default {
 					payType: 2,
 					voucher: '',
 					remark: ''
+				}
+			},
+			dialogRefund: {
+				type: 1,
+				title: '退款审核',
+				visible: false,
+				loading: false,
+				uploadList: [],
+				rules: {
+					remarks: [
+						{ required: true, message: '必填项', trigger: 'blur' }
+					]
+				},
+				countermandReason: '',
+				countermandPic: [],
+				data: {
+					id: '',
+					voucherPic: '',
+					remarks: ''
 				}
 			},
 			dialogTick: {
@@ -520,6 +559,8 @@ export default {
 				loading.close()
 			})
 		},
+
+		// 支付
 		showDialogPay(type = 1, row) {
 			this.$$utils.copyObj(this.dialogPay.data, '')
 			this.dialogPay.visible = true
@@ -534,7 +575,7 @@ export default {
 				loading.close()
 			})
 		},
-		submitDialogPay() { // 支付凭证
+		submitDialogPay() {
 			this.$refs.payForm.validate(valid => {
         if (valid) {
           this.dialogPay.loading = true
@@ -553,6 +594,43 @@ export default {
         }
       })
 		},
+
+		// 退款审核
+		showDialogRefund(row) {
+			this.$$utils.copyObj(this.dialogRefund.data, '')
+			this.dialogRefund.visible = true
+			this.dialogRefund.data.id = row.id
+			this.dialogRefund.countermandReason = row.countermandReason
+			this.dialogRefund.countermandPic = row.countermandPic ? row.countermandPic.split(',') : []
+		},
+		submitDialogRefund() { 
+			if(this.$refs.dialogRefundUpload.waiting > 0) {
+				this.$message.error('退款凭证正在上传中')
+				return
+			}
+
+			this.dialogRefund.data.voucherPic = this.dialogRefund.uploadList.map(item => item.src || item.url).join(',')
+			this.dialogRefund.data.overPass = 1
+			this.$refs.refundForm.validate(valid => {
+        if (valid) {
+          this.dialogRefund.loading = true
+          this.$$api.order.refund(this.dialogRefund.data).then(_ => {
+						this.$message.success('操作成功')
+						this.dialogRefund.visible = false
+            this.refreshList()
+          }).finally(()=>{
+            this.dialogRefund.loading = false
+          })  
+        }else {
+        	this.$message({
+						type: 'error',
+						message: '请完善表单信息'
+					})
+        }
+      })
+		},
+
+		// 上传票证
 		showDialogTick(row) {
 			this.$$utils.copyObj(this.dialogTick.data, row)
 			this.dialogTick.data.carId = row.id

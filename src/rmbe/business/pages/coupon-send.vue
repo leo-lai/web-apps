@@ -32,7 +32,7 @@
       </div>
       <f7-list form style="margin:0;">
         <f7-list-item>
-          <f7-label style="width:auto;">请选择发放优惠券：</f7-label>
+          <f7-label style="width:auto;">优惠券类型：</f7-label>
           <f7-input type="select" v-model="coupon.data.type" @change="getCouponList">
             <option value="full_cut">满减券</option>
             <option value="times">次数券</option>
@@ -40,12 +40,20 @@
         </f7-list-item>
       </f7-list>
       <f7-list class="l-scroll" form style="margin:0; max-height: 15.0rem;">
-        <f7-list-item radio name="coupon" :title="item.title +'（剩余'+item.rest_count+'张）'" v-for="item in coupon.list"  :key="item.id" @click="couponSlt(item)"></f7-list-item>
+        <f7-list-item radio name="coupon" :title="'优惠券名称： ' + item.title +'（剩余'+item.rest_count+'张）'" v-for="item in coupon.list" :key="item.id" @click="couponSlt(item)"></f7-list-item>
+        <div class="l-text-gray l-padding l-text-center" v-if="coupon.list.length === 0">暂无优惠券</div>
       </f7-list>
-      <f7-list form style="margin:0;">
+
+      <f7-list form style="margin:15px 0 0 0;">
         <f7-list-item>
           <f7-label>数量</f7-label>
           <f7-input type="tel" v-model="coupon.data.count" placeholder="请输入发放数量" maxlength="10"/>
+        </f7-list-item>
+      </f7-list>
+      <f7-list form style="margin:0;">
+        <f7-list-item>
+          <f7-label>过期时间</f7-label>
+          <f7-input type="date" v-model="coupon.data.expire_date" placeholder="请选择优惠券过期时间" />
         </f7-list-item>
       </f7-list>
 
@@ -82,7 +90,8 @@ export default {
           customer_id: '',
           type: 'full_cut',
           coupon_id: '',
-          count: ''
+          count: '',
+          expire_date: ''
 				}
 			}
 		}
@@ -141,19 +150,27 @@ export default {
         this.$$utils.toptip('请选择发放优惠券')
         return
       }
-
       if(!/^\d{1,}$/.test(this.coupon.data.count)) {
         this.$$utils.toptip('请输入发放数量')
         return
       }
-
       if(this.coupon.data.count > this.coupon.slted.rest_count) {
         this.$$utils.toptip('发放数量大于剩余数量')
         return
       }
 
+      // if(this.coupon.data.expire_date) {
+      //   this.coupon.data.expire_date = this.coupon.data.expire_date.replace(/T/ig, ' ')
+      //   if(this.coupon.data.expire_date.length <= 16) {
+      //     this.coupon.data.expire_date += ':00'  
+      //   }
+      // }
+      console.log(this.coupon.data.expire_date)
+      let promise1 = this.$$api.coupon.send(this.coupon.data)
+      // let promise2 = this.$$api.coupon.update(this.coupon.data)
+
       this.$f7.showIndicator()
-      this.$$api.coupon.send(this.coupon.data).then(({data}) => {
+      Promise.all([promise1]).then(_ => {
         this.couponClose()
         this.$f7.alert('优惠券发放成功')
       }).finally(_ => {

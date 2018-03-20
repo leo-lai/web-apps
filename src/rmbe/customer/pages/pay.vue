@@ -2,16 +2,16 @@
   <f7-page name="pay">
     <f7-navbar title="支付确认" sliding>
     </f7-navbar>
-    <f7-list>
+    <f7-list style="border: 1px solid #ccc; border-radius: 5px; margin: 0.75rem; overflow: hidden;">
       <f7-list-item title="类型" after="启动设备"></f7-list-item>
-      <f7-list-item title="金额" :after="data.amount + '元'"></f7-list-item>
+      <f7-list-item title="金额RMB" :after="data.amount + '元'"></f7-list-item>
       <f7-list-item title="备注" :after="data.desc"></f7-list-item>
     </f7-list>
     <div class="l-margin">
-      <f7-button big fill @click="payNow">确定支付</f7-button>  
+      <f7-button style="background-color:#323232;" big fill @click="payNow">确定支付</f7-button>  
     </div>
     <div class="l-margin">
-      <f7-button big fill @click="back" color="green">返回</f7-button>  
+      <f7-button style="background-color:#323232;" big fill @click="back" color="green">返回</f7-button>  
     </div>
 
   </f7-page>

@@ -506,6 +506,9 @@ const api = {
     },
     getContractInfo(orderId = '') { // 合同信息
       return fetch.post('/ConsumerOrder/getContractInfo', { orderId })
+    },
+    refund(formData = {}) { // 退款
+      return fetch.post('/ConsumerOrder/countermandExamine', formData)
     }
   },
   pay: { // 通联支付
