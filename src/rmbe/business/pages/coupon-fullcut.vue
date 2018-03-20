@@ -6,7 +6,7 @@
       </f7-nav-right>
     </f7-navbar>
     <f7-list style="margin:0;">
-		  <f7-list-item :title="item.title" :after="'剩余：'+item.rest_count+'张'" v-for="item in list.data" key="id"></f7-list-item>
+		  <f7-list-item :title="item.title" :after="'剩余：'+item.rest_count+'张'" v-for="item in list.data" :key="item.id"></f7-list-item>
 		</f7-list>
     <infinite-loading :on-infinite="onInfinite" ref="infinite">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
@@ -15,14 +15,7 @@
     </infinite-loading>
 		<!-- popup -->
     <f7-popup :opened="coupon.opened" theme="lightblue">
-      <f7-navbar>
-        <f7-nav-left>
-          <f7-link text="返回" icon-f7="chevron_left" @click="couponClose"></f7-link>
-        </f7-nav-left>
-        <f7-nav-center>生成满减券</f7-nav-center>
-        <f7-nav-right></f7-nav-right>
-      </f7-navbar>
-
+      <div class="navbar l-text-center" style="line-height: 44px;">生成满减券</div>
       <f7-list form style="margin:0;">
         <f7-list-item>
           <f7-label>名称</f7-label>
@@ -41,7 +34,13 @@
           <f7-input type="tel" placeholder="请输入生成张数" v-model="coupon.data.count" :maxlength="7"/>
         </f7-list-item>
       </f7-list>
-      <f7-block><f7-button fill big @click="couponSave">确定生成</f7-button></f7-block>
+
+      <div class="l-margin">
+        <f7-button big fill @click="couponSave">确定生成</f7-button>  
+      </div>
+      <div class="l-margin">
+        <f7-button big fill @click="couponClose" color="green">返回</f7-button>  
+      </div>
     </f7-popup>
   </f7-page>
 </template>

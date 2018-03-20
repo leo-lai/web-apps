@@ -35,7 +35,7 @@
 						<span style="margin: 0 3px; color: #ccc;">|</span>
 						<span style="display:inline-block; min-width: 80px; text-align: center;">{{item.userPhone || '--'}}</span>
 						<span style="margin: 0 3px; color: #ccc;">|</span>
-						<span style="display:inline-block; min-width: 155px; text-align: center;">--</span>
+						<span style="display:inline-block; min-width: 155px; text-align: center;">{{item.car.vin || '--'}}</span>
 					</p>
 	      </template>
 			</el-table-column>
@@ -75,8 +75,14 @@
 					<div class="l-order-info-base">
 						<span>订单号：{{dialogInfo.data.orderCode}}</span>
 						<span>车辆总数：{{dialogInfo.data.carNum}}</span>
-						<span>总定金：￥{{dialogInfo.data.totalDepositPrice}}</span>
-						<span>总成交价：<b class="l-text-error">￥{{dialogInfo.data.totalFinalPrice}}</b></span>
+						<span>
+							总定金：￥{{dialogInfo.data.totalDepositPrice}}
+							<a v-if="dialogInfo.data.pay1Image && dialogInfo.data.pay1Image.length > 0" class="l-btn-link l-margin-l-s" @click="showImages(0, dialogInfo.data.pay1Image)">定金支付凭证</a>
+						</span>
+						<span>
+							总成交价：<b class="l-text-error">￥{{dialogInfo.data.totalFinalPrice}}</b>
+							<a v-if="dialogInfo.data.pay2Image && dialogInfo.data.pay2Image.length > 0" class="l-btn-link l-margin-l-s" @click="showImages(0, dialogInfo.data.pay2Image)">尾款支付凭证</a>
+						</span>
 					</div>
 					<div class="l-order-info-base" style="border-top:1px solid #eaeaea; margin-top: 15px; padding-top: 15px;">
 						<span>客户经理：{{dialogInfo.data.creator}}</span>
@@ -441,11 +447,14 @@ export default {
 					this.list.page = data.page
 					this.list.rows = data.rows
 					this.list.data = data.list.map(item => {
-						item.number = 0
-						item.infos.forEach(carItem => {
-							item.number += carItem.carNum
+						item.customers && item.customers.map(customer => {
+							if(customer.infos && customer.infos[0] && customer.infos[0].cars&& customer.infos[0].cars[0]) {
+								customer.car = customer.infos[0].cars[0]
+							}else{
+								customer.car = {}
+							}
+							return customer
 						})
-						item.deling = false
 						return item
 					})
 				}
@@ -481,6 +490,24 @@ export default {
 						})
 					})
 				})
+
+				// 支付信息
+				let pay1Image = [], pay2Image = []
+				data.orderPaymentVOs.forEach(pay => {
+					if (pay.voucher) {
+						if (pay.type == 1) {
+							pay1Image = pay1Image.concat(pay.voucher.split(','))
+						} else if(pay.type == 2) {
+							pay2Image = pay2Image.concat(pay.voucher.split(','))
+						}
+					}
+				})
+
+				data.pay1Image = pay1Image
+				data.pay2Image = pay2Image
+
+				console.log(pay1Image, pay2Image)
+
 				this.dialogInfo.data = data
 			})
 		},

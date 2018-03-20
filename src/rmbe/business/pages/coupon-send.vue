@@ -2,7 +2,7 @@
   <f7-page name="coupon">
     <f7-navbar title="发放优惠券" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
-    	<f7-list-item v-for="item in list.data" key="id">
+    	<f7-list-item v-for="item in list.data" :key="item.id">
         <div slot="inner" style="width: 100%;">
           <div class="l-flex-hc">
             <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb"></div>
@@ -22,13 +22,7 @@
     </infinite-loading>
 		<!-- popup -->
     <f7-popup :opened="coupon.opened" theme="lightblue">
-      <f7-navbar>
-        <f7-nav-left>
-          <f7-link text="返回" icon-f7="chevron_left" @click="couponClose"></f7-link>
-        </f7-nav-left>
-        <f7-nav-center>发放优惠券</f7-nav-center>
-        <f7-nav-right></f7-nav-right>
-      </f7-navbar>
+      <div class="navbar l-text-center" style="line-height: 44px;">发放优惠券</div>
 			<div class="l-flex-hc l-padding">
         <div class="l-margin-r" v-if="customer.thumb"><img class="l-avatar" :src="customer.thumb"></div>
         <div class="l-rest">
@@ -46,7 +40,7 @@
         </f7-list-item>
       </f7-list>
       <f7-list class="l-scroll" form style="margin:0; max-height: 15.0rem;">
-        <f7-list-item radio name="coupon" :title="item.title +'（剩余'+item.rest_count+'张）'" v-for="item in coupon.list" key="id" @click="couponSlt(item)"></f7-list-item>
+        <f7-list-item radio name="coupon" :title="item.title +'（剩余'+item.rest_count+'张）'" v-for="item in coupon.list"  :key="item.id" @click="couponSlt(item)"></f7-list-item>
       </f7-list>
       <f7-list form style="margin:0;">
         <f7-list-item>
@@ -55,8 +49,12 @@
         </f7-list-item>
       </f7-list>
 
-
-      <f7-block><f7-button fill big @click="couponSend">确定发放</f7-button></f7-block>
+      <div class="l-margin">
+        <f7-button big fill @click="couponSend">确定发放</f7-button>  
+      </div>
+      <div class="l-margin">
+        <f7-button big fill @click="couponClose" color="green">返回</f7-button>  
+      </div>
     </f7-popup>
   </f7-page>
 </template>
