@@ -63,8 +63,10 @@ export default {
         opened: false,
         slted: {},
         data: {
+          id: '',
           thumb: '',
           nickname: '',
+          customer_id: '',
           customer_nickname: ''
         }
       }
@@ -101,13 +103,14 @@ export default {
       this.edit.slted = item
       this.edit.disabled = true
       this.$$utils.copyObj(this.edit.data, item)
+      this.edit.data.customer_id = item.id
       this.edit.opened = true
     },
     saveEdit() {
       this.$f7.showIndicator()
       this.$$api.customer.update(this.edit.data).then(({data}) => {
         // this.$$utils.copyObj(this.edit.slted, this.edit.data)
-        this.edit.slted.nickname = this.edit.slted.customer_nickname
+        this.edit.slted.nickname = this.edit.data.customer_nickname
       }).finally(_ => {
         this.$f7.hideIndicator()
         this.closeEdit()
