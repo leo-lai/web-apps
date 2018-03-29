@@ -27,12 +27,12 @@
 	    <el-table-column label="库存数量" prop="number" align="center"></el-table-column>
 	    <el-table-column label="优惠金额" prop="discountPrice" align="center"></el-table-column>
 	    <el-table-column label="门店/公司名称" prop="orgName" align="center" min-width="120"></el-table-column>
-	    <el-table-column label="线上展示" prop="isOnLine" align="center">
+	    <!-- <el-table-column label="线上展示" prop="isOnLine" align="center">
 	    	<template slot-scope="scope">
 	    		<span v-if="!scope.row.isOnLine" class="l-text-error">否</span>
 	    		<span v-else>是</span>
 	      </template>
-	    </el-table-column>
+	    </el-table-column> -->
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">查看 / 编辑</el-button>

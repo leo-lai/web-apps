@@ -26,8 +26,12 @@
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderCode" width="120"></el-table-column>
+			<el-table-column label="订单类型" prop="orderType" align="center" width="100">
+				<template slot-scope="scope">
+					{{scope.row.orderType ? orderType[scope.row.orderType - 1] : '常规单'}}
+	      </template>
+			</el-table-column>
 	    <el-table-column class-name="l-fs-xs" label="订购门店" prop="orgName"></el-table-column>
-			<el-table-column label="订购员" prop="orgLinker" align="center" width="100"></el-table-column>
 			<el-table-column class-name="l-fs-xs" label="客户姓名 | 手机号 | 车架号" align="center" width="360" :render-header="columnHeader">
 				<template slot-scope="scope">
 					<p class="l-text-wrap1" v-for="item in scope.row.customers" :key="item.id">
@@ -67,15 +71,16 @@
 		<el-dialog custom-class="l-order-info-dialog" :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="1100px" >
 			<div class="l-order-info l-scroll">
 				<div class="_hd">
+					<div class="l-order-info-base"><span>订购门店：{{dialogInfo.data.orgName}}</span></div>
 					<div class="l-order-info-base">
-						<span>订购门店：{{dialogInfo.data.orgName}}</span>
-						<span>门店联系人：{{dialogInfo.data.orgLinker}}</span>
-						<span>门店联系电话：{{dialogInfo.data.orgPhone}}</span>
+						<span>联&ensp;系&ensp;人：{{dialogInfo.data.orgLinker}}</span>
+						<span>联系电话：{{dialogInfo.data.orgPhone}}</span>
+						<span>车辆总数：{{dialogInfo.data.carNum}}</span>
 						<span class="l-text-warn">订单状态：{{dialogInfo.data.orderStateName}}</span>
 					</div>
 					<div class="l-order-info-base">
-						<span>订单号：{{dialogInfo.data.orderCode}}</span>
-						<span>车辆总数：{{dialogInfo.data.carNum}}</span>
+						<span>订单编号：{{dialogInfo.data.orderCode}}</span>
+						<span>订单类型：{{dialogInfo.data.orderType ? orderType[dialogInfo.data.orderType - 1] : '常规单'}}</span>
 						<span>
 							总定金：￥{{dialogInfo.data.totalDepositPrice}}
 							<a v-if="dialogInfo.data.pay1Image && dialogInfo.data.pay1Image.length > 0" class="l-btn-link l-margin-l-s" @click="showImages(0, dialogInfo.data.pay1Image)">定金支付凭证</a>
@@ -119,6 +124,7 @@
 									<!-- <span class="l-margin-l" style="color:#00b7ee;">车辆状态：已验车</span> -->
 								</div>
 							</div>
+							<div v-if='carItem.remark' class="l-text-gray">备注：{{carItem.remark}}</div>
 							<!-- <div>
 								<span>购买数量：{{carItem.colorName}}</span>
 								<span class="l-margin-l">裸车价：￥{{carItem.nakedPrice}}</span>
@@ -134,7 +140,7 @@
 									<el-button class="l-margin-l" type="primary" size="mini" plain @click="showDialogTick(frame)">上传票证</el-button>
 								</div>
 								<div class="_pic">
-									<div class="l-margin-b" style="font-weight:700;"><span>车辆备注</span>{{frame.auditRemark}}</div>
+									<div class="l-margin-b" style="font-weight:700;"><span>换车或修改价格备注</span>{{frame.auditRemark}}</div>
 									<div class="l-flex-h">
 										<span>验车照片</span>
 										<div class="l-rest">
@@ -326,6 +332,7 @@ export default {
 		}
 
 		return {
+			orderType: ['常规单', '炒车单'],
 			dateOptions: {
 				shortcuts: [{
           text: '最近一周',

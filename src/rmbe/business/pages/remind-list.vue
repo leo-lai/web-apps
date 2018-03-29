@@ -15,13 +15,14 @@
 					<p class="l-text-error">机器物料不足，请及时联系工厂配货</p>
 					<p class="l-text-gray">{{item.alter_time}}</p>
 				</div>
-				<div class="l-padding l-text-gray l-text-center" v-if="isAjax && list1.length === 0">暂无提醒</div>
+				<div class="l-padding l-text-gray l-text-center" v-if="isAjax && list1.length === 0">暂无物料提醒</div>
 		  </f7-tab>
 		  <f7-tab id="tab-2">
-				<div class="l-padding l-bg-white l-border-b" >
+				<div v-if="list2.title" class="l-padding l-bg-white l-border-b" >
 					<p class="l-text-error">{{list2.title}}</p>
 					<p class="l-text-gray">{{list2.alter_time}}</p>
 				</div>
+				<div v-else class="l-padding l-text-gray l-text-center">暂无充值提醒</div>
 		  </f7-tab>
 		</f7-tabs>
   </f7-page>

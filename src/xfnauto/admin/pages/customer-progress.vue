@@ -108,10 +108,16 @@
   			<div class="l-form1-row">
   				<div class="_tit"><b>订单信息</b></div>
   				<div class="_cont">
-						<el-form-item class="_flex" label="车辆型号" prop="carsId" style="width: 605px;">
-					    <el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderItemChange" @change="cascaderChange"
-					    	v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
-					  </el-form-item>
+						<div class="l-flex-hc">
+							<el-form-item class="_flex" label="车辆型号" prop="carsId" style="width: 605px;">
+								<el-cascader style="width: 100%;" :show-all-levels="false" @active-item-change="cascaderItemChange" @change="cascaderChange"
+									v-model="cascader.value" :options="cascader.data" :props="cascader.props"></el-cascader>
+							</el-form-item>
+							<el-form-item>
+								<div style="width: 84px;" slot="label">车架号</div>
+								<el-input :disabled="true" :value="dialogInfo.data.frameNumber || '--'"></el-input>
+							</el-form-item>
+						</div>
 					  <el-form-item label="车身颜色" prop="colourId">
 					  	<el-select v-model="dialogInfo.data.colourId" placeholder="请选择">
 						    <el-option v-for="color in dialogInfo.colorList" :key="color.carColourId" :label="color.carColourName" :value="color.carColourId"></el-option>

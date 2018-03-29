@@ -22,15 +22,15 @@
 		<!-- popup -->
     <f7-popup :opened="edit.opened" theme="lightblue">
       <div class="navbar l-text-center" style="line-height: 44px;">修改昵称</div>
-      <div class="l-margin l-text-center" v-if="edit.data.thumb"><img class="l-avatar" :src="edit.data.thumb"></div>
+      <div class="l-margin l-text-center" v-if="edit.slted.thumb"><img class="l-avatar" :src="edit.slted.thumb"></div>
       <f7-list form>
         <f7-list-item>
           <f7-label>旧昵称</f7-label>
-          <f7-input disabled type="text" :value="edit.data.nickname"/>
+          <f7-input disabled type="text" :value="edit.slted.nickname"/>
         </f7-list-item>
         <f7-list-item>
           <f7-label>新昵称</f7-label>
-          <f7-input type="text" placeholder="请输入新昵称" v-model="edit.data.customer_nickname" @input="edit.disabled = false"/>
+          <f7-input type="text" placeholder="请输入新昵称" v-model="edit.data.nickname" @input="edit.disabled = false"/>
         </f7-list-item>
       </f7-list>
       <div class="l-margin">
@@ -65,9 +65,8 @@ export default {
         data: {
           id: '',
           thumb: '',
-          nickname: '',
           customer_id: '',
-          customer_nickname: ''
+          nickname: ''
         }
       }
 		}
@@ -104,13 +103,14 @@ export default {
       this.edit.disabled = true
       this.$$utils.copyObj(this.edit.data, item)
       this.edit.data.customer_id = item.id
+      this.edit.data.nickname = ''
       this.edit.opened = true
     },
     saveEdit() {
       this.$f7.showIndicator()
       this.$$api.customer.update(this.edit.data).then(({data}) => {
         // this.$$utils.copyObj(this.edit.slted, this.edit.data)
-        this.edit.slted.nickname = this.edit.data.customer_nickname
+        this.edit.slted.nickname = this.edit.data.nickname
       }).finally(_ => {
         this.$f7.hideIndicator()
         this.closeEdit()
@@ -123,7 +123,6 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
-      this.resetInfinite()
     })
   }
 }

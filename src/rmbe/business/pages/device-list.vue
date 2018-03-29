@@ -135,7 +135,7 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
-      this.resetInfinite()
+      // this.resetInfinite()
     })
   },
   beforeDestroy() {

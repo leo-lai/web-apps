@@ -4,6 +4,7 @@ var webpack = require('webpack')
 var utils = require('./utils')
 var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
+const vuxLoader = require('vux-loader')
 
 // 获得入口js文件
 var entries = utils.getMultiEntry('./src/'+ config.moduleName +'/*/main.js') 
@@ -34,6 +35,16 @@ var webpackConfig = {
     }
   },
   module: {
+    ...(config.dev.useEslint ? [{
+      test: /\.(js|vue)$/,
+      loader: 'eslint-loader',
+      enforce: 'pre',
+      include: [resolve('src'), resolve('test')],
+      options: {
+        formatter: require('eslint-friendly-formatter'),
+        emitWarning: !config.dev.showEslintErrorsInOverlay
+      }
+    }] : []),
     rules: [{
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -79,4 +90,6 @@ var webpackConfig = {
   ]
 }
 
-module.exports = webpackConfig
+module.exports = vuxLoader.merge(webpackConfig, {
+  plugins: ['vux-ui', 'progress-bar', 'duplicate-style']
+})

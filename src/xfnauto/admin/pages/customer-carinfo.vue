@@ -114,7 +114,7 @@
 		  		<caption>人车合照/车辆照片</caption>
 		  	</table>
 		  	<div style="overflow:hidden;">
-		  		<img style="float:left; width: 150px; height: 100px; margin: 15px 15px 0 0;" v-for="(img,index) in data.extractCarImage" :src="img.thumb" @click="previewImage(index)">
+		  		<img style="float:left; width: 150px; height: 100px; margin: 15px 15px 0 0;" v-for="(img,index) in data.extractCarImage" :key="index" :src="img.thumb" @click="previewImage(index)">
 		  	</div>
 	  	</template>
 		</div>
