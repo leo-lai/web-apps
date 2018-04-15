@@ -39,7 +39,7 @@ export default {
 	},
 	methods: {
     resetInfinite() {
-      this.$refs.infinite.$emit('$InfiniteLoading:reset')
+      this.$refs.infinite.$emit('$InfiniteLoading:reset', false)
       this.onInfinite(1)
     },
     onInfinite(page) {

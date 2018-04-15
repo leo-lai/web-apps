@@ -1,7 +1,7 @@
 ﻿export let regionData = [
   {
     "text": "北京市",
-    "value": "100000",
+    "value": "110000",
     "children": [{
       "text": "北京市",
       "value": "110100",
@@ -14538,11 +14538,12 @@
         ]
       },
       {
-        "text": "吐鲁番地区",
+        "text": "吐鲁番市",
         "value": "652100",
-        "children": [{
-            "text": "吐鲁番市",
-            "value": "652101"
+        "children": [
+          {
+            "name": "高昌区",
+            "value": "652121"
           },
           {
             "text": "鄯善县",
@@ -14555,10 +14556,10 @@
         ]
       },
       {
-        "text": "哈密地区",
+        "text": "哈密市",
         "value": "652200",
         "children": [{
-            "text": "哈密市",
+            "text": "伊州区",
             "value": "652201"
           },
           {
