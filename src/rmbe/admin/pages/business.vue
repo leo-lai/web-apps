@@ -33,7 +33,11 @@
 	    	</template>
 	    </el-table-column>
 	    
-	    <el-table-column label="拥有设备数量" prop="own_device_count" align="center" min-width="150"></el-table-column>
+	    <el-table-column label="拥有设备数量" prop="own_device_count" align="center" min-width="150">
+	    	<template slot-scope="scope">
+	    		<router-link class="l-text-link" :to="'/device?tel=' + scope.row.tel">{{scope.row.own_device_count}}</router-link>
+	    	</template>
+	    </el-table-column>
 	    <el-table-column label="启动失败次数" prop="device_failed_count" align="center" min-width="150">
 	    	<template slot-scope="scope">
 	    		<p :class="scope.row.device_failed_count >= 10 ? 'l-text-error' : ''">{{scope.row.device_failed_count}}</p>
@@ -334,6 +338,9 @@ export default {
         }
       })
 		}
+	},
+	created() {
+		this.list.filter.name = this.$route.query.name || ''
 	},
 	mounted() {
 		this.getList()

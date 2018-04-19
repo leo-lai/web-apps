@@ -6,7 +6,7 @@
       </f7-nav-left> -->
     </f7-navbar>
     <ul class="l-recharge-list">
-    	<li v-for="item in list" :class="{'_slted': slted.id === item.id}" @click="slt(item)">{{item.name}}</li>
+    	<li v-for="item in list" :key="item.id" :class="{'_slted': slted.id === item.id}" @click="slt(item)">{{item.name}}</li>
     </ul>
 		<div class="l-padding l-bg-white">
 			<p class="l-fs-l l-text-center">价值：{{slted.priceStr}}元</p>

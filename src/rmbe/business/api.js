@@ -274,10 +274,13 @@ const api = {
     send(formData = {}) {
       return fetch.post('/seller/coupon/send', formData)
     },
+    recycle(coupon_id) {
+      return fetch.post('/seller/coupon/recycle', { coupon_id })
+    },
     update(formData = {}) {
       return fetch.post('/seller/coupon/update_customer', formData)
     },
-    getCustomerList(formData = {}, page = 1, rows = 50) {
+    getCustomerList(formData = {}, page = 1, rows = 10000) {
       formData.per_page = rows
       formData.page_number = page - 1      
       return fetch.post('/seller/customer/list', formData).then(({data}) => {
@@ -304,7 +307,7 @@ const api = {
     }
   },
   order: {
-    getList(formData = {}, page = 1, rows = 50) {
+    getList(formData = {}, page = 1, rows = 10000) {
       formData.per_page = rows
       formData.page_number = page - 1      
       return fetch.post('/seller/order/list/consume', formData).then(({data}) => {

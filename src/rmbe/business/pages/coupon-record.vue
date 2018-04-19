@@ -2,7 +2,7 @@
   <f7-page name="coupon">
     <f7-navbar title="发放记录" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
-    	<f7-list-item v-for="item in list.data" :key="item">
+    	<f7-list-item v-for="(item,index) in list.data" :key="index">
         <div slot="inner" class="l-flex-h" style="width: 100%;">
           <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb" width="44"></div>
           <div class="l-rest">

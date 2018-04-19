@@ -25,7 +25,7 @@
 				      <span slot="title">{{menu.meta.title}}</span>
 			      </el-menu-item>
           </template>
-          <el-menu-item index="" @click.native="shopAdmin">
+          <el-menu-item index="" @click.native="shopAdmin" v-if="showShopAdmin">
 			      <i class="el-icon-caret-right"></i>
 			      <!-- <a style="color: inherit; text-decoration: none;" :href="$$config.shop.admin + '?token=' + userInfo.token" target="_blank" slot="title">商城管理</a> -->
 			      <span slot="title">商城管理</span>
@@ -89,6 +89,7 @@ export default {
   data() {
     return {
     	userMenus,
+    	showShopAdmin: false,
     	pwdForm: {
     		visible: false,
 				submiting: false,
@@ -155,7 +156,17 @@ export default {
   	},
   	submitPwdForm() {
 
+  	},
+  	getRights() {
+  		this.$$api.auth.getRights().then(({data}) => {
+  			if(data && data.length > 0 && data.filter(item => item.operation_route == 'plat:right:shopManagement')[0]) {
+  				this.showShopAdmin = true
+  			}
+  		})
   	}
+  },
+  created() {
+  	this.getRights()
   },
   mounted() {
   	this.initSomething()

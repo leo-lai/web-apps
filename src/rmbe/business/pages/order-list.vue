@@ -2,7 +2,7 @@
   <f7-page name="order-list">
     <f7-navbar title="订单列表" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
-    	<f7-list-item v-for="item in list.data" key="order_id">
+    	<f7-list-item v-for="item in list.data" :key="item.order_id">
         <div slot="inner" style="width: 100%;">
           <div class="l-flex-h" style="padding-top: 0.25rem;">
             <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb" style="width: 50px; height: 50px;"></div>

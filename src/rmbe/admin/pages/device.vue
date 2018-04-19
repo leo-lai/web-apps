@@ -30,7 +30,8 @@
 	    <el-table-column label="设备编号" prop="number"></el-table-column>
 	    <el-table-column label="属于商户" prop="name" align="center">
 	    	<template slot-scope="scope">
-	    		<span>{{ scope.row.seller_id ? scope.row.name : '无' }}</span>
+	    		<router-link class="l-text-link" v-if="scope.row.seller_id" :to="'/business?name=' + scope.row.name">{{scope.row.name}}</router-link>
+	    		<span v-else></span>
 	    	</template>
 	    </el-table-column>
 	    <el-table-column label="商家手机号" prop="tel" align="center"></el-table-column>
@@ -355,6 +356,9 @@ export default {
 				})
       })
 		}
+	},
+	created() {
+		this.list.filter.tel = this.$route.query.tel || ''
 	},
 	mounted() {
 		this.getList()

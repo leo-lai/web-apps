@@ -145,6 +145,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Toast from 'assets/f7-toast'
 export default {
   name: 'index',
 	data() {
@@ -225,6 +226,8 @@ export default {
           })
         })
 
+        Toast(this.$f7)
+
         this.checkLogin()
       })
     })
@@ -237,6 +240,7 @@ export default {
 @import '~framework7-icons/css/framework7-icons.css';
 @import '~assets/css/font.less';
 @import '~assets/css/base.less';
+@import '~assets/f7-toast/index.less';
 @import '../assets/framework7.less';
 body{font-size: 0.75rem;}
 .l-index-menu{

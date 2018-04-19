@@ -2,7 +2,7 @@
   <f7-page name="device-list">
     <f7-navbar title="设备列表" back-link="返回" sliding></f7-navbar>
     <!-- Search bar -->
-    <f7-searchbar cancel-link="取消" placeholder="输入设备别名/设备编号" :clear="true" 
+    <f7-searchbar cancel-link="取消" placeholder="输入设备别名/设备编号查询" :clear="true" 
       @input="onSearch" @click:clear="onClear" @click:cancel="onClear">
     </f7-searchbar>
 

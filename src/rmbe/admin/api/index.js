@@ -60,6 +60,9 @@ const api = {
         // toLogin && location.replace(`${config.router.base}/login?to=` + location.href)
         toLogin && router.replace('/login')
       })
+    },
+    getRights() {
+      return fetch.post('/role/rights')
     }
   },
   dashboard: {

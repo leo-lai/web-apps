@@ -2,7 +2,7 @@
   <f7-page name="wallet-record" toolbar-fixed>
     <f7-navbar title="充值记录" back-link="返回" sliding></f7-navbar>
     <div class="l-wallet-record l-bg-white">
-      <div class="_item l-border-b l-padding" v-for="item in list.data">
+      <div class="_item l-border-b l-padding" v-for="item in list.data" :key="item.order_id">
         <p>订&ensp;单&ensp;号：{{item.order_id}}</p>
         <p>时&emsp;&emsp;间：{{item.update_time}}</p>
         <p><b class="l-fs l-fr l-text-main">￥{{item.amount}}</b>充值次数：{{item.pay_data}}</p>

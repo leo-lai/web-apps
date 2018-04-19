@@ -1,8 +1,12 @@
 <template>
   <f7-page name="coupon">
     <f7-navbar title="发放优惠券" back-link="返回" sliding></f7-navbar>
+    <f7-searchbar cancel-link="取消" placeholder="输入昵称查询" :clear="true" 
+      @input="onSearch" @click:clear="onClear" @click:cancel="onClear">
+    </f7-searchbar>
+
     <f7-list class="l-fs-m" style="margin:0;">
-    	<f7-list-item v-for="item in list.data" :key="item.id">
+    	<f7-list-item v-for="item in list.filterList" :key="item.id">
         <div slot="inner" style="width: 100%;">
           <div class="l-flex-hc">
             <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb"></div>
@@ -77,9 +81,12 @@ export default {
 		return {
       userInfo: {},
       list: {
-        filter: {},
+        filter: {
+          keywords: ''
+        },
         page: 1,
-        data: []
+        data: [],
+        filterList: []
       },
       customer: {},
 			coupon: {
@@ -96,6 +103,11 @@ export default {
 			}
 		}
 	},
+  computed: {
+    filterList() {
+      return this.list.data.filter(item => this.list.filter.keywords ? item.nickname.includes(this.list.filter.keywords) : this.list.data)
+    }
+  },
 	methods: {
     resetInfinite() {
       this.$refs.infinite.$emit('$InfiniteLoading:reset', false)
@@ -105,6 +117,7 @@ export default {
       this.$$api.coupon.getCustomerList(this.list.filter, page || this.list.page).then(data => {
         let returnList = data.list
         this.list.data = data.page > 1 ? this.list.data.concat(returnList) : returnList
+        this.list.filterList = this.list.data
 
         if(returnList.length > 0){
           this.$nextTick(()=>{
@@ -122,6 +135,16 @@ export default {
       }).catch(_ => {
         this.$refs.infinite.$emit('$InfiniteLoading:complete')
       })
+    },
+    onSearch(query, found) {
+      this.list.filter.keywords = query
+      this.list.filterList = this.list.data.filter(item => this.list.filter.keywords ? item.nickname.includes(this.list.filter.keywords) : this.list.data)
+      // this.resetInfinite()
+    },
+    onClear(query, found) {
+      this.list.filter.keywords = ''
+      this.list.filterList = this.list.data
+      // this.onInfinite(1)
     },
     getCouponList() {
       this.$f7.showIndicator()

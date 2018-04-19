@@ -5,9 +5,20 @@
         <f7-link text="生成" icon-f7="add_round" @click="couponOpen"></f7-link>
       </f7-nav-right>
     </f7-navbar>
-    <f7-list style="margin:0;">
+    <!-- <f7-list style="margin:0;">
 		  <f7-list-item :title="item.title" :after="'剩余：'+item.rest_count+'张'" v-for="item in list.data" :key="item.id"></f7-list-item>
-		</f7-list>
+		</f7-list> -->
+
+    <div class="l-bg-white">
+      <div class="l-flex-hc l-padding l-border-b" v-for="item in list.data" :key="item.id">
+        <div class="l-rest">{{item.title}}</div>
+        <div class="l-fs-s l-text-gray">剩余：{{item.rest_count}}张</div>
+        <div class="l-margin-l">
+          <f7-button color="red" @click="recycle(item.id)">回收</f7-button>
+        </div>
+      </div>
+    </div>
+
     <infinite-loading :on-infinite="onInfinite" ref="infinite">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
@@ -122,6 +133,17 @@ export default {
         this.resetInfinite()
       }).finally(_ => {
         this.$f7.hideIndicator()
+      })
+    },
+    recycle(id) {
+      this.$f7.confirm('是否确定回收？', _ => {
+        this.$f7.showIndicator()
+        this.$$api.coupon.recycle(id).then(({data}) => {
+          this.$f7.toast('回收成功').show()
+          this.resetInfinite()
+        }).finally(_ => {
+          this.$f7.hideIndicator()
+        })  
       })
     }
 	},
