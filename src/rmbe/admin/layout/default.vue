@@ -25,11 +25,16 @@
 				      <span slot="title">{{menu.meta.title}}</span>
 			      </el-menu-item>
           </template>
-          <el-menu-item index="" @click.native="shopAdmin" v-if="showShopAdmin">
-			      <i class="el-icon-caret-right"></i>
-			      <!-- <a style="color: inherit; text-decoration: none;" :href="$$config.shop.admin + '?token=' + userInfo.token" target="_blank" slot="title">商城管理</a> -->
-			      <span slot="title">商城管理</span>
-		      </el-menu-item>
+          <template v-if="showShopAdmin">
+	          <el-menu-item index="" @click.native="shopAdmin1">
+				      <i class="el-icon-caret-right"></i>
+				      <span slot="title">商家商城管理</span>
+			      </el-menu-item>
+			      <el-menu-item index="" @click.native="shopAdmin2">
+				      <i class="el-icon-caret-right"></i>
+				      <span slot="title">消费者商城管理</span>
+			      </el-menu-item>
+		      </template>
         </el-menu>
       </el-aside>
 	    <el-container direction="vertical">
@@ -89,7 +94,7 @@ export default {
   data() {
     return {
     	userMenus,
-    	showShopAdmin: false,
+    	showShopAdmin: true,
     	pwdForm: {
     		visible: false,
 				submiting: false,
@@ -116,8 +121,11 @@ export default {
     ])
   },
   methods: {
-  	shopAdmin() {
-  		window.open(`${this.$$config.shop.admin}?token=${this.userInfo.token}&uid=${this.userInfo.id}`)
+  	shopAdmin1() {
+  		window.open(`${this.$$config.shop.admin1}?token=${this.userInfo.token}&uid=${this.userInfo.id}`)
+  	},
+  	shopAdmin2() {
+  		window.open(`${this.$$config.shop.admin2}?token=${this.userInfo.token}&uid=${this.userInfo.id}`)
   	},
   	doCollapse() {
   		this.$store.dispatch('toggleCollapse')

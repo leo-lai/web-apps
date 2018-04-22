@@ -13,7 +13,7 @@ let config = {
   	baseURL: 'http://api.nrmbe.gzmypay.com/api'
   },
 
-  shopURL: 'http://shop.nrmbe.gzmypay.com/h5/#/home',
+  shopURL: 'http://cshop.nrmbe.gzmypay.com/h5/#/home',
 
 	framework7: {
 		root: '#app',
@@ -34,7 +34,6 @@ let config = {
 
 if (window.location.host.indexOf('leolai.cn') > -1) {
 	config.api.baseURL = 'http://api.leolai.cn/api'
-	config.shop.shopURL = 'http://shop.leolai.cn/h5/#/home'
 }
 
 export default config

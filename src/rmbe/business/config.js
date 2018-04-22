@@ -33,7 +33,6 @@ let config = {
 }
 if (window.location.host.indexOf('leolai.cn') > -1) {
 	config.api.baseURL = 'http://api.leolai.cn/api'
-	config.shop.shopURL = 'http://shop.leolai.cn/h5/#/home'
 }
 
 export default config
