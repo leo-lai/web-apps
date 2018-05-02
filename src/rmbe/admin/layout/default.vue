@@ -8,7 +8,7 @@
     		</div>
         <el-menu class="l-menu" :default-active="$route.path" :collapse="collapse" :router="true" :unique-opened="false" background-color="#38415f" text-color="#fff" active-text-color="#ffd04b">
           <template v-for="menu in userMenus" v-if="!menu.hidden">
-          	<el-submenu v-if="menu.children.length > 1" :index="menu.path">
+          	<el-submenu v-if="menu.children.length > 1" :index="menu.path" :key="menu.path">
 			        <template slot="title">
 			          <i class="el-icon-caret-right"></i>
 			          <span>{{menu.meta.title}}</span>
@@ -20,7 +20,7 @@
 						    </template>
 				      </el-menu-item>
 			      </el-submenu>
-			      <el-menu-item v-else :index="menu.path">
+			      <el-menu-item v-else :index="menu.path" :key="menu.path">
 				      <i class="el-icon-caret-right"></i>
 				      <span slot="title">{{menu.meta.title}}</span>
 			      </el-menu-item>

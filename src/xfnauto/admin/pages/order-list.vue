@@ -252,7 +252,7 @@
 			    <el-input type="textarea" :rows="2" v-model="dialogPay.data.remark"></el-input>
 			  </el-form-item>
 			  <el-form-item style="margin-top: 50px;" label="">
-			  	<el-button type="primary" :loading="dialogPay.loading" @click="submitDialogPay">确定支付</el-button>
+			  	<el-button type="primary" :loading="dialogPay.loading" @click="submitDialogPay">确定收到</el-button>
 			  </el-form-item>
   		</el-form>
 		</el-dialog>
@@ -323,8 +323,6 @@ export default {
 		let validateUpload = function(rule, value, callback) {
 			if(that.$refs.dialogPayUpload.waiting > 0) {
 				callback(new Error('图片正在上传中'))
-			}else if(that.dialogPay.uploadList.length === 0) {
-				callback(new Error('请上传支付凭证'))
 			}else {
 				that.dialogPay.data.voucher = that.dialogPay.uploadList.map(item => item.src || item.url).join(',')
 				callback()
@@ -398,7 +396,7 @@ export default {
 						{ required: true, type: 'number', message: '必填项', trigger: 'change' }
 					],
 					imageUpload: [
-						{ required: true, validator: validateUpload, trigger: 'change' }
+						{  validator: validateUpload, trigger: 'change' }
 					]
 				},
 				data: {
@@ -572,7 +570,7 @@ export default {
 			this.$$utils.copyObj(this.dialogPay.data, '')
 			this.dialogPay.visible = true
 			this.dialogPay.type = type
-			this.dialogPay.title = type === 1 ? '支付定金' : '支付尾款'
+			this.dialogPay.title = type === 1 ? '收定金' : '收尾款'
 			this.dialogPay.data.orderId = row.id
 			const loading = this.$loading()
 			this.$$api.order.getPayInfo(row.id).then(({data}) => {

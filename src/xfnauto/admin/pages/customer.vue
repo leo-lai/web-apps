@@ -12,6 +12,9 @@
 		  <el-tab-pane label="全部客户" name="all">
 		  	<customer-all></customer-all>
 		  </el-tab-pane>
+			<el-tab-pane label="客户订单列表" name="order">
+		  	<customer-order></customer-order>
+		  </el-tab-pane>
 		</el-tabs>
 
 	</div>
@@ -21,12 +24,14 @@ import { mapGetters } from 'vuex'
 import customerAll from './customer-all'
 import customerTrack from './customer-track'
 import customerBespeak from './customer-bespeak'
+import customerOrder from './customer-order'
 export default {
 	name: 'customer',
 	components: {
 		customerAll,
 		customerTrack,
-		customerBespeak
+		customerBespeak,
+		customerOrder
 	},
 	data() {
 		return {
@@ -45,7 +50,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.tabActive = this.$route.query.tab || (this.userInfo.orgLevel === 3 ? 'bespeak' : 'all')
+		this.tabActive = this.$route.query.tab || (this.userInfo.orgLevel === 3 ? 'bespeak' : 'order')
 		this.tabClick()
 	}
 }

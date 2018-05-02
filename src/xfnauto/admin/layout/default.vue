@@ -9,15 +9,17 @@
 						<template v-if="userInfo.orgType < 4">
 							<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
 							<el-menu-item index="/stock">库存管理</el-menu-item>
-							<el-menu-item v-if="userInfo.orgLevel < 3" index="/order">代购管理</el-menu-item>
+							<el-menu-item index="/order">代购管理</el-menu-item>
 							<el-menu-item index="/customer">客户体系</el-menu-item>
 							<el-menu-item index="/base/setting">基本设置</el-menu-item>
 							<el-menu-item index="/base/data">资料设置</el-menu-item>
-							<!-- <el-submenu index="/base">
+							<!-- 
+							<el-submenu index="/base">
 								<template slot="title">基础设置</template>
 								<el-menu-item index="/base/setting">基本设置</el-menu-item>
 								<el-menu-item index="/base/data">资料设置</el-menu-item>
-							</el-submenu> -->
+							</el-submenu> 
+							-->
 						</template>
 					  <el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
 					</el-menu>
@@ -37,18 +39,14 @@
 					</span>
     		</div>
 	    </el-header>
-	    <!-- <el-header class="l-header-tabs">
-	    	<el-tabs type="card">
-				  <el-tab-pane :closable="false" label="首页" name="index"></el-tab-pane>
-			    <el-tab-pane :closable="true" label="配置管理" name="second"></el-tab-pane>
-				</el-tabs>
-	    </el-header> -->
       <el-main class="l-main">
-      	<!-- <div class="l-breadcrumb" v-show="$route.path !== '/'">
+      	<!-- 
+				<div class="l-breadcrumb" v-show="$route.path !== '/'">
 	      	<el-breadcrumb separator-class="el-icon-arrow-right">
 					  <el-breadcrumb-item v-if="item.path" v-for="item in $route.matched" :key="item.path">{{ item.meta.title }}</el-breadcrumb-item>
 					</el-breadcrumb>	
-      	</div> -->
+      	</div> 
+				-->
         <transition name="fade" mode="out-in">
           <router-view></router-view>
         </transition>

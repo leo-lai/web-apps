@@ -17,15 +17,25 @@
     </div>
   
     <div class="l-panel-coupon">
-      <div class="l-flex-hc">
-        <span>选择优惠券：</span>
-        <div class="l-rest">
-          <select style="width:100%; padding: 5px;" name="" id="" v-model="couponType" @change="getCouponList">
+      <f7-list class="l-margin-0 l-coupon-form" form>
+        <f7-list-item>
+          <f7-label style="width: auto;">选择优惠券：</f7-label>
+          <f7-input type="select" v-model="couponType" @change="getCouponList">
             <option value="full_cut">满减券</option>
             <option value="times">次数券</option>
-          </select>
+          </f7-input>
+        </f7-list-item>
+      </f7-list>
+      
+      <!-- <div class="l-flex-hc">
+        <span>选择优惠券：</span>
+        <div class="l-rest">
+          <f7-input type="select" v-model="couponType" @change="getCouponList">
+            <option value="full_cut">满减券</option>
+            <option value="times">次数券</option>
+          </f7-input>
         </div>
-      </div>
+      </div> -->
       <f7-list class="l-scroll" form style="margin:0; max-height: 15.0rem;">
         <f7-list-item radio name="coupon" :title="item.title + (item.type === 'times' ? '（剩余次数：'+ item.device_count +'）' : '')" v-for="item in couponList" :key="item.id" @click="couponSlt(item)"></f7-list-item>
       </f7-list>
@@ -109,6 +119,10 @@ export default {
         number: this.number
       }
 
+       if(!this.money) {
+         formData.money = 0
+       }
+
       if(this.couponSlted && this.couponSlted.id){
         formData.type = 'coupon'
         formData.coupon_type = this.couponSlted.type
@@ -118,7 +132,7 @@ export default {
       }
 
       if(formData.coupon_type !== 'times' && formData.coupon_type !== 'plat_times'){
-        if(!this.money) {
+        if(this.money === '') {
           this.$$utils.toptip('请输入支付金额')
           return
         }
@@ -153,6 +167,14 @@ export default {
   }
 }
 </script>
+<style lang="less">
+.l-coupon-form{
+  .item-content{padding-left: 0 !important;}
+  ul:before, ul:after{
+    display: none !important;
+  }
+}
+</style>
 
 <style scoped lang="less">
 .l-panel-coupon{

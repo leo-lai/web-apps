@@ -361,6 +361,11 @@ const api = {
     addOrder(formData = {}) { // 新增/编辑
       return fetch.post('/editCustomerOrder', formData)
     },
+    getOrderList(formData = {}, page = 1, rows = 50) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.post('/customerOrderList', formData)
+    },
     getOrderInfo(customerOrderId = '') { // 获取订单详情
       return fetch.post('/customerOrderInfo', { customerOrderId })
     },
