@@ -208,58 +208,7 @@
 		  </span>
 		</el-dialog>
 
-		<!-- 收款历史，订单费用 -->
-		<el-dialog class="l-padding-t-0" append-to-body :title="dialogOther.title" :visible.sync="dialogOther.visible" width="500px">
-			<template v-if="dialogOther.type === 1">
-				<div class="l-margin-b-m">{{dialogOther.data1.carsName}} 指导价：{{dialogOther.data1.guidingPrice}}元</div>
-				<table class="l-order-paylist">
-					<thead>
-						<tr>
-							<th>订单收费项目</th>
-							<th style="text-align:center;">对应费用（元）</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>车辆最终成交价</td>
-							<td style="text-align:center;">{{dialogOther.data1.carUnitPrice}}</td>
-						</tr>
-						<tr>
-							<td>车辆购置税</td>
-							<td style="text-align:center;">{{dialogOther.data1.purchaseTaxPriace}}</td>
-						</tr>
-						<tr>
-							<td>上牌费</td>
-							<td style="text-align:center;">{{dialogOther.data1.licensePlatePriace}}</td>
-						</tr>
-						<tr>
-							<td>商业保险费</td>
-							<td style="text-align:center;">{{dialogOther.data1.insurancePriace}}</td>
-						</tr>
-						<tr>
-							<td>按揭费用</td>
-							<td style="text-align:center;">{{dialogOther.data1.mortgagePriace}}</td>
-						</tr>
-						<tr>
-							<td>精品加装费用</td>
-							<td style="text-align:center;">{{dialogOther.data1.boutiquePriace}}</td>
-						</tr>
-						<tr>
-							<td>车船税</td>
-							<td style="text-align:center;">{{dialogOther.data1.vehicleAndVesselTax}}</td>
-						</tr>
-					</tbody>
-				</table>
-			</template>
-			<template v-if="dialogOther.type === 2">
-				<div class="l-scroll" style="max-height: 300px;">
-					<div class="l-margin-b" v-for="item in dialogOther.data2" :key="item.createDate">
-						<p><span class="l-margin-r">{{item.createDate}}</span>收款：{{item.amount}}元</p>
-						<p class="l-text-gray">{{item.remarks}}</p>
-					</div>
-				</div>
-			</template>
-		</el-dialog>
+		
 
 		<!-- 查看购车历程 -->
 		<!-- <el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" title="购车历程" :visible.sync="dialogBuy.visible" width="500px">
@@ -319,6 +268,59 @@
 	   		<qrcanvas ref="qrcode" :options="qrcode.opts"></qrcanvas>
 	   		<p class="l-margin"><b>本次支付金额：{{dialogPay.data.amount}}</b></p>
 	    </div>
+		</el-dialog>
+
+		<!-- 收款历史，订单费用 -->
+		<el-dialog class="l-padding-t-0" append-to-body :title="dialogOther.title" :visible.sync="dialogOther.visible" width="500px">
+			<template v-if="dialogOther.type === 1">
+				<div class="l-margin-b-m">{{dialogOther.data1.carsName}} 指导价：{{dialogOther.data1.guidingPrice}}元</div>
+				<table class="l-order-paylist">
+					<thead>
+						<tr>
+							<th>订单收费项目</th>
+							<th style="text-align:center;">对应费用（元）</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>车辆最终成交价</td>
+							<td style="text-align:center;">{{dialogOther.data1.carUnitPrice}}</td>
+						</tr>
+						<tr>
+							<td>车辆购置税</td>
+							<td style="text-align:center;">{{dialogOther.data1.purchaseTaxPriace}}</td>
+						</tr>
+						<tr>
+							<td>上牌费</td>
+							<td style="text-align:center;">{{dialogOther.data1.licensePlatePriace}}</td>
+						</tr>
+						<tr>
+							<td>商业保险费</td>
+							<td style="text-align:center;">{{dialogOther.data1.insurancePriace}}</td>
+						</tr>
+						<tr>
+							<td>按揭费用</td>
+							<td style="text-align:center;">{{dialogOther.data1.mortgagePriace}}</td>
+						</tr>
+						<tr>
+							<td>精品加装费用</td>
+							<td style="text-align:center;">{{dialogOther.data1.boutiquePriace}}</td>
+						</tr>
+						<tr>
+							<td>车船税</td>
+							<td style="text-align:center;">{{dialogOther.data1.vehicleAndVesselTax}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</template>
+			<template v-if="dialogOther.type === 2">
+				<div class="l-scroll" style="max-height: 300px;">
+					<div class="l-margin-b" v-for="item in dialogOther.data2" :key="item.createDate">
+						<p><span class="l-margin-r">{{item.createDate}}</span>收款：{{item.amount}}元</p>
+						<p class="l-text-gray">{{item.remarks}}</p>
+					</div>
+				</div>
+			</template>
 		</el-dialog>
 
 		<!-- 提车车辆 -->

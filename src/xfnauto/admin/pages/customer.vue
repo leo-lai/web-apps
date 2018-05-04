@@ -9,9 +9,9 @@
 			  	<customer-track></customer-track>
 			  </el-tab-pane>	
 			</template>
-		  <el-tab-pane label="全部客户" name="all">
+		  <!-- <el-tab-pane label="全部客户" name="all">
 		  	<customer-all></customer-all>
-		  </el-tab-pane>
+		  </el-tab-pane> -->
 			<el-tab-pane label="客户订单列表" name="order">
 		  	<customer-order></customer-order>
 		  </el-tab-pane>
