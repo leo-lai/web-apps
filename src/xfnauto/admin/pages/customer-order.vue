@@ -262,16 +262,15 @@ export default {
         { id: 5, name: '工商银行' },
         { id: 6, name: '广州银行' },
         { id: 7, name: '鹤山珠江村镇银行' },
-        { id: 8, name: '鹤山农村信用合作社' }
+        { id: 8, name: '鹤山农村信用合作社' },
+        { id: 9, name: '锐诚金融' }
 			],
 			list: {
 				filter: {
-					phoneNumber: '',
-					orgId: ''
+					keywords: '',
 				},
 				rules: {
-					phoneNumber: [],
-					orgId: []
+					keywords: [],
 				},
 				loading: false,
 				page: 1,
