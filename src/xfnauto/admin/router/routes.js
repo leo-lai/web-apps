@@ -53,6 +53,18 @@ const routes = [
     ],
   },
   {
+    path: '/school',
+    component: layout,
+    meta: { hidden: true },
+    children: [
+      {
+        path: '',
+        meta: { title: '喜蜂鸟学堂' },
+        component: resolve => require(['../pages/school'], resolve),
+      }
+    ],
+  },
+  {
     path: '/order',
     component: layout,
     meta: { hidden: true },
