@@ -11,9 +11,9 @@
 							<el-menu-item index="/stock">库存管理</el-menu-item>
 							<el-menu-item index="/order">资源订单</el-menu-item>
 							<el-menu-item index="/customer">客户管理</el-menu-item>
-							<el-menu-item index="/base/setting">基本设置</el-menu-item>
-							<el-menu-item index="/base/data">资料设置</el-menu-item>
 							<el-menu-item index="/school">喜蜂鸟学堂</el-menu-item>
+							<el-menu-item index="/base/setting">用户管理</el-menu-item>
+							<el-menu-item index="/base/data">基础设置</el-menu-item>
 							<!-- 
 							<el-submenu index="/base">
 								<template slot="title">基础设置</template>

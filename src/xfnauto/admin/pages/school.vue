@@ -4,9 +4,9 @@
 		  <el-tab-pane label="文章列表" name="list">
 		  	<school-list></school-list>
 		  </el-tab-pane>
-      <el-tab-pane label="操作指南" name="video">
+      <!-- <el-tab-pane label="操作指南" name="video">
         <guide-video></guide-video>
-      </el-tab-pane>
+      </el-tab-pane> -->
 		</el-tabs>
 	</div>
 </template>

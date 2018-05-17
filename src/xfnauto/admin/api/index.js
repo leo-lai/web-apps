@@ -3,10 +3,12 @@ import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
 import router from '../router'
+import { SIGHUP } from 'constants';
 
+let baseURL1 = config.api.baseURL1
+let baseURL2 = config.api.baseURL2
 // 创建axios实例
 const service = axios.create({
-  baseURL: config.api.baseURL,
   timeout: 60000
 })
 // request拦截器
@@ -81,22 +83,31 @@ service.interceptors.response.use(response => {
 })
 
 const fetch = {
-  ajax(url = '', data = {}, method = 'GET', contentType = 'form') {
+  ajax(url = '', data = {}, method = 'GET') {
     data.sessionId = storage.local.get('sessionId')
     return new Promise((resolve, reject) => {
-      service({
-        url, method, data,
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        transformRequest: [function(data) {
-          let ret = []
-          for (let key in data) {
-            ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+      let ajaxParams = {
+        url, method
+      }
+      switch (method) {
+        case 'POST':
+          ajaxParams.data = data
+          ajaxParams.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
           }
-          return ret.join('&')
-        }]
-      }).then(resolve).catch(error => {
+          ajaxParams.transformRequest = [function (data) {
+            let ret = []
+            for (let key in data) {
+              ret.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+            }
+            return ret.join('&')
+          }]
+          break
+        default:
+          ajaxParams.params = data
+          break
+      }
+      service(ajaxParams).then(resolve).catch(error => {
         error && error.message && Message({
           type: 'error',
           message: error.message
@@ -127,10 +138,10 @@ const fetch = {
 }
 
 const api = {
-  baseURL: config.api.baseURL,
+  baseURL: config.api.baseURL1,
   pageSizes: [100, 200, 300, 400],
   uploadBase64(base64Data = '') {
-    return fetch.post('/uploadImageBase64', {
+    return fetch.post(baseURL1 + '/uploadImageBase64', {
       img_file: base64Data
     })
   },
@@ -138,7 +149,7 @@ const api = {
     var formData = new FormData()
     //convertBase64UrlToBlob函数是将base64编码转换为Blob  
     formData.append('img_file', utils.convert.base64ToBlob(base64Data), 'image_' + Date.now() + '.png')
-    return fetch.form('/uploadImage', formData)
+    return fetch.form(baseURL1 + '/uploadImage', formData)
   },
   auth: {
     check() {
@@ -146,12 +157,12 @@ const api = {
     },
     login(formData = {}) {
       formData.userName = (formData.userName || '').trim()
-      return fetch.post('/login', formData)
+      return fetch.post(baseURL1 + '/login', formData)
     },
     logout(toLogin = true) {
       // return new Promise((resolve, reject) => {
       //   if (storage.local.get('sessionId')) {
-      //     fetch.post('/loginOut').then(resolve, reject)
+      //     fetch.post(baseURL1 + '/loginOut').then(resolve, reject)
       //   } else {
       //     resolve()
       //   }
@@ -164,376 +175,403 @@ const api = {
       // })
     },
     changePwd(formData = {}) {
-      return fetch.post('/changePassword', formData)
+      return fetch.post(baseURL1 + '/changePassword', formData)
     },
     getZuzhiList() {
-      return fetch.post('/organizationLevelList')
+      return fetch.post(baseURL1 + '/organizationLevelList')
     },
     getRoleList() {
-      return fetch.post('/roleListList')
+      return fetch.post(baseURL1 + '/roleListList')
     }
   },
   index: {
     getCount() {
-      return fetch.post('/index')
+      return fetch.post(baseURL1 + '/index')
     }
   },
   zuzhi: { // 组织架构管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/organizationList', formData)
+      return fetch.post(baseURL1 + '/organizationList', formData)
     },
     getParent(orgLevel = 0) {
-      return fetch.post('/organizationLevelListByLevel', { orgLevel })
+      return fetch.post(baseURL1 + '/organizationLevelListByLevel', { orgLevel })
     },
     getInfo(orgId = '') {
-      return fetch.post('/organizationInfo', { orgId })
+      return fetch.post(baseURL1 + '/organizationInfo', { orgId })
     },
     enable(orgId = '', isOn = '') {
-      return fetch.post('/organizationOnOff', {orgId, isOn})
+      return fetch.post(baseURL1 + '/organizationOnOff', {orgId, isOn})
     },
     add(formData = {}) {
-      return fetch.post('/organizationEdit', formData)
+      return fetch.post(baseURL1 + '/organizationEdit', formData)
     },
     getCangList() { // 仓库列表
-      return fetch.post('/organizationWarehouseList')
+      return fetch.post(baseURL1 + '/organizationWarehouseList')
     }
   },
   user: { // 系统用户管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/userList', formData)
+      return fetch.post(baseURL1 + '/userList', formData)
     },
     enable(userId = '', isEnable = '') {
-      return fetch.post('/userIsEnable', {userId, isEnable})
+      return fetch.post(baseURL1 + '/userIsEnable', {userId, isEnable})
     },
     add(formData = {}) {
-      return fetch.post('/addUser', formData)
+      return fetch.post(baseURL1 + '/addUser', formData)
     },
     getSalesList(formData = {}) {
-      return fetch.post('/salesList', formData)
+      return fetch.post(baseURL1 + '/salesList', formData)
     }
   },
   role: { // 角色管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/roleList', formData)
+      return fetch.post(baseURL1 + '/roleList', formData)
     },
     add(formData = {}) {
-      return fetch.post('/roleEdit', formData)
+      return fetch.post(baseURL1 + '/roleEdit', formData)
     },
     getMenuList(roleId = '') {
-      return fetch.post('/menuListTree', { roleId })
+      return fetch.post(baseURL1 + '/menuListTree', { roleId })
     },
     setRoleMenu(formData = {}) {
-      return fetch.post('/setRoleMenu', formData)
+      return fetch.post(baseURL1 + '/setRoleMenu', formData)
     }
   },
   group: { // 分组管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/systemGroupingList', formData)
+      return fetch.post(baseURL1 + '/systemGroupingList', formData)
     },
     add(formData = {}) {
-      return fetch.post('/systemGroupingEdit', formData)
+      return fetch.post(baseURL1 + '/systemGroupingEdit', formData)
     },
     del(groupingId = '') { // 删除分组
-      return fetch.post('/systemGroupingDalete', { groupingId })
+      return fetch.post(baseURL1 + '/systemGroupingDalete', { groupingId })
     },
     getUserList(groupingId = '') { // 已分配人员列表
-      return fetch.post('/systemUserGroupingList', { groupingId })
+      return fetch.post(baseURL1 + '/systemUserGroupingList', { groupingId })
     },
     getSltUserList() { // 待分配人员列表
-      return fetch.post('/orgOneSelfList')
+      return fetch.post(baseURL1 + '/orgOneSelfList')
     },
     addUser(formData = {}) { // 添加人员
-      return fetch.post('/systemUserGroupingEdit', formData)
+      return fetch.post(baseURL1 + '/systemUserGroupingEdit', formData)
     },
     delUser(userGroupingId = '') { // 删除人员
-      return fetch.post('/systemUserGroupingDalete', { userGroupingId })
+      return fetch.post(baseURL1 + '/systemUserGroupingDalete', { userGroupingId })
     }
   },
   menu: {
     add(formData = {}) {
-      return fetch.post('/editMenu', formData)
+      return fetch.post(baseURL1 + '/editMenu', formData)
     },
     del(menuId = '') {
-      return fetch.post('/deleteMenu', { menuId })
+      return fetch.post(baseURL1 + '/deleteMenu', { menuId })
     }
   },
   supplier: { // 供应商管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/supplierList', formData)
+      return fetch.post(baseURL1 + '/supplierList', formData)
     },
     add(formData = {}) {
-      return fetch.post('/supplierEdit', formData)
+      return fetch.post(baseURL1 + '/supplierEdit', formData)
     },
     del(supplierId = '') {
-      return fetch.post('/supplierDelete', { supplierId })
+      return fetch.post(baseURL1 + '/supplierDelete', { supplierId })
     },
     getListDown() {
-      return fetch.post('/supplierListList')
+      return fetch.post(baseURL1 + '/supplierListList')
     }
   },
   car: { // 车型管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/carsList', formData)
+      return fetch.post(baseURL1 + '/carsList', formData)
     },
     add(formData = {}) {
-      return fetch.post('/carsEdit', formData)
+      return fetch.post(baseURL1 + '/carsEdit', formData)
     },
     del(carId = '') {
-      return fetch.post('/carsDelete', { carId })
+      return fetch.post(baseURL1 + '/carsDelete', { carId })
     },
     getBrandList() { // 品牌列表
-      return fetch.post('/carsBrandList')
+      return fetch.post(baseURL1 + '/carsBrandList')
     },
     getFamilyList(brandId = '') { // 车系列表
-      return fetch.post('/carsFamilyList', { brandId })
+      return fetch.post(baseURL1 + '/carsFamilyList', { brandId })
     },
     getStyleList(familyId = '') { // 车等级列表
-      return fetch.post('/carsStyleList', { familyId })
+      return fetch.post(baseURL1 + '/carsStyleList', { familyId })
     },
     getCarsList(familyId = '') { // 车大类列表
-      return fetch.post('/carsListList', { familyId })
+      return fetch.post(baseURL1 + '/carsListList', { familyId })
     },
     getCarsInfo(carId = '') { // 车大类相关信息
-      return fetch.post('/carsInfo', { carId })
+      return fetch.post(baseURL1 + '/carsInfo', { carId })
     },
     getDepositPrice(formData = {}) { // 获取车辆定金
-      return fetch.post('/carDepositPrice', formData)
+      return fetch.post(baseURL1 + '/carDepositPrice', formData)
     }
   },
   color: { // 车身颜色内饰管理
     getList(formData = {}, page = 1, rows = 50) { // 车系列表(分页)
       formData.page = page
       formData.rows = rows
-      return fetch.post('/carsFamilyListPage', formData)
+      return fetch.post(baseURL1 + '/carsFamilyListPage', formData)
     },
     getCheshenList(familyId = '') { // 获取车身颜色列表
-      return fetch.post('/carColourGetByBrand', { familyId })
+      return fetch.post(baseURL1 + '/carColourGetByBrand', { familyId })
     },
     addCheshen(formData = {}) {
-      return fetch.post('/carColourEdit', formData)
+      return fetch.post(baseURL1 + '/carColourEdit', formData)
     },
     delCheshen(carColourId = '') {
-      return fetch.post('/carColourDelete', { carColourId })
+      return fetch.post(baseURL1 + '/carColourDelete', { carColourId })
     },
     getNeishiList(familyId = '') { // 获取内饰颜色列表
-      return fetch.post('/carInteriorGetByBrand', { familyId })
+      return fetch.post(baseURL1 + '/carInteriorGetByBrand', { familyId })
     },
     addNeishi(formData = {}) {
-      return fetch.post('/carInteriorEdit', formData)
+      return fetch.post(baseURL1 + '/carInteriorEdit', formData)
     },
     delNeishi(interiorId = '') {
-      return fetch.post('/carInteriorDelete', { interiorId })
+      return fetch.post(baseURL1 + '/carInteriorDelete', { interiorId })
     },
     addImages(formData = {}) {
-      return fetch.post('/carColourImageAdd', formData)
+      return fetch.post(baseURL1 + '/carColourImageAdd', formData)
     },
     getImages(carsId = '',  carColourId = '') { // 获取车身照片
-      return fetch.post('/carColourImageGetByCarColour', { carsId, carColourId })
+      return fetch.post(baseURL1 + '/carColourImageGetByCarColour', { carsId, carColourId })
     }
   },
   customer: { // 客户管理
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/customerOrgList', formData)
+      return fetch.post(baseURL1 + '/customerOrgList', formData)
     },
     getInfo(formData = {}) {
-      return fetch.post('/customerUsersrInfo', formData)
+      return fetch.post(baseURL1 + '/customerUsersrInfo', formData)
     },
     saveUserInfo(formData = {}) {
-      return fetch.post('/changeUserInfo', formData)
+      return fetch.post(baseURL1 + '/changeUserInfo', formData)
     },
     saveCarInfo(formData = {}) {
-      return fetch.post('/changeUserCarInfo', formData)
+      return fetch.post(baseURL1 + '/changeUserCarInfo', formData)
     },
     addOrder(formData = {}) { // 新增/编辑
-      return fetch.post('/editCustomerOrder', formData)
+      return fetch.post(baseURL1 + '/editCustomerOrder', formData)
     },
     getOrderList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/customerOrderList', formData)
+      return fetch.post(baseURL1 + '/customerOrderList', formData)
     },
     getOrderInfo(customerOrderId = '') { // 获取订单详情
-      return fetch.post('/customerOrderInfo', { customerOrderId })
+      return fetch.post(baseURL1 + '/customerOrderInfo', { customerOrderId })
     },
     payOrder(formData = {}) { // 支付定金
-      return fetch.post('/payInOrder', formData)
+      return fetch.post(baseURL1 + '/payInOrder', formData)
     },
     orderPrice(customerOrderId = '') { // 订单费用
-      return fetch.post('/orderPriceList', { customerOrderId })
+      return fetch.post(baseURL1 + '/orderPriceList', { customerOrderId })
     },
     payHistory(customerOrderId = '') { // 收款历史
-      return fetch.post('/orderPayList', { customerOrderId })
+      return fetch.post(baseURL1 + '/orderPayList', { customerOrderId })
     },
     bankPass(customerOrderId = '') { // 银行审核通过
-      return fetch.post('/bankApprovalPass', { customerOrderId })
+      return fetch.post(baseURL1 + '/bankApprovalPass', { customerOrderId })
     },
     fullPay(customerOrderId = '') { // 银行审核不通过，改成全款支付尾款
-      return fetch.post('/changeFullPayment', { customerOrderId })
+      return fetch.post(baseURL1 + '/changeFullPayment', { customerOrderId })
     },
     giveCar(formData = {}) {
-      return fetch.post('/turnOverVehicle', formData)
+      return fetch.post(baseURL1 + '/turnOverVehicle', formData)
     },
     saveRemark(formData = {}) {
-      return fetch.post('/addCustomerRemarks', formData)
+      return fetch.post(baseURL1 + '/addCustomerRemarks', formData)
     },
     add(formData = {}) { // 新增客户
-      return fetch.post('/addCustomerUsersr', formData)
+      return fetch.post(baseURL1 + '/addCustomerUsersr', formData)
     }, // 跟踪列表
     getTrackList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/trackCustomerOrgList', formData)
+      return fetch.post(baseURL1 + '/trackCustomerOrgList', formData)
     }, // 预约列表
     getBespeakList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/bespeakCustomerOrgList', formData)
+      return fetch.post(baseURL1 + '/bespeakCustomerOrgList', formData)
     },
     notBuy(customerUsersOrgId = '') { // 标记为不购买
-      return fetch.post('/notBuyCustomerOrg', { customerUsersOrgId })
+      return fetch.post(baseURL1 + '/notBuyCustomerOrg', { customerUsersOrgId })
     },
     track(formData = {}) { // 标记为已到店
-      return fetch.post('/systenUserChangeCustomerOrg', formData)
+      return fetch.post(baseURL1 + '/systenUserChangeCustomerOrg', formData)
     },
     getContractInfo(customerOrderId = '') { // 合同信息
-      return fetch.post('/customerOrderPrint', { customerOrderId })
+      return fetch.post(baseURL1 + '/customerOrderPrint', { customerOrderId })
     }
   },
   stock: { // 库存管理
     getList(formData = {}, page = 1, rows = 50) { // 车辆库存列表
       formData.page = page
       formData.rows = rows
-      return fetch.post('/stockCarList', formData)
+      return fetch.post(baseURL1 + '/stockCarList', formData)
     },
     getInfo(formData = {}){ // 车辆库存详情
-      return fetch.post('/stockCarInfo', formData)
+      return fetch.post(baseURL1 + '/stockCarInfo', formData)
     },
     editInfo(formData = {}) { // 编辑车辆库存详情
-      return fetch.post('/stockCarEdit', formData)
+      return fetch.post(baseURL1 + '/stockCarEdit', formData)
     },
     getInList(formData = {}, page = 1, rows = 50) { // 入库单列表
       formData.page = page
       formData.rows = rows
-      return fetch.post('/storageList', formData)
+      return fetch.post(baseURL1 + '/storageList', formData)
     },
     addIn(formData = {}) { // 新增入库单
-      return fetch.post('/storageEdit', formData)
+      return fetch.post(baseURL1 + '/storageEdit', formData)
     },
     delIn(stockCarId = '') {
-      return fetch.post('/storageCarDelete', { stockCarId })
+      return fetch.post(baseURL1 + '/storageCarDelete', { stockCarId })
     },
     getInInfo(storageId = '') { // 入库单详情
-      return fetch.post('/storageInfo', { storageId })
+      return fetch.post(baseURL1 + '/storageInfo', { storageId })
     },
     getInCarList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post('/storageCarList', formData)
+      return fetch.post(baseURL1 + '/storageCarList', formData)
     },
     addInCar(formData = {}) { // 新增入库车辆
-      return fetch.post('/storageCarEdit', formData)
+      return fetch.post(baseURL1 + '/storageCarEdit', formData)
     },
     addOrder(formData = {}) { // 新增订车单
-      return fetch.post('/stockOrderCreate', formData)
+      return fetch.post(baseURL1 + '/stockOrderCreate', formData)
     },
     cancelOrder(stockOrderId = '') { // 取消订车单
-      return fetch.post('/stockOrderCancel', { stockOrderId })
+      return fetch.post(baseURL1 + '/stockOrderCancel', { stockOrderId })
     },
     getOrderInfo(stockOrderId = '', isSellList = 0) { // 获取订车单详情
-      return fetch.post('/stockOrderInfo', { stockOrderId, isSellList })
+      return fetch.post(baseURL1 + '/stockOrderInfo', { stockOrderId, isSellList })
     },
     signOrder(stockOrderId = '') {
-      return fetch.post('/stockOrderSign', { stockOrderId })
+      return fetch.post(baseURL1 + '/stockOrderSign', { stockOrderId })
     },
     noticeBefore(stockOrderId = '') { // 通知有车前信息
-      return fetch.post('/stockOrderNoticeBefor', { stockOrderId })
+      return fetch.post(baseURL1 + '/stockOrderNoticeBefor', { stockOrderId })
     },
     notice(formData = {}) { // 通知有车
-      return fetch.post('/stockOrderNotice', formData)
+      return fetch.post(baseURL1 + '/stockOrderNotice', formData)
     },
     getOrderList(formData = {}, page = 1, rows = 50) { // 订车列表
       formData.page = page
       formData.rows = rows
-      return fetch.post('/stockOrderList', formData)
+      return fetch.post(baseURL1 + '/stockOrderList', formData)
     },
     outStockBefor(stockOrderId = '') { // 二级出库车辆前信息
-      return fetch.post('/stockOrderStorageOutBefor', { stockOrderId })
+      return fetch.post(baseURL1 + '/stockOrderStorageOutBefor', { stockOrderId })
     },
     outStock(formData = {}) { // 二级车辆出库
-      return fetch.post('/stockOrderStorageOut', formData)
+      return fetch.post(baseURL1 + '/stockOrderStorageOut', formData)
     },
     getOrderList2(formData = {}, page = 1, rows = 50) { // 三级车辆出库列表
       formData.page = page
       formData.rows = rows
-      return fetch.post('/customerOrderList', formData)
+      return fetch.post(baseURL1 + '/customerOrderList', formData)
     },
     outStockBefor2(customerOrderId = '') { // 三级出库车辆前信息
-      return fetch.post('/customerOrderStorageOutBefor', { customerOrderId })
+      return fetch.post(baseURL1 + '/customerOrderStorageOutBefor', { customerOrderId })
     },
     outStock2(formData = {}) { // 三级车辆出库
-      return fetch.post('/customerOrderStorageOut', formData)
+      return fetch.post(baseURL1 + '/customerOrderStorageOut', formData)
     }
   },
   order: { // 代购管理
-    getList(formData = {}, page = 1, rows = 50) { // 代购单列表
+    getList1(formData = {}, page = 1, rows = 50) { // 代购单列表
       formData.page = page
       formData.rows = rows
-      return fetch.post('/ConsumerOrder/listOrders', formData)
+      return fetch.post(baseURL1 + '/ConsumerOrder/listOrders', formData)
+    },
+    getList(formData = {}, page = 1, rows = 50) { // 资源订单列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v1/consumer/index', formData)
     },
     getInfo(orderId = '') {
-      return fetch.post('/ConsumerOrder/getOrderDetail', { orderId })
+      return fetch.post(baseURL1 + '/ConsumerOrder/getOrderDetail', { orderId })
     },
     getPayInfo(orderId = '') { // 获取支付信息
-      return fetch.post('/ConsumerOrder/getPaymentInfo', { orderId })
+      return fetch.post(baseURL1 + '/ConsumerOrder/getPaymentInfo', { orderId })
     },
     pay(formData = {}) { // 上传支付凭证
-      return fetch.post('/ConsumerOrderPayment/create', formData)
+      return fetch.post(baseURL1 + '/ConsumerOrderPayment/create', formData)
     },
     tickPic(formData = {}) { // 上传票证图片
-      return fetch.post('/ConsumerOrderCar/uploadTickPic', formData)
+      return fetch.post(baseURL1 + '/ConsumerOrderCar/uploadTickPic', formData)
     },
     tickDone(orderId = '') { // 所有上传票证图片
-      return fetch.post('/ConsumerOrder/finishOrder', { orderId })
+      return fetch.post(baseURL1 + '/ConsumerOrder/finishOrder', { orderId })
     },
     getContractInfo(orderId = '') { // 合同信息
-      return fetch.post('/ConsumerOrder/getContractInfo', { orderId })
+      return fetch.post(baseURL1 + '/ConsumerOrder/getContractInfo', { orderId })
     },
     refund(formData = {}) { // 退款
-      return fetch.post('/ConsumerOrder/countermandExamine', formData)
+      return fetch.post(baseURL1 + '/ConsumerOrder/countermandExamine', formData)
     }
   },
   pay: { // 通联支付
     orderPay(formData = {}) {
-      return fetch.post('/stockOrderPay', formData)
+      return fetch.post(baseURL1 + '/stockOrderPay', formData)
     },
     finish(customerOrderId = '') { // 完款交车
-      return fetch.post('/endOrder', { customerOrderId })
+      return fetch.post(baseURL1 + '/endOrder', { customerOrderId })
     }
   },
   bank: {
     getList(formData = {}, page = 1, rows = 50) { // 审核列表
       formData.page = page
       formData.rows = rows
-      return fetch.post('/bankToExamineOrderList', formData)
+      return fetch.post(baseURL1 + '/bankToExamineOrderList', formData)
     },
     examine(formData = {}) { // 审核
-      return fetch.post('/bankToExamineOrder', formData)
+      return fetch.post(baseURL1 + '/bankToExamineOrder', formData)
     }
-  }
+  },
+  school: { // 喜蜂鸟学堂
+    getList(formData = {}, page = 1, rows = 50) { // 文章列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v1/article/index', formData)
+    },
+    getInfo(id = '') { // 文章详情
+      return fetch.ajax(baseURL2 + '/backend_v1/article/detail', { id })
+    },
+    add(formData = {}) { // 新增
+      return fetch.post(baseURL2 + '/backend_v1/article/create', formData)
+    },
+    edit(formData = {}) { // 编辑
+      return fetch.post(baseURL2 + '/backend_v1/article/edit', formData)
+    },
+    del(id = '') { // 删除
+      return fetch.ajax(baseURL2 + '/backend_v1/article/remove', { id })
+    },
+    publish(id = '') { // 发布
+      return fetch.ajax(baseURL2 + '/backend_v1/article/publish', { id })
+    },
+  },
 }
 
 export default api

@@ -8,8 +8,10 @@ let config = {
     base: Object.is(process.env.NODE_ENV, 'production') ? '/' : '/admin/'
   },
   api: {
-    baseURL: window.location.host === 'admin.xfnauto.com' ? 
-      'https://tomcat.xfnauto.com/tauto/management/admin' : 'http://tomcat.mifengqiche.com/tauto/management/admin'
+    baseURL1: window.location.host === 'admin.xfnauto.com' ? 
+      'https://tomcat.xfnauto.com/tauto/management/admin' : 'http://tomcat.mifengqiche.com/tauto/management/admin',
+    baseURL2: window.location.host === 'admin.xfnauto.com' ?
+      'https://api.xfnauto.com' : 'http://api.mifengqiche.com'
   },
   pay: {
     url: window.location.host === 'admin.xfnauto.com' ? 

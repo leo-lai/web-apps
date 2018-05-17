@@ -25,8 +25,13 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderId" width="120"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="订购门店" prop="orgName" width="120"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderCode" width="120"></el-table-column>
+			<el-table-column label="订单类型" prop="orderType" align="center" width="100">
+				<template slot-scope="scope">
+					{{scope.row.orderType ? orderType[scope.row.orderType - 1] : '常规单'}}
+	      </template>
+			</el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="订购门店" prop="orgName"></el-table-column>
 			<el-table-column class-name="l-fs-xs" label="客户姓名 | 手机号 | 车架号" align="center" width="360" :render-header="columnHeader">
 				<template slot-scope="scope">
 					<p class="l-text-wrap1" v-for="item in scope.row.customers" :key="item.id">
@@ -38,19 +43,10 @@
 					</p>
 	      </template>
 			</el-table-column>
-	    <el-table-column label="成交价" prop="totalFinalPrice" align="center" width="100"></el-table-column>
-	    <el-table-column label="定金" prop="totalDepositPrice" align="center" width="100"></el-table-column>
-	    <el-table-column label="尾款" prop="totalRestPrice" align="center" width="100"></el-table-column>
-	    <el-table-column label="运费" prop="freight" align="center" width="100"></el-table-column>
 	    <el-table-column label="建单员" prop="creator" align="center" width="110"></el-table-column>
 			<el-table-column class-name="l-fs-xs" label="建单日期" prop="createTime" align="center" width="100"></el-table-column>
-			<el-table-column label="订单类型" prop="orderType" align="center" width="100">
-				<template slot-scope="scope">
-					{{scope.row.orderType ? orderType[scope.row.orderType - 1] : '常规单'}}
-	      </template>
-			</el-table-column>
 			<el-table-column class-name="l-fs-xs" label="订单状态" prop="orderStateName" align="center" width="100"></el-table-column>
-	    <el-table-column label="操作" align="center" width="130" fixed="right">
+	    <el-table-column label="操作" align="center" width="130">
 	    	<template slot-scope="scope">
 	    		<el-button class="l-text-link" type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
 					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'order/contract?id=' + scope.row.id" target="_blank">打印合同</a>
@@ -83,7 +79,7 @@
 						<span class="l-text-warn">订单状态：{{dialogInfo.data.orderStateName}}</span>
 					</div>
 					<div class="l-order-info-base">
-						<span>订单编号：{{dialogInfo.data.orderId}}</span>
+						<span>订单编号：{{dialogInfo.data.orderCode}}</span>
 						<span>订单类型：{{dialogInfo.data.orderType ? orderType[dialogInfo.data.orderType - 1] : '常规单'}}</span>
 						<span>
 							总定金：￥{{dialogInfo.data.totalDepositPrice}}

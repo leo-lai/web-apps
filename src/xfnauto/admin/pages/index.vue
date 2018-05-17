@@ -9,7 +9,7 @@
 							<h3>{{organization.shortName}}</h3>
 							<p class="l-margin-tb-m l-text-gray">{{$$config.baseData.orgLevel[organization.orgLevel-1]}}</p>
 							<p class="l-margin-tb-m l-text-gray">{{organization.address}}</p>
-							<p><router-link class="l-text-link" to="/base/setting?tab=zuzhi">更改基础设置</router-link></p>
+							<!-- <p><router-link class="l-text-link" to="/base/setting?tab=zuzhi">更改基础设置</router-link></p> -->
 						</div>
 					</div>
 				</el-card>

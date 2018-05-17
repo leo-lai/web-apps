@@ -1,15 +1,13 @@
 <template>
 	<div>
 		<el-row>
-  		<el-col :span="24" class="l-text-right">
+			<el-col :span="4">
+				<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
+			</el-col>
+  		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-  				<el-form-item prop="orgId">
-  					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
-				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
-				    </el-select>
-  				</el-form-item>
-				  <el-form-item prop="carsName">
-				  	<el-input v-model="list.filter.carsName" placeholder="请输入车辆型号"></el-input>
+				  <el-form-item prop="keywords">
+				  	<el-input v-model="list.filter.keywords" placeholder="请输入文章标题"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -20,22 +18,17 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="车辆型号" prop="carsName" min-width="200"></el-table-column>
-	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
-	    <el-table-column label="指导价格" prop="guidingPrice" align="center"></el-table-column>
-	    <el-table-column label="库存数量" prop="number" align="center"></el-table-column>
-	    <el-table-column label="优惠金额" prop="discountPrice" align="center"></el-table-column>
-	    <el-table-column label="门店/公司名称" prop="orgName" align="center" min-width="120"></el-table-column>
-	    <!-- <el-table-column label="线上展示" prop="isOnLine" align="center">
-	    	<template slot-scope="scope">
-	    		<span v-if="!scope.row.isOnLine" class="l-text-error">否</span>
-	    		<span v-else>是</span>
-	      </template>
-	    </el-table-column> -->
+	    <el-table-column label="文章标题" prop="title" min-width="200"></el-table-column>
+	    <el-table-column label="发布时间" prop="publishedTime" align="center"></el-table-column>
+			<el-table-column label="状态" prop="stateName" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">查看 / 编辑</el-button>
+					<span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
+	        <span v-show="!scope.row.doing">
+						<el-button v-if="scope.row.state == 0" class="l-text-ok" type="text" size="small" @click="publishInfo(scope.row)">发布</el-button>
+						<el-button v-if="scope.row.state > -1" class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
+						<el-button v-if="scope.row.state != 0" class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">{{scope.row.state == -1 ? '启用' : '禁用'}}</el-button>
+					</span>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -49,100 +42,43 @@
 	  	 	:total="list.total">
 			</el-pagination>
 	  </el-row>
-
-	  <!-- 车辆库存详情 -->
-		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="873px">
-  		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
-  			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
-			  <el-form-item class="_flex" label="车辆型号" style="width: 622px;">
-			    <el-input disabled v-model="dialogInfo.data.carsName"></el-input>
+ 
+	  <!-- 文章详情 -->
+		<el-dialog class="l-padding-tb-0" :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
+  		<el-form class="l-form1" ref="infoForm" label-width="100px" inline :model="dialogInfo.data" :rules="dialogInfo.rules">
+  			<el-form-item class="_flex" label="文章标题" prop="title">
+			    <el-input placeholder="请输入文章标题" v-model="dialogInfo.data.title" :maxlength="200"></el-input>
 			  </el-form-item>
-			  <el-form-item label="指导价" >
-			  	<el-input disabled v-model="dialogInfo.data.guidingPrice"></el-input>
+			  <el-form-item class="_flex" label="摘要" prop="pl" >
+			    <el-input type="textarea" placeholder="请输入文章摘要" v-model="dialogInfo.data.excerpt" :maxlength="500"></el-input>
 			  </el-form-item>
-			  <el-form-item label="发票金额" prop="invoicePrice">
-			  	<el-input v-model="dialogInfo.data.invoicePrice" :maxlength="10"></el-input>
+			  
+			  <el-form-item class="_flex" label="文章内容" prop="content" >
+			 		<quill-editor ref="dialogInfoEditor" class="l-text-editor" v-model="dialogInfo.data.content"></quill-editor>
 			  </el-form-item>
-			  <el-form-item label="定金/辆" prop="depositPrice">
-			  	<el-input v-model="dialogInfo.data.depositPrice"></el-input>
-			  </el-form-item>
-			  <el-form-item label="优惠" prop="discountPrice">
-			  	<el-input v-model="dialogInfo.data.discountPrice" :maxlength="10"></el-input>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="是否线上展示">
-			  	<el-switch v-model="dialogInfo.data.isOnLine" active-text="是" inactive-text="否"></el-switch>
-			  	<el-tooltip content="关闭线上展示则客户预定该车型时，不推荐客户来您门店了解和试驾" placement="right">
-            <i style="vertical-align: middle;" class="el-icon-question"></i>
-          </el-tooltip>
-			  </el-form-item>
-			  <el-table class="l-table-hdbg" stripe :data="dialogInfo.list">
-			    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
-			    <el-table-column label="发动机号" prop="engineNumber"  align="center"></el-table-column>
-			    <el-table-column label="票证号" prop="certificateNumber"  align="center"></el-table-column>
-			    <el-table-column label="仓位" prop="warehouseName"  align="center"></el-table-column>
-			    <el-table-column label="入库时间" prop="createDate"  align="center" class-name="l-fs-xs" min-width="120"></el-table-column>
-			    <el-table-column label="操作" align="center">
-			    	<template slot-scope="scope">
-			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
-			      </template>
-			    </el-table-column>
-			  </el-table>
 			</el-form>
 			<span slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
-		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
+		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">保存</el-button>
+				<!-- <el-button type="success" :loading="dialogInfo.loading" @click="publishDialogInfo">保存并发布</el-button> -->
 		  </span>
 		</el-dialog>
-
-		<viewer-images ref="viewer"></viewer-images>
 	</div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import viewerImages from 'components/viewer-images'
 export default {
-	name: 'stock-list',
-	components: {
-		viewerImages
-	},
+	name: 'school-list',
 	data() {
+		let that = this
+
 		return {
-			dateOptions: {
-				shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-			},
 			list: {
 				filter: {
-					carsName: '',
-					orgId: ''
+					keywords: ''
 				},
 				rules: {
-					carsName: [],
-					orgId: []
+					keywords: []
 				},
 				loading: false,
 				page: 1,
@@ -152,39 +88,27 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '查看/编辑库存信息',
+				title: '新增文章',
 				visible: false,
 				loading: false,
 				rules: {
-					depositPrice: [
-						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					title: [
+						{ required: true, message: '请输入文章标题',  trigger: 'blur' }
 					],
-					discountPrice: [
-						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
-					],
-					invoicePrice: [
-						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					content: [
+						{ required: true, message: '请输入文章内容',  trigger: 'change' }
 					]
 				},
 				data: {
-					carsId: '',
-					colourId: '',
-					interiorId: '',
-					carsName: '',
-					guidingPrice: '',
-					isOnLine: true,
-					depositPrice: '',
-					discountPrice: '',
-					invoicePrice: ''
+					title: '',
+					excerpt: '',
+					content: '',
+					icon: '',
+					videoUrl: ''
 				},
 				list: []
 			}
 		}
-	},
-	computed: {
-		...mapGetters([
-  		'zuzhiList'
-    ])
 	},
 	methods: {
 		sizeChange(size = 100) {
@@ -195,13 +119,13 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.stock.getList(this.list.filter, page, rows)
+			this.$$api.school.getList(this.list.filter, page, rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
-        	item.deling = false
+        	item.doing = false
         	return item
         })
 			}).finally(_ => {
@@ -218,30 +142,20 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'edit', row) { // 查看/编辑库存详情
-			this.dialogInfo.type = type
-			let { carsId, colourId, interiorId } = row
-			this.$$utils.copyObj(this.dialogInfo.data, row)
-			const loading = this.$loading()
-			this.$$api.stock.getInfo({ carsId, colourId, interiorId }).then(({data}) => {
-				this.dialogInfo.list = data.map(item => {
-					if(item.stockCarImages) {
-						item.imagesArr = item.stockCarImages.split(',').map(img => {
-							return {
-								url: this.$$utils.image.thumb(img, 150), 
-								thumb: this.$$utils.image.thumb(img, 150), 
-								src: img, 
-								name: img, 
-								status: 'success'
-							}
-						})
-					}
-					return item
-				})
+		showDialogInfo(type = 'new', row) { // 新增/编辑文章
+			if(type === 'new') {
 				this.dialogInfo.visible = true
-			}).finally(_ => {
-				loading.close()
-			})
+				this.dialogInfo.data.id = ''
+			}else if(type === 'edit'){
+				let loading = this.$loading()
+				this.dialogInfo.data.id = row.id
+				this.$$api.school.getInfo(row.id).then(({data}) => {
+					this.dialogInfo.data = this.$$utils.copyObj(this.dialogInfo.data, data)
+					this.dialogInfo.visible = true
+				}).finally(_ => {
+					loading.close()
+				})
+			}
 		},
 		closeDialogInfo(done) {
 			if(done) {
@@ -249,37 +163,74 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.$refs.dialogInfoEditor.quill.root.click()
 			this.$refs.infoForm.resetFields()
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
-		submitDialogInfo() { // 提交库存信息
+		submitDialogInfo() { // 保存文章
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
-          this.dialogInfo.loading = true
-          this.$$api.stock.editInfo(this.dialogInfo.data).then(_ => {
-            this.closeDialogInfo()
+					if(!this.dialogInfo.data.content) {
+						this.$message.error('请输入文章内容')
+						return
+					}
+					if(this.$refs.dialogInfoEditor.$el.querySelectorAll('.l-convert-doing').length > 0) {
+						this.$message.error('等待文章内容图片上传完毕')
+						return
+					}
+					
+					this.dialogInfo.loading = true
+					let promise = null
+					if(this.dialogInfo.data.id) {
+						promise = this.$$api.school.edit(this.dialogInfo.data)
+					}else {
+						promise = this.$$api.school.add(this.dialogInfo.data)
+					}
+          return promise.then(_ => {
             this.$message({
 							type: 'success',
-							message: '编辑库存信息成功'
+							message: '操作成功'
 						})
+						this.closeDialogInfo()
             this.refreshList()
           }).finally(()=>{
             this.dialogInfo.loading = false
           })  
-        }else {
-        	this.$message({
-						type: 'error',
-						message: '请完善表单信息'
-					})
         }
       })
 		},
-		showCarImages(imagesArr = []) { // 查看验车图片
-			if(imagesArr && imagesArr.length > 0) {
-				this.$refs.viewer.show(0, imagesArr)
-			}else{
-				this.$message.info('没有可查看图片')
-			}
+		deleteInfo(row) { // 启用-禁用
+			this.$confirm('是否确定'+ (row.state == -1 ? '启用' : '禁用') +'该文章?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(_ => {
+      	row.doing = true
+				this.$$api.school.del(row.id).then(_ => {
+					this.$message({
+						type: 'success',
+						message: '操作成功'
+					})
+					this.refreshList()
+				}).finally(_ => {
+					row.doing = false
+				})
+      })
+		},
+		publishInfo(row) {
+			row.doing = true
+			this.$$api.school.publish(row.id).then(_ => {
+				this.$message({
+					type: 'success',
+					message: '发布成功'
+				})
+				this.refreshList()
+			}).finally(_ => {
+				row.doing = false
+			})
+		},
+		publishDialogInfo() {
+
 		}
 	},
 	mounted() {
