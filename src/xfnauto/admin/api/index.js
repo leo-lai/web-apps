@@ -525,8 +525,9 @@ const api = {
     tickDone(orderId = '') { // 所有上传票证图片
       return fetch.post(baseURL1 + '/ConsumerOrder/finishOrder', { orderId })
     },
-    getContractInfo(orderId = '') { // 合同信息
-      return fetch.post(baseURL1 + '/ConsumerOrder/getContractInfo', { orderId })
+    getContractInfo(id = '') { // 合同信息
+      // return fetch.post(baseURL1 + '/ConsumerOrder/getContractInfo', { orderId })
+      return fetch.ajax(baseURL2 + '/backend_v1/consumer/detail', { id })
     },
     refund(formData = {}) { // 退款
       return fetch.post(baseURL1 + '/ConsumerOrder/countermandExamine', formData)

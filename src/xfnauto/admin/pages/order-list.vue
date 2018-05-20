@@ -55,8 +55,8 @@
 	    		<el-button class="l-text-link" type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
 					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'order/contract?id=' + scope.row.id" target="_blank">打印合同</a>
 					<el-button class="l-text-warn" v-if="scope.row.countermandApply == 1" type="text" size="mini" @click="showDialogRefund(scope.row)">退款审核</el-button>
-	    		<el-button class="l-text-error" v-if="scope.row.state == 5" type="text" size="mini" @click="showDialogPay(1, scope.row)">收定金</el-button>
-	    		<el-button class="l-text-error" v-if="scope.row.state == 35" type="text" size="mini" @click="showDialogPay(2, scope.row)">收尾款</el-button>
+	    		<el-button class="l-text-error" v-if="scope.row.orderState == 5" type="text" size="mini" @click="showDialogPay(1, scope.row)">收定金</el-button>
+	    		<el-button class="l-text-error" v-if="scope.row.orderState == 35" type="text" size="mini" @click="showDialogPay(2, scope.row)">收尾款</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
