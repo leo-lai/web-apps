@@ -1,17 +1,22 @@
 <template>
 	<div>
 		<el-row>
-  		<el-col :span="24" class="l-text-right">
+  		<el-col :span="24">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-					<el-form-item prop="keywords">
-				    <el-input placeholder="请输入客户姓名/车架号" v-model="list.filter.keywords"></el-input>
-				  </el-form-item>
-  				<el-form-item prop="orgId">
-  					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
+					<el-form-item prop="orgId">
+  					<el-select style="width:180px;" v-model="list.filter.orgId" placeholder="公司/门店" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
   				</el-form-item>
-				  <el-form-item prop="dateRange" style="width:360px;">
+					<el-form-item prop="state">
+  					<el-select style="width:130px;" v-model="list.filter.state" placeholder="订单状态" @change="search()">
+				      <el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+				    </el-select>
+  				</el-form-item>
+					<el-form-item prop="keywords">
+				    <el-input placeholder="客户姓名/车架号" v-model="list.filter.keywords"></el-input>
+				  </el-form-item>
+				  <el-form-item prop="dateRange" style="width:300px;">
 				  	<el-date-picker style="width: 100%;" type="daterange" value-format="yyyy-MM-dd"
 				  		range-separator="到" start-placeholder="从建单时间" end-placeholder="建单时间"
 				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
@@ -19,6 +24,7 @@
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
 				    <el-button type="danger" @click="clear">刷新</el-button>
+						<el-button :loading="exceling" type="plain" @click="toExcel">导出excel</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
@@ -43,7 +49,7 @@
 	    <el-table-column label="尾款" prop="totalRestPrice" align="center" width="100"></el-table-column>
 	    <el-table-column label="运费" prop="freight" align="center" width="100"></el-table-column>
 	    <el-table-column label="建单员" prop="creator" align="center" width="110"></el-table-column>
-			<el-table-column class-name="l-fs-xs" label="建单日期" prop="createTime" align="center" width="100"></el-table-column>
+			<el-table-column class-name="l-fs-xs" label="建单日期" prop="createTime" align="center" width="90"></el-table-column>
 			<el-table-column label="订单类型" prop="orderType" align="center" width="100">
 				<template slot-scope="scope">
 					{{scope.row.orderType ? orderType[scope.row.orderType - 1] : '常规单'}}
@@ -334,6 +340,7 @@ export default {
 		}
 
 		return {
+			exceling: false,
 			orderType: ['常规单', '炒车单'],
 			dateOptions: {
 				shortcuts: [{
@@ -362,20 +369,30 @@ export default {
           }
         }]
 			},
+			stateList: [
+				{ label: '待收定金', value: 5},
+				{ label: '待配车', value: 10},
+				{ label: '待验车', value: 15},
+				{ label: '待出库', value: 40},
+				{ label: '待上传票证', value: 45},
+				{ label: '已退款', value: 37},
+			],
 			list: {
 				filter: {
 					dateRange: [],
 					keywords: '',
 					startDate: '',
 					endDate: '',
-					orgId: ''
+					orgId: '',
+					state: '',
 				},
 				rules: {
 					keywords: [],
 					dateRange: [],
 					startDate: [],
 					endDate: [],
-					orgId: []
+					orgId: [],
+					state: [],
 				},
 				loading: false,
 				page: 1,
@@ -458,6 +475,14 @@ export default {
     ])
 	},
 	methods: {
+		toExcel() {
+			this.exceling = true
+			this.$$api.order.toExcel(this.list.filter).then(({data}) => {
+				window.location.href = data.url
+			}).finally(_ => {
+				this.exceling = false
+			})
+		},
 		columnHeader(h, { column, $index }) {
 			return (
 				<p class="l-text-center" style="font-size:12px; font-weight: 500;">

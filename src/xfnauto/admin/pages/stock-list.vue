@@ -1,41 +1,61 @@
 <template>
 	<div>
 		<el-row>
-  		<el-col :span="24" class="l-text-right">
+  		<el-col :span="24" >
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
   				<el-form-item prop="orgId">
   					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
   				</el-form-item>
-				  <el-form-item prop="carsName">
-				  	<el-input v-model="list.filter.carsName" placeholder="请输入车辆型号"></el-input>
+					<el-form-item prop="state">
+  					<el-select v-model="list.filter.state" placeholder="请选择库存状态" @change="search()">
+				      <el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+				    </el-select>
+  				</el-form-item>
+					<el-form-item prop="frame_number">
+				  	<el-input v-model="list.filter.frame_number" placeholder="请输入车架号"></el-input>
+				  </el-form-item>
+				  <el-form-item prop="cars_info">
+				  	<el-input v-model="list.filter.cars_info" placeholder="请输入车辆型号"></el-input>
+				  </el-form-item>
+					<el-form-item prop="dateRange" style="width:360px;">
+				  	<el-date-picker style="width: 100%;" type="daterange" value-format="yyyy-MM-dd"
+				  		range-separator="到" start-placeholder="从入库时间" end-placeholder="入库时间"
+				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
 				    <el-button type="danger" @click="clear">刷新</el-button>
+				    <el-button :loading="exceling" type="plain" @click="toExcel">导出excel</el-button>
 				  </el-form-item>
 				</el-form>
   		</el-col>
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="车辆型号" prop="carsName" min-width="200"></el-table-column>
-	    <el-table-column label="车身颜色" prop="colourName" align="center"></el-table-column>
-	    <el-table-column label="内饰颜色" prop="interiorName" align="center"></el-table-column>
-	    <el-table-column label="指导价格" prop="guidingPrice" align="center"></el-table-column>
-	    <el-table-column label="库存数量" prop="number" align="center"></el-table-column>
-	    <el-table-column label="优惠金额" prop="discountPrice" align="center"></el-table-column>
-	    <el-table-column label="门店/公司名称" prop="orgName" align="center" min-width="120"></el-table-column>
-	    <!-- <el-table-column label="线上展示" prop="isOnLine" align="center">
-	    	<template slot-scope="scope">
-	    		<span v-if="!scope.row.isOnLine" class="l-text-error">否</span>
-	    		<span v-else>是</span>
+	    <el-table-column class-name="l-fs-xs" label="车辆型号" prop="carsName" width="300">
+				<template slot-scope="scope">
+					<p>{{scope.row.carsName}}</p>
+					<p class="l-text-gray">
+						<span class="l-margin-r">车身：{{scope.row.colourName}}</span>
+						<span>内饰：{{scope.row.interiorName}}</span>
+					</p>
 	      </template>
-	    </el-table-column> -->
-	    <el-table-column label="操作" align="center">
+			</el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="车架号" prop="frameNumber" align="center" width="140"></el-table-column>
+			<el-table-column label="库存状态" prop="state" align="center" width="100"></el-table-column>
+	    <el-table-column label="指导价" prop="guidingPrice" align="center" width="100"></el-table-column>
+	    <el-table-column label="采购价" prop="unitPrice" align="center" width="100"></el-table-column>
+	    <el-table-column label="运费/辆" prop="freight" align="center" width="100"></el-table-column>
+	    <el-table-column label="其他费用" prop="othersFee" align="center" width="100"></el-table-column>
+			<el-table-column class-name="l-fs-xs" label="所属门店" prop="orgName" align="center" width="120"></el-table-column>
+	    <el-table-column label="仓位" prop="warehouseName" align="center" width="100"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="入库时间" prop="createDate" align="center" width="90"></el-table-column>
+	    <el-table-column label="操作" align="center" fixed="right" width="140">
 	    	<template slot-scope="scope">
-	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">查看 / 编辑</el-button>
+					<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">完善库存信息</el-button>
+	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('view', scope.row)">查看</el-button>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -52,44 +72,78 @@
 
 	  <!-- 车辆库存详情 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="873px">
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="700px">
   		<el-form ref="infoForm" inline class="l-form1" label-width="100px" 
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
-			  <el-form-item class="_flex" label="车辆型号" style="width: 622px;">
-			    <el-input disabled v-model="dialogInfo.data.carsName"></el-input>
-			  </el-form-item>
-			  <el-form-item label="指导价" >
-			  	<el-input disabled v-model="dialogInfo.data.guidingPrice"></el-input>
-			  </el-form-item>
-			  <el-form-item label="发票金额" prop="invoicePrice">
-			  	<el-input v-model="dialogInfo.data.invoicePrice" :maxlength="10"></el-input>
-			  </el-form-item>
-			  <el-form-item label="定金/辆" prop="depositPrice">
-			  	<el-input v-model="dialogInfo.data.depositPrice"></el-input>
-			  </el-form-item>
-			  <el-form-item label="优惠" prop="discountPrice">
-			  	<el-input v-model="dialogInfo.data.discountPrice" :maxlength="10"></el-input>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="是否线上展示">
-			  	<el-switch v-model="dialogInfo.data.isOnLine" active-text="是" inactive-text="否"></el-switch>
-			  	<el-tooltip content="关闭线上展示则客户预定该车型时，不推荐客户来您门店了解和试驾" placement="right">
-            <i style="vertical-align: middle;" class="el-icon-question"></i>
-          </el-tooltip>
-			  </el-form-item>
-			  <el-table class="l-table-hdbg" stripe :data="dialogInfo.list">
-			    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
-			    <el-table-column label="发动机号" prop="engineNumber"  align="center"></el-table-column>
-			    <el-table-column label="票证号" prop="certificateNumber"  align="center"></el-table-column>
-			    <el-table-column label="仓位" prop="warehouseName"  align="center"></el-table-column>
-			    <el-table-column label="入库时间" prop="createDate"  align="center" class-name="l-fs-xs" min-width="120"></el-table-column>
-			    <el-table-column label="操作" align="center">
-			    	<template slot-scope="scope">
-			        <el-button :class="scope.row.imagesArr ? 'l-text-link' : 'l-text-gary'" type="text" size="small" @click="showCarImages(scope.row.imagesArr)">查看验车照片</el-button>
-			      </template>
-			    </el-table-column>
-			  </el-table>
+				<template v-if="dialogInfo.type == 'view'">
+					<el-form-item class="_flex" label="车辆型号" style="width: 622px;">
+						<el-input readonly :value="dialogInfo.data.carsName"></el-input>
+					</el-form-item>
+					<el-form-item label="车身颜色" >
+						<el-input readonly :value="dialogInfo.data.colorName"></el-input>
+					</el-form-item>
+					<el-form-item label="内饰颜色" >
+						<el-input readonly :value="dialogInfo.data.interiorName"></el-input>
+					</el-form-item>
+					<el-form-item label="车架号" >
+						<el-input readonly :value="dialogInfo.data.frameNumber"></el-input>
+					</el-form-item>
+					<el-form-item label="发动机号" >
+						<el-input readonly :value="dialogInfo.data.enginNumber"></el-input>
+					</el-form-item>
+					<el-form-item label="指导价" >
+						<el-input readonly :value="dialogInfo.data.guidingPrice"></el-input>
+					</el-form-item>
+					<el-form-item label="采购价" >
+						<el-input readonly :value="dialogInfo.data.unitPrice"></el-input>
+					</el-form-item>
+					<el-form-item label="运费/辆" >
+						<el-input readonly :value="dialogInfo.data.freight"></el-input>
+					</el-form-item>
+					<el-form-item label="其他费用" >
+						<el-input readonly :value="dialogInfo.data.othersFee"></el-input>
+					</el-form-item>
+					<el-form-item class="_flex" label="所属门店" style="width: 622px;">
+						<el-input readonly :value="dialogInfo.data.orgName"></el-input>
+					</el-form-item>
+					<el-form-item label="仓位" >
+						<el-input readonly :value="dialogInfo.data.warehouseName"></el-input>
+					</el-form-item>
+					<el-form-item label="入库时间" >
+						<el-input readonly :value="dialogInfo.data.createTime"></el-input>
+					</el-form-item>
+					<el-form-item label="库存状态" >
+						<el-input readonly :value="dialogInfo.data.state"></el-input>
+					</el-form-item>
+					<el-form-item label="出厂时间" >
+						<el-input readonly :value="dialogInfo.data.factoryOut"></el-input>
+					</el-form-item>
+					<el-form-item label="公里数" >
+						<el-input readonly :value="dialogInfo.data.mileage"></el-input>
+					</el-form-item>
+					<el-form-item label="是否带交强险" >
+						<el-input readonly :value="dialogInfo.data.overStrongInsurance ? '是' : '否'"></el-input>
+					</el-form-item>
+					<el-form-item class="_flex" label="随车资料" style="width: 622px;">
+						<el-input type="textarea" autosize readonly :value="dialogInfo.data.followInformation"></el-input>
+					</el-form-item>
+					<el-form-item class="_flex" label="验车照片" style="width: 622px;">
+						<img style="margin: 10px 10px 0 0; width: 90px; height: 90px;" v-for="(item,index) in dialogInfo.data.imagesArr" :key="item.name" :src="item.thumb" @click="showCarImages(dialogInfo.data.imagesArr, index)">
+					</el-form-item>
+				</template>
+				<template v-else>
+					<el-form-item label="采购价" prop="unitPrice">
+						<el-input :maxlength="10" v-model="dialogInfo.data.unitPrice"></el-input>
+					</el-form-item>
+					<el-form-item label="运费/辆" prop="freight">
+						<el-input :maxlength="10" v-model="dialogInfo.data.freight"></el-input>
+					</el-form-item>
+					<el-form-item label="其他费用" prop="othersFee">
+						<el-input :maxlength="10" v-model="dialogInfo.data.othersFee"></el-input>
+					</el-form-item>
+				</template>
 			</el-form>
-			<span slot="footer" class="l-margin-r-m">
+			<span v-if="dialogInfo.type == 'edit'" slot="footer" class="l-margin-r-m">
 				<el-button @click="closeDialogInfo()">取消</el-button>
 		    <el-button type="primary" :loading="dialogInfo.loading" @click="submitDialogInfo">确定提交</el-button>
 		  </span>
@@ -108,6 +162,7 @@ export default {
 	},
 	data() {
 		return {
+			exceling: false,
 			dateOptions: {
 				shortcuts: [{
           text: '最近一周',
@@ -135,14 +190,26 @@ export default {
           }
         }]
 			},
+			stateList: [
+				{ label: '新建', value: 0},
+				{ label: '已入库', value: 1},
+				{ label: '已锁定', value: 2},
+				{ label: '已出库', value: 3},
+			],
 			list: {
 				filter: {
-					carsName: '',
-					orgId: ''
+					dateRange: [],
+					cars_info: '',
+					frame_number: '',
+					orgId: '',
+					state: '',
 				},
 				rules: {
+					dateRange: [],
 					carsName: [],
-					orgId: []
+					frame_number: [],
+					orgId: [],
+					state: [],
 				},
 				loading: false,
 				page: 1,
@@ -151,33 +218,27 @@ export default {
 				data: []
 			},
 			dialogInfo: {
-				type: 'new',
-				title: '查看/编辑库存信息',
+				type: 'view',
+				title: '查看库存信息',
 				visible: false,
 				loading: false,
 				rules: {
-					depositPrice: [
+					unitPrice: [
 						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
-					discountPrice: [
-						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					freight: [
+						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					],
-					invoicePrice: [
-						{ required: true, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
+					othersFee: [
+						{ required: false, pattern: /^\d{1,9}(\.\d{1,2})?$/, message: '必填项，正确格式(如：10.24)', trigger: 'blur' }
 					]
 				},
 				data: {
-					carsId: '',
-					colourId: '',
-					interiorId: '',
-					carsName: '',
-					guidingPrice: '',
-					isOnLine: true,
-					depositPrice: '',
-					discountPrice: '',
-					invoicePrice: ''
-				},
-				list: []
+					id: '',
+					unitPrice: '',
+					freight: '',
+					othersFee: '',
+				}
 			}
 		}
 	},
@@ -187,6 +248,25 @@ export default {
     ])
 	},
 	methods: {
+		toExcel() {
+			this.exceling = true
+			this.$$api.stock.toExcel(this.list.filter).then(({data}) => {
+				window.location.href = data.url
+			}).finally(_ => {
+				this.exceling = false
+			})
+		},
+		filterDateChange(value) {
+			if(value) {
+				this.list.filter.startTime = value[0] || ''
+				this.list.filter.endTime = value[1] || ''
+				
+			}else {
+				this.list.filter.startTime = ''
+				this.list.filter.endTime = ''
+			}
+			this.search()	
+		},
 		sizeChange(size = 100) {
 			this.getList(1, size)
 		},
@@ -218,26 +298,20 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'edit', row) { // 查看/编辑库存详情
+		showDialogInfo(type = 'view', row) { // 查看库存详情
 			this.dialogInfo.type = type
-			let { carsId, colourId, interiorId } = row
-			this.$$utils.copyObj(this.dialogInfo.data, row)
 			const loading = this.$loading()
-			this.$$api.stock.getInfo({ carsId, colourId, interiorId }).then(({data}) => {
-				this.dialogInfo.list = data.map(item => {
-					if(item.stockCarImages) {
-						item.imagesArr = item.stockCarImages.split(',').map(img => {
-							return {
-								url: this.$$utils.image.thumb(img, 150), 
-								thumb: this.$$utils.image.thumb(img, 150), 
-								src: img, 
-								name: img, 
-								status: 'success'
-							}
-						})
+			this.$$api.stock.getInfo(row.id).then(({data}) => {
+				data.imagesArr = data.stockCarImages ? data.stockCarImages.split(',').map(img => {
+					return {
+						url: this.$$utils.image.thumb(img, 150), 
+						thumb: this.$$utils.image.thumb(img, 150), 
+						src: img, 
+						name: img, 
+						status: 'success'
 					}
-					return item
-				})
+				}) : []
+				this.dialogInfo.data = type === 'edit' ? this.$$utils.copyObj(this.dialogInfo.data, data) : data
 				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
@@ -252,7 +326,7 @@ export default {
 			this.$refs.infoForm.resetFields()
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
-		submitDialogInfo() { // 提交库存信息
+		submitDialogInfo() { // 完善库存信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
@@ -260,7 +334,7 @@ export default {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: '编辑库存信息成功'
+							message: '完善库存信息成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -274,9 +348,9 @@ export default {
         }
       })
 		},
-		showCarImages(imagesArr = []) { // 查看验车图片
+		showCarImages(imagesArr = [], index = 0) { // 查看验车图片
 			if(imagesArr && imagesArr.length > 0) {
-				this.$refs.viewer.show(0, imagesArr)
+				this.$refs.viewer.show(index, imagesArr)
 			}else{
 				this.$message.info('没有可查看图片')
 			}

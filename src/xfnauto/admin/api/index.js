@@ -425,16 +425,30 @@ const api = {
     }
   },
   stock: { // 库存管理
-    getList(formData = {}, page = 1, rows = 50) { // 车辆库存列表
+    toExcel(formData = {}) {
+      return fetch.ajax(baseURL2 + '/backend_v1/stock/export', formData) 
+    },
+    getList_bak(formData = {}, page = 1, rows = 50) { // 车辆库存列表
       formData.page = page
       formData.rows = rows
       return fetch.post(baseURL1 + '/stockCarList', formData)
     },
-    getInfo(formData = {}){ // 车辆库存详情
+    getList(formData = {}, page = 1, rows = 50) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v1/stock', formData) 
+    },
+    getInfo_bak(formData = {}){ // 车辆库存详情
       return fetch.post(baseURL1 + '/stockCarInfo', formData)
     },
-    editInfo(formData = {}) { // 编辑车辆库存详情
+    getInfo(id = '') {
+      return fetch.ajax(baseURL2 + '/backend_v1/stock/detail', { id })
+    },
+    editInfo_bak(formData = {}) { // 编辑车辆库存详情
       return fetch.post(baseURL1 + '/stockCarEdit', formData)
+    },
+    editInfo(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v1/stock/edit', formData)
     },
     getInList(formData = {}, page = 1, rows = 50) { // 入库单列表
       formData.page = page
@@ -500,7 +514,10 @@ const api = {
     }
   },
   order: { // 代购管理
-    getList1(formData = {}, page = 1, rows = 50) { // 代购单列表
+    toExcel(formData = {}) {
+      return fetch.ajax(baseURL2 + '/backend_v1/consumer/export', formData)
+    },
+    getList_bak(formData = {}, page = 1, rows = 50) { // 代购单列表
       formData.page = page
       formData.rows = rows
       return fetch.post(baseURL1 + '/ConsumerOrder/listOrders', formData)
