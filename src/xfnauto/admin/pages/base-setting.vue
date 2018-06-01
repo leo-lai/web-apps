@@ -1,18 +1,18 @@
 <template>
 	<div class="l-main-body">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
-		  <el-tab-pane label="公司/门店" name="zuzhi">
+		  <el-tab-pane label="组织列表" name="zuzhi">
 		  	<base-setting-zuzhi></base-setting-zuzhi>
 		  </el-tab-pane>
 		  <el-tab-pane label="系统用户" name="user">
 		  	<base-setting-user></base-setting-user>
 		  </el-tab-pane>
-		  <el-tab-pane label="角色及权限" name="role">
+		  <el-tab-pane label="系统角色" name="role">
 		  	<base-setting-role></base-setting-role>
 		  </el-tab-pane>
-			<el-tab-pane label="人员分组" name="group">
+			<!-- <el-tab-pane label="人员分组" name="group">
 		  	<base-setting-group></base-setting-group>
-		  </el-tab-pane>
+		  </el-tab-pane> -->
 		</el-tabs>
 	</div>
 </template>

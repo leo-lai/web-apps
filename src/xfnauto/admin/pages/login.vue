@@ -4,7 +4,7 @@
       :model="loginForm.data" :rules="loginForm.rules" @keyup.native.enter="submitForm">
       <h3 class="_tit">喜蜂鸟管理系统</h3>
       <el-form-item prop="phoneNumber">
-        <el-input type="text" v-model.trim="loginForm.data.phoneNumber" auto-complete="off" placeholder="手机号码"></el-input>
+        <el-input type="text" v-model.trim="loginForm.data.phoneNumber" :maxlength="11" auto-complete="off" placeholder="手机号码"></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input type="password" v-model.trim="loginForm.data.password" auto-complete="off" placeholder="密码"></el-input>

@@ -6,6 +6,11 @@
 			</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+					<el-form-item prop="type">
+  					<el-select v-model="list.filter.type" placeholder="文章类别" @change="search()">
+				      <el-option v-for="item in typeList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+				    </el-select>
+  				</el-form-item>
 				  <el-form-item prop="keywords">
 				  	<el-input v-model="list.filter.keywords" placeholder="请输入文章标题"></el-input>
 				  </el-form-item>
@@ -19,6 +24,7 @@
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="文章标题" prop="title" min-width="200"></el-table-column>
+	    <el-table-column label="文章类别" prop="type"></el-table-column>
 	    <el-table-column label="发布时间" prop="publishedTime" align="center"></el-table-column>
 			<el-table-column label="状态" prop="stateName" align="center"></el-table-column>
 	    <el-table-column label="操作" align="center">
@@ -27,7 +33,7 @@
 	        <span v-show="!scope.row.doing">
 						<el-button v-if="scope.row.state == 0" class="l-text-ok" type="text" size="small" @click="publishInfo(scope.row)">发布</el-button>
 						<el-button v-if="scope.row.state > -1" class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
-						<el-button v-if="scope.row.state != 0" class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">{{scope.row.state == -1 ? '启用' : '禁用'}}</el-button>
+						<el-button class="l-text-error" type="text" size="small" @click="deleteInfo(scope.row)">删除</el-button>
 					</span>
 	      </template>
 	    </el-table-column>
@@ -50,6 +56,14 @@
   			<el-form-item class="_flex" label="文章标题" prop="title">
 			    <el-input placeholder="请输入文章标题" v-model="dialogInfo.data.title" :maxlength="200"></el-input>
 			  </el-form-item>
+				<el-form-item label="文章类别" prop="type">
+			    <el-select v-model="dialogInfo.data.type" placeholder="文章类别">
+						<el-option v-for="item in typeList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+					</el-select>
+			  </el-form-item>
+				<el-form-item label="文章缩略图" prop="icon">
+			    <uploader ref="dialogInfoUpload" :limit="1" :file-list.sync="dialogInfo.uploadList"></uploader>
+			  </el-form-item>
 			  <el-form-item class="_flex" label="摘要" prop="pl" >
 			    <el-input type="textarea" placeholder="请输入文章摘要" v-model="dialogInfo.data.excerpt" :maxlength="500"></el-input>
 			  </el-form-item>
@@ -67,17 +81,28 @@
 	</div>
 </template>
 <script>
+import uploader from 'components/uploader'
 export default {
 	name: 'school-list',
+	components: { uploader },
 	data() {
 		let that = this
 
 		return {
+			uploadList: [],
+			typeList: [
+				{ label: '公司新闻', value: '1'},
+				{ label: '行业动态', value: '2'},
+				{ label: '汽车商学院', value: '3'},
+				{ label: '喜蜂鸟学堂', value: '4'}
+			],
 			list: {
 				filter: {
+					type: '',
 					keywords: ''
 				},
 				rules: {
+					type: [],
 					keywords: []
 				},
 				loading: false,
@@ -95,18 +120,22 @@ export default {
 					title: [
 						{ required: true, message: '请输入文章标题',  trigger: 'blur' }
 					],
+					type: [
+						{ required: true, message: '请选择文章类别',  trigger: 'change' }
+					],
 					content: [
 						{ required: true, message: '请输入文章内容',  trigger: 'change' }
 					]
 				},
+				uploadList: [],
 				data: {
 					title: '',
 					excerpt: '',
 					content: '',
+					type: '',
 					icon: '',
 					videoUrl: ''
-				},
-				list: []
+				}
 			}
 		}
 	},
@@ -151,6 +180,15 @@ export default {
 				this.dialogInfo.data.id = row.id
 				this.$$api.school.getInfo(row.id).then(({data}) => {
 					this.dialogInfo.data = this.$$utils.copyObj(this.dialogInfo.data, data)
+					this.dialogInfo.uploadList = data.icon ? data.icon.split(',').map(img => {
+						return {
+							url: this.$$utils.image.thumb(img, 150), 
+							thumb: this.$$utils.image.thumb(img, 150), 
+							src: img, 
+							name: img, 
+							status: 'success'
+						}
+					}) : []
 					this.dialogInfo.visible = true
 				}).finally(_ => {
 					loading.close()
@@ -165,11 +203,17 @@ export default {
 			}
 			this.$refs.dialogInfoEditor.quill.root.click()
 			this.$refs.infoForm.resetFields()
+			this.dialogInfo.uploadList = []
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 保存文章
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
+					if(this.$refs.dialogInfoUpload.waiting > 0) {
+						this.$message.error('缩略图正在上传中...')
+						return
+					}
+
 					if(!this.dialogInfo.data.content) {
 						this.$message.error('请输入文章内容')
 						return
@@ -177,6 +221,10 @@ export default {
 					if(this.$refs.dialogInfoEditor.$el.querySelectorAll('.l-convert-doing').length > 0) {
 						this.$message.error('等待文章内容图片上传完毕')
 						return
+					}
+					
+					if(this.dialogInfo.uploadList.length > 0){
+						this.dialogInfo.data.icon = this.dialogInfo.uploadList[0].src
 					}
 					
 					this.dialogInfo.loading = true
@@ -199,8 +247,8 @@ export default {
         }
       })
 		},
-		deleteInfo(row) { // 启用-禁用
-			this.$confirm('是否确定'+ (row.state == -1 ? '启用' : '禁用') +'该文章?', '提示', {
+		deleteInfo(row) { // 启用-删除
+			this.$confirm('是否确定'+ (row.state == -1 ? '启用' : '删除') +'该文章?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

@@ -8,13 +8,13 @@ let config = {
     base: Object.is(process.env.NODE_ENV, 'production') ? '/' : '/admin/'
   },
   api: {
-    baseURL1: window.location.host === 'admin.xfnauto.com' ? 
+    baseURL1: window.location.host.indexOf('xfnauto.com') !== -1? 
       'https://tomcat.xfnauto.com/tauto/management/admin' : 'http://tomcat.mifengqiche.com/tauto/management/admin',
-    baseURL2: window.location.host === 'admin.xfnauto.com' ?
+    baseURL2: window.location.host.indexOf('xfnauto.com') !== -1 ?
       'https://api.xfnauto.com' : 'http://api.mifengqiche.com'
   },
   pay: {
-    url: window.location.host === 'admin.xfnauto.com' ? 
+    url: window.location.host.indexOf('xfnauto.com') !== -1 ? 
       'https://service.allinpay.com/gateway/index.do' : 'http://ceshi.allinpay.com/gateway/index.do'
   },
   baseData: {

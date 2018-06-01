@@ -137,9 +137,7 @@
 import uploader from 'components/uploader'
 export default {
 	name: 'base-data-car',
-	components: {
-		uploader
-	},
+	components: { uploader },
 	data() {
 		let that = this
 		// 车辆型号选择

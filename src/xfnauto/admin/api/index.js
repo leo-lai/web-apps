@@ -3,12 +3,12 @@ import axios from 'axios'
 import { storage, utils } from 'assets/js/utils'
 import { Message } from 'element-ui'
 import router from '../router'
-import { SIGHUP } from 'constants';
 
 let baseURL1 = config.api.baseURL1
 let baseURL2 = config.api.baseURL2
 // 创建axios实例
 const service = axios.create({
+  baseURL: config.api.baseURL1,
   timeout: 60000
 })
 // request拦截器
@@ -157,7 +157,8 @@ const api = {
     },
     login(formData = {}) {
       formData.userName = (formData.userName || '').trim()
-      return fetch.post(baseURL1 + '/login', formData)
+      return fetch.post(baseURL2 + '/backend_v1/login', formData)
+      // return fetch.post(baseURL1 + '/login', formData)
     },
     logout(toLogin = true) {
       // return new Promise((resolve, reject) => {
@@ -178,7 +179,7 @@ const api = {
       return fetch.post(baseURL1 + '/changePassword', formData)
     },
     getZuzhiList() {
-      return fetch.post(baseURL1 + '/organizationLevelList')
+      return fetch.ajax(baseURL2 + '/backend_v1/organization/getorg')
     },
     getRoleList() {
       return fetch.post(baseURL1 + '/roleListList')
@@ -190,57 +191,111 @@ const api = {
     }
   },
   zuzhi: { // 组织架构管理
+    // getList(formData = {}, page = 1, rows = 50) {
+    //   formData.page = page
+    //   formData.rows = rows
+    //   return fetch.post(baseURL1 + '/organizationList', formData)
+    // },
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post(baseURL1 + '/organizationList', formData)
+      return fetch.ajax(baseURL2 + '/backend_v1/organization/index', formData)
     },
     getParent(orgLevel = 0) {
       return fetch.post(baseURL1 + '/organizationLevelListByLevel', { orgLevel })
     },
-    getInfo(orgId = '') {
-      return fetch.post(baseURL1 + '/organizationInfo', { orgId })
+    // getInfo(orgId = '') {
+    //   return fetch.post(baseURL1 + '/organizationInfo', { orgId })
+    // },
+    getInfo(id = '') {
+      return fetch.ajax(baseURL2 + '/backend_v1/organization/detail', { id })
     },
     enable(orgId = '', isOn = '') {
       return fetch.post(baseURL1 + '/organizationOnOff', {orgId, isOn})
     },
+    // add(formData = {}) {
+    //   return fetch.post(baseURL1 + '/organizationEdit', formData)
+    // },
     add(formData = {}) {
-      return fetch.post(baseURL1 + '/organizationEdit', formData)
+      return fetch.post(baseURL2 + '/backend_v1/organization/create', formData)
+    },
+    edit(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v1/organization/edit', formData)
     },
     getCangList() { // 仓库列表
       return fetch.post(baseURL1 + '/organizationWarehouseList')
     }
   },
   user: { // 系统用户管理
+    // getList(formData = {}, page = 1, rows = 50) {
+    //   formData.page = page
+    //   formData.rows = rows
+    //   return fetch.post(baseURL1 + '/userList', formData)
+    // },
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post(baseURL1 + '/userList', formData)
+      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/index', formData)
     },
-    enable(userId = '', isEnable = '') {
-      return fetch.post(baseURL1 + '/userIsEnable', {userId, isEnable})
+    getInfo(id = '') {
+      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/detail', { id })
     },
+    // enable(userId = '', isEnable = '') {
+    //   return fetch.post(baseURL1 + '/userIsEnable', {userId, isEnable})
+    // },
+    enable(id = '') {
+      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/remove', { id })
+    },
+    // add_bak(formData = {}) {
+    //   return fetch.post(baseURL1 + '/addUser', formData)
+    // },
     add(formData = {}) {
-      return fetch.post(baseURL1 + '/addUser', formData)
+      return fetch.post(baseURL2 + '/backend_v1/systemuser/create', formData)
+    },
+    edit(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v1/systemuser/edit', formData)
     },
     getSalesList(formData = {}) {
       return fetch.post(baseURL1 + '/salesList', formData)
-    }
+    },
+    getParentList(orgId = '') { // 上级主管列表
+      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/higherups', { orgId })
+    },
   },
   role: { // 角色管理
+    // getList(formData = {}, page = 1, rows = 50) {
+    //   formData.page = page
+    //   formData.rows = rows
+    //   return fetch.post(baseURL1 + '/roleList', formData)
+    // },
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
-      return fetch.post(baseURL1 + '/roleList', formData)
+      return fetch.ajax(baseURL2 + '/backend_v1/role/index', formData)
+    },
+    getDownList(orgId = '') { // 角色列表(下拉)
+      return fetch.ajax(baseURL2 + '/backend_v1/role/list', { orgId })
     },
     add(formData = {}) {
-      return fetch.post(baseURL1 + '/roleEdit', formData)
+      return fetch.post(baseURL2 + '/backend_v1/role/create', formData)
     },
-    getMenuList(roleId = '') {
-      return fetch.post(baseURL1 + '/menuListTree', { roleId })
+    edit(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v1/role/edit', formData)
     },
-    setRoleMenu(formData = {}) {
-      return fetch.post(baseURL1 + '/setRoleMenu', formData)
+    del(roleId = '') {
+      return fetch.ajax(baseURL2 + '/backend_v1/role/remove', { roleId })
+    },
+    // getMenuList(roleId = '') {
+    //   return fetch.post(baseURL1 + '/menuListTree', { roleId })
+    // },
+    getMenuList(id = '') { // 根据角色返回当前菜单
+      return fetch.ajax(baseURL2 + '/backend_v1/roleaccess/index', { id })
+    },
+    // setRoleMenu(formData = {}) {
+    //   return fetch.post(baseURL1 + '/setRoleMenu', formData)
+    // },
+    setMenuList(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v1/roleaccess/addauth', formData)
     }
   },
   group: { // 分组管理
@@ -269,12 +324,21 @@ const api = {
     }
   },
   menu: {
+    getList() { // orgLevel = 1 返回所有菜单
+      return fetch.ajax(baseURL2 + '/backend_v1/menu/index')
+    },
+    // add(formData = {}) {
+    //   return fetch.post(baseURL1 + '/editMenu', formData)
+    // },
     add(formData = {}) {
-      return fetch.post(baseURL1 + '/editMenu', formData)
+      return fetch.post(baseURL2 + '/backend_v1/menu/create', formData)
+    },
+    edit(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v1/menu/edit', formData)
     },
     del(menuId = '') {
-      return fetch.post(baseURL1 + '/deleteMenu', { menuId })
-    }
+      return fetch.ajax(baseURL2 + '/backend_v1/menu/remove', { menuId })
+    },
   },
   supplier: { // 供应商管理
     getList(formData = {}, page = 1, rows = 50) {
@@ -428,11 +492,11 @@ const api = {
     toExcel(formData = {}) {
       return fetch.ajax(baseURL2 + '/backend_v1/stock/export', formData) 
     },
-    getList_bak(formData = {}, page = 1, rows = 50) { // 车辆库存列表
-      formData.page = page
-      formData.rows = rows
-      return fetch.post(baseURL1 + '/stockCarList', formData)
-    },
+    // getList(formData = {}, page = 1, rows = 50) { // 车辆库存列表
+    //   formData.page = page
+    //   formData.rows = rows
+    //   return fetch.post(baseURL1 + '/stockCarList', formData)
+    // },
     getList(formData = {}, page = 1, rows = 50) {
       formData.page = page
       formData.rows = rows
@@ -517,11 +581,11 @@ const api = {
     toExcel(formData = {}) {
       return fetch.ajax(baseURL2 + '/backend_v1/consumer/export', formData)
     },
-    getList_bak(formData = {}, page = 1, rows = 50) { // 代购单列表
-      formData.page = page
-      formData.rows = rows
-      return fetch.post(baseURL1 + '/ConsumerOrder/listOrders', formData)
-    },
+    // getList(formData = {}, page = 1, rows = 50) { // 代购单列表
+    //   formData.page = page
+    //   formData.rows = rows
+    //   return fetch.post(baseURL1 + '/ConsumerOrder/listOrders', formData)
+    // },
     getList(formData = {}, page = 1, rows = 50) { // 资源订单列表
       formData.page = page
       formData.rows = rows
@@ -589,6 +653,11 @@ const api = {
     publish(id = '') { // 发布
       return fetch.ajax(baseURL2 + '/backend_v1/article/publish', { id })
     },
+    getMsgList(formData = {}, page = 1, rows = 50) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v1/note', formData)
+    }
   },
 }
 

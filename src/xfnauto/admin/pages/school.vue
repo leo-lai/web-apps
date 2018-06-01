@@ -4,20 +4,22 @@
 		  <el-tab-pane label="文章列表" name="list">
 		  	<school-list></school-list>
 		  </el-tab-pane>
-      <!-- <el-tab-pane label="操作指南" name="video">
-        <guide-video></guide-video>
-      </el-tab-pane> -->
+      <el-tab-pane label="官网留言列表" name="msg">
+        <msg-list></msg-list>
+      </el-tab-pane>
 		</el-tabs>
 	</div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
 import schoolList from './school-list'
+import msgList from './msg-list'
 import guideVideo from './guide-video'
 export default {
 	name: 'school',
 	components: {
 		schoolList,
+		msgList,
 		guideVideo
 	},
 	data() {

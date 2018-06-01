@@ -1,13 +1,13 @@
 <template>
 	<div>
   	<el-row>
-  		<el-col :span="8">
-  			<el-button type="primary" @click="showDialogInfo('new')">新增</el-button>
+  		<el-col :span="4">
+  			<el-button type="primary" @click="showDialogInfo('new')">新增组织</el-button>
   		</el-col>
-  		<el-col :span="16" class="l-text-right">
+  		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-				  <el-form-item prop="orgName">
-				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
+				  <el-form-item prop="keywords">
+				    <el-input placeholder="请输入组织名称" v-model="list.filter.keywords"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -18,23 +18,24 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading" >
-	    <el-table-column label="公司/门店名称" prop="shortName"></el-table-column>
-	    <el-table-column label="上级机构" prop="parentName"></el-table-column>
-	    <el-table-column label="标签" prop="orgLevel" align="center">
+	    <el-table-column label="组织名称" prop="orgName" min-width="130px"></el-table-column>
+	    <!-- <el-table-column label="上级组织" prop="parentOrgName" min-width="130px"></el-table-column> -->
+	    <!-- <el-table-column label="标签" prop="orgLevel" align="center" width="130px">
 	    	<template slot-scope="scope">
 	    		<el-tag v-if="scope.row.orgLevel === 1" type="success">公司</el-tag>
 	    		<el-tag v-else-if="scope.row.orgLevel === 2" type="warning">分公司</el-tag>
-	    		<el-tag v-else="success" type="primary">门店</el-tag>
+	    		<el-tag v-else type="primary">门店</el-tag>
 	      </template>
-	    </el-table-column>
-	    <el-table-column label="地址" prop="address" min-width="200"></el-table-column>
-	    <el-table-column label="状态" prop="status" align="center">
+	    </el-table-column> -->
+	    <el-table-column label="详细地址" prop="address" min-width="150px"></el-table-column>
+	    <el-table-column label="状态" prop="status" align="center" width="130px">
 	    	<template slot-scope="scope">
-	    		<span v-if="scope.row.status === 1" class="l-text-ok">运营中</span>
-	    		<span v-else class="l-text-error">已禁用</span>
+					<span :class="statusClass[scope.row.status]">{{statusText[scope.row.status]}}</span>
+	    		<!-- <span v-if="scope.row.status === 1" class="l-text-ok">运营中</span>
+	    		<span v-else class="l-text-error">已禁用</span> -->
 	      </template>
 	    </el-table-column>
-	    <el-table-column label="操作" align="center">
+	    <el-table-column label="操作" align="center" width="130px">
 	    	<template slot-scope="scope">
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	        <span v-show="!scope.row.doing">
@@ -62,13 +63,13 @@
   		<el-form class="l-form1" ref="infoForm" label-width="100px"  inline
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="名称" prop="shortName">
-			    <el-input v-model="dialogInfo.data.shortName" placeholder="请输入公司/门店名称" :maxlength="50"></el-input>
+			    <el-input v-model="dialogInfo.data.shortName" placeholder="请输入组织名称" :maxlength="50"></el-input>
 			  </el-form-item>
-			  <el-form-item label="级别" prop="orgLevel">
+			  <!-- <el-form-item label="级别" prop="orgLevel">
 			    <el-select v-model="dialogInfo.data.orgLevel" placeholder="请选择" @change="orgLevelChange">
 			    	<el-option v-for="(item,index) in $$config.baseData.orgLevel" :key="index" :label="item" :value="index+1"></el-option>
 			    </el-select>
-			  </el-form-item>
+			  </el-form-item> -->
 			  <el-form-item label="性质" prop="orgType">
 			  	<el-select v-model="dialogInfo.data.orgType" placeholder="请选择">
 			    	<el-option label="直营" :value="1"></el-option>
@@ -77,15 +78,14 @@
 			    	<el-option label="其他" :value="4"></el-option>
 			    </el-select>
 			  </el-form-item>
-			  <el-form-item label="上级组织" prop="parentId">
+			  <!-- <el-form-item label="上级组织" prop="parentId">
 			  	<el-select v-model="dialogInfo.data.parentId" placeholder="请选择" :disabled="!dialogInfo.isParent">
 			      <el-option v-for="item in dialogInfo.zuzhiParents" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 			    </el-select>
+			  </el-form-item> -->
+			  <el-form-item label="联系电话" prop="telephone">
+			  	<el-input :maxlength="20" v-model="dialogInfo.data.telephone"></el-input>
 			  </el-form-item>
-			  <el-form-item label="联系电话" prop="telePhone">
-			  	<el-input :maxlength="20" v-model="dialogInfo.data.telePhone"></el-input>
-			  </el-form-item>
-			  <el-form-item label=""></el-form-item>
 			  <el-form-item class="_flex" label="地址" @click.native="amapOpts.visible = true" prop="region">
 			  	<el-input readonly style="width: 526px;" placeholder="如：广东省广州市海珠区东晓南路548号"
 				  	:value="amapAddress"></el-input>
@@ -130,7 +130,6 @@
 import AmapSelector from 'components/amap-selector'
 import uploader from 'components/uploader'
 import { getValueByText } from 'assets/js/region.data'
-import { mapGetters } from 'vuex'
 
 export default {
 	name: 'base-setting-zuzhi',
@@ -156,7 +155,7 @@ export default {
 			}else if(that.dialogInfo.uploadList.length === 0) {
 				callback(new Error('请上传照片'))
 			}else {
-				that.dialogInfo.data.imageUrl = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
+				that.dialogInfo.data.imageurl = that.dialogInfo.uploadList.map(item => item.src || item.url).join(',')
 				callback()
 			}
 		}
@@ -170,6 +169,8 @@ export default {
 		}
 
 		return {
+			statusText: ['', '正常使用', '已禁用', '待审核'],
+			statusClass: ['', 'l-text-ok', 'l-text-error', 'l-text-warn'],
 			amapOpts: {
 				visible: false,
 				province: '',
@@ -194,10 +195,10 @@ export default {
 			},
 			list: {
 				filter: {
-					orgName: ''
+					keywords: ''
 				},
 				rules: {
-					orgName: []
+					keywords: []
 				},
 				loading: false,
 				page: 1,
@@ -206,7 +207,7 @@ export default {
 				data: []
 			},
 			dialogInfo: {
-				title: '新增公司/门店',
+				title: '新增组织',
 				visible: false,
 				isParent: true,
 				uploadList: [],
@@ -215,16 +216,16 @@ export default {
 					shortName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
 					],
-					orgLevel: [
-						{ required: true, type: 'number', message: '必选项', trigger: 'change' }
-					],
+					// orgLevel: [
+					// 	{ required: true, type: 'number', message: '必选项', trigger: 'change' }
+					// ],
 					orgType: [
 						{ required: true, type: 'number', message: '必选项', trigger: 'change' }
 					],
-					parentId: [
-						{ required: true, validator: validateParent, trigger: 'change' }
-					],
-					telePhone: [
+					// parentId: [
+					// 	{ required: true, validator: validateParent, trigger: 'change' }
+					// ],
+					telephone: [
 						{ required: true, message: '必填项', trigger: 'blur' },
 					],
 					introduce: [
@@ -250,11 +251,11 @@ export default {
 					]
 				},
 				data: {
-					orgId: '',
+					id: '',
 					shortName: '',
-					orgLevel: '',
+					// orgLevel: '',
 					orgType: '',
-					parentId: '',
+					// parentId: '',
 					longitude: '',
 					latitude: '',
 					province: '',
@@ -264,13 +265,13 @@ export default {
 					areaId: '',
 					area: '',
 					address: '',
-					telePhone: '',
+					telephone: '',
 					bankAccount: '',
 					nameOfAccount: '',
 					bankName: '',
 					openingBranch: '',
 					introduce: '',
-					imageUrl: ''
+					imageurl: ''
 				}
 			}
 		}
@@ -283,9 +284,6 @@ export default {
 			}
 			return address || ''
 		},
-		...mapGetters([
-  		'zuzhiList'
-    ])
 	},
 	methods: {
 		orgLevelChange(value = 1) {
@@ -309,13 +307,15 @@ export default {
 			this.list.loading = true
 			this.$$api.zuzhi.getList(this.list.filter, page, rows)
 			.then(({data}) => {
-				this.list.total = data.total
-        this.list.page = data.page
-        this.list.rows = data.rows
-        this.list.data = data.list.map(item => {
-        	item.doing = false
-        	return item
-        })
+				if(data) {
+					this.list.total = data.total
+					this.list.page = data.page
+					this.list.rows = data.rows
+					this.list.data = data.list.map(item => {
+						item.doing = false
+						return item
+					})
+				}
 			}).finally(_ => {
 				this.list.loading = false
 			})
@@ -331,24 +331,22 @@ export default {
 			this.getList()
 		},
 		showDialogInfo(type = 'new', row) {
-			let promises = [this.$store.dispatch('getZuzhiList')]
-			
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改公司/门店'
-				let zuzhiInfoPromise = this.$$api.zuzhi.getInfo(row.orgId)
-				promises.push(zuzhiInfoPromise)
+				this.dialogInfo.title = '修改组织'
 
-				zuzhiInfoPromise.then(({data}) => {
+				const loading = this.$loading()
+				this.$$api.zuzhi.getInfo(row.id).then(({data}) => {
+					data.orgType = Number(data.orgType)
 					this.$$utils.copyObj(this.amapOpts, data)
 					this.$$utils.copyObj(this.dialogInfo.data, data)
 
-					this.dialogInfo._orgLevel = data.orgLevel
-					this.dialogInfo._parentId = data.parentId
-					this.orgLevelChange(data.orgLevel)
+					// this.dialogInfo._orgLevel = data.orgLevel
+					// this.dialogInfo._parentId = data.parentId
+					// this.orgLevelChange(data.orgLevel)
 
-					this.dialogInfo.uploadList = this.dialogInfo.data.imageUrl ? 
-					this.dialogInfo.data.imageUrl.split(',').map(img => {
+					this.dialogInfo.uploadList = this.dialogInfo.data.imageurl ? 
+					this.dialogInfo.data.imageurl.split(',').map(img => {
 						return {
 							url: this.$$utils.image.thumb(img, 150), 
 							thumb: this.$$utils.image.thumb(img, 150), 
@@ -357,18 +355,15 @@ export default {
 							status: 'success'
 						}
 					}) : []
+
+					this.dialogInfo.visible = true
+				}).finally(_ => {
+					loading.close()
 				})
 			} else {
-				this.dialogInfo.title = '新增公司/门店'
-				this.resetDialogInfo()
-			}
-
-			const loading = this.$loading()
-			Promise.all(promises).then(dataArr =>　{
+				this.dialogInfo.title = '新增组织'
 				this.dialogInfo.visible = true
-			}).finally(_ => {
-				loading.close()
-			})
+			}
 		},
 		closeDialogInfo(done) {
 			if(done) {
@@ -386,11 +381,12 @@ export default {
 		submitDialogInfo() { // 提交组织信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
-          this.dialogInfo.loading = true
-          this.$$api.zuzhi.add(this.dialogInfo.data).then(_ => {
+					this.dialogInfo.loading = true
+					let promise = this.dialogInfo.type == 'edit' ? this.$$api.zuzhi.edit(this.dialogInfo.data) : this.$$api.zuzhi.add(this.dialogInfo.data)
+          promise.then(_ => {
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '公司/门店成功'
+							message: (this.dialogInfo.type == 'edit' ? '修改' : '新增') + '组织成功'
 						})
 						this.closeDialogInfo()
             this.refreshList()
@@ -420,8 +416,8 @@ export default {
 		},
 		enable(row, status = 1) { // 禁用/启用组织
 			row.doing = true
-			this.$$api.zuzhi.enable(row.orgId, status).then(_ => {
-				row.status = status
+			this.$$api.zuzhi.enable(row.id, status).then(_ => {
+				row.status = status == 0 ? 2 : status
 				this.$message({
 					type: 'success',
 					message: status === 1 ? '启用成功' : '禁用成功'

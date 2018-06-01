@@ -66,6 +66,10 @@ const user = {
 		},
 		getZuzhiList({ commit }) { // 获取登录账号的组织列表
 			return api.auth.getZuzhiList().then(({data}) => {
+				data = data ? data.map(item => {
+					item.shortName = item.orgName
+					return item
+				}) : []
 				commit('ZUZHI_LIST', data)
 				return data
 			})

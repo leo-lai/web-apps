@@ -7,7 +7,7 @@
   		</div>
   		<el-button :disabled="loading" type="text" @click="showDialogInfo('new')">添加一级菜单</el-button>
   	</div>
-    <el-tree v-if="menuList.length > 0" ref="menuTree" class="l-basedata-menu" highlight-current node-key="menuId" 
+    <el-tree v-if="menuList" ref="menuTree" class="l-basedata-menu" highlight-current node-key="id" 
     	:data="menuList" :props="menuProps" :render-content="renderContent">
 		</el-tree>
 
@@ -43,7 +43,7 @@ export default {
     	menuList: [],
       menuProps: {
         children: 'children',
-        label: 'menuName'
+        label: 'name'
       },
 			dialogInfo: {
 				type: 'new',
@@ -70,8 +70,8 @@ export default {
   methods: {
   	getList() {
   		this.loading = true
-			this.$$api.role.getMenuList().then(({data}) => {
-				this.menuList = data
+			this.$$api.menu.getList().then(({data}) => {
+				this.menuList = data || []
 			}).finally(_ => {
 				this.loading = false
 			})
@@ -82,6 +82,8 @@ export default {
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改菜单'
 				this.$$utils.copyObj(this.dialogInfo.data, data)
+				this.dialogInfo.data.menuId = data.id
+				this.dialogInfo.data.menuName = data.name
 			} else {
 				this.dialogInfo.title = '新增菜单'
 				this.resetDialogInfo()
@@ -104,24 +106,30 @@ export default {
 		submitDialogInfo() { // 提交菜单信息
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
-          this.dialogInfo.loading = true
-          this.$$api.menu.add(this.dialogInfo.data).then(({data}, message) => {
+					this.dialogInfo.loading = true
+					let promise = this.dialogInfo.type == 'edit' ? this.$$api.menu.edit(this.dialogInfo.data) : this.$$api.menu.add(this.dialogInfo.data)
+          promise.then(({data}, message) => {
 						this.dialogInfo.data.menuId = data.menuId || this.dialogInfo.data.menuId || Date.now()
-						if(this.dialogInfo.type === 'new') {
+						if(this.dialogInfo.type == 'edit') {
+							message = '修改菜单成功'
+							this.dialogInfo._data.menuName = this.dialogInfo.data.menuName
+							this.dialogInfo._data.src = this.dialogInfo.data.src
+							this.$refs.menuTree.setCurrentKey(this.dialogInfo.data.menuId)
+							console.log(this.$refs.menuTree)
+						}else {
 							message = '新增菜单成功'
-							let newChild = Object.assign({ children: [] }, this.dialogInfo.data)
+							let newChild = { 
+								id: this.dialogInfo.data.menuId,
+								name: this.dialogInfo.data.menuName,
+								src: this.dialogInfo.data.src,
+								children: []
+							}
 							if(this.dialogInfo._data) {
 								this.dialogInfo._data.children.unshift(newChild)	
 							}else {
 								this.menuList.unshift(newChild)
 							}
 							this.$refs.menuTree.setCurrentKey(newChild.menuId)
-						}else {
-							message = '修改菜单成功'
-							this.dialogInfo._data.menuName = this.dialogInfo.data.menuName
-							this.dialogInfo._data.src = this.dialogInfo.data.src
-							this.$refs.menuTree.setCurrentKey(this.dialogInfo.data.menuId)
-							console.log(this.$refs.menuTree)
 						}
 
 						this.$message.success(message)
@@ -154,7 +162,7 @@ export default {
       return (
         <div style="flex:1;" class="l-flex-hc">
           <span class="l-rest">
-            <span>{data.menuName}</span>
+            <span>{data.name}</span>
           </span>
           <span class="l-padding-r" onClick={ preventClick }>
             <el-button class="l-text-link" type="text" onClick={ _ => this.showDialogInfo('edit', data) }>编辑</el-button>
