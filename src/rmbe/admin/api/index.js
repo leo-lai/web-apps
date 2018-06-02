@@ -197,6 +197,13 @@ const api = {
       formData.page_number = page - 1      
       return fetch.post('/order/statistics/list', formData)
     }
+  },
+  prize: { // 中奖记录
+    getList(formData = {}, page = 1, row = 10) {
+      formData.per_page = row
+      formData.page_number = page - 1      
+      return fetch.post('/lottery/winning/log', formData)
+    }
   }
 }
 

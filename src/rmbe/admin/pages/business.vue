@@ -249,7 +249,7 @@ export default {
 		},
 		getList(page = 1, row) {
 			this.list.loading = true
-			this.$$api.business.getList(this.list.filter, page, row)
+			this.$$api.business.getList(this.list.filter, page, row || this.list.row)
 			.then(({data}) => {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1

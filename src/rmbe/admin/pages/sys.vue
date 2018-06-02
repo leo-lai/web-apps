@@ -46,7 +46,7 @@
 	  	 	@size-change="sizeChange" 
 	  	 	@current-change="pageChange" 
 	  	 	:page-sizes="$$api.pageSizes"
-	  	 	:page-size="list.rows"
+	  	 	:page-size="list.row"
 	  	 	:current-page="list.page"
 	  	 	:total="list.total">
 			</el-pagination>
@@ -123,7 +123,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				row: 100,
 				total: 0,
 				data: []
 			},
@@ -185,13 +185,13 @@ export default {
 		pageChange(page = 1) {
 			this.getList(page)
 		},
-		getList(page = 1, rows) {
+		getList(page = 1, row) {
 			this.list.loading = true
-			this.$$api.sys.getList(this.list.filter, page, rows)
+			this.$$api.sys.getList(this.list.filter, page, row || this.list.row)
 			.then(({data}) => {
 				this.list.total = data.count
         this.list.page = Number(data.page_number) + 1
-        this.list.rows = Number(data.per_page)
+        this.list.row = Number(data.per_page)
         this.list.data = data.list.map(item => {
         	item.doing = false
         	return item

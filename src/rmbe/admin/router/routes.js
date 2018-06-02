@@ -134,6 +134,18 @@ export let userMenus = [
       }
     ],
   },
+  {
+    path: '/prize',
+    component: layout,
+    meta: { title: '中奖记录' },
+    children: [
+      { 
+        path: '', 
+        meta: { title: '' },
+        component: resolve => require(['../pages/prize'], resolve),
+      }
+    ],
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 
