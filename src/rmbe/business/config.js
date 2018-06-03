@@ -10,6 +10,7 @@ let config = {
   
   api: {
   	baseURL: 'http://api.nrmbe.gzmypay.com/api'
+  	// baseURL: 'http://rmbe.frpgz1.idcfengye.com/api'
   },
 
   shopURL: 'http://shop.nrmbe.gzmypay.com/h5/#/home',

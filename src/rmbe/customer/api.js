@@ -206,6 +206,9 @@ const api = {
     },
     create(formData = {}) {
       return fetch.post('/customer/order/create', formData)
+    },
+    getLottery(formData = {}){
+      return fetch.post('/customer/lottery/status', formData)
     }
   }
 }

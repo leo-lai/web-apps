@@ -1,15 +1,11 @@
 <template>
-  <f7-page name="order-list">
-    <f7-navbar title="订单列表" back-link="返回" sliding></f7-navbar>
+  <f7-page name="coupon">
+    <f7-navbar :title="title" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
-    	<f7-list-item v-for="item in list.data" :key="item.order_id">
+    	<f7-list-item v-for="item in list.data" :key="item.id">
         <div slot="inner" style="width: 100%;">
-          <div class="l-fr" v-if="item.customer.thumb"><img class="l-avatar" :src="item.customer.thumb" style="width: 50px; height: 50px;"></div>
-          <p class="l-text-nowrap">昵称： {{item.customer.nickname}}</p>
-          <!-- <p>消费金额：<b class="l-fs l-text-main">{{item.amount ? (item.amount / 100).toFixed(2) : 0}}元</b></p> -->
-          <p>设备号：{{item.device_number}}</p>
-          <p>券名称：{{item.customer_coupon.title}}</p>
-          <p>创建时间：{{item.create_time}}</p>
+          <p>券名称： {{item.title}}</p>
+          <p>剩余次数： {{item.device_count}}</p>
         </div>
       </f7-list-item>
 		</f7-list>
@@ -29,21 +25,37 @@ export default {
   },
 	data() {
 		return {
+      title: '券列表',
       userInfo: {},
       list: {
         filter: {},
         page: 1,
         data: []
+      },
+      customer: {},
+      edit: {
+        disabled: true,
+        opened: false,
+        slted: {},
+        data: {
+          id: '',
+          thumb: '',
+          customer_id: '',
+          nickname: ''
+        }
       }
 		}
 	},
-  methods: {
+	methods: {
     resetInfinite() {
       this.$refs.infinite.$emit('$InfiniteLoading:reset', false)
       this.onInfinite(1)
     },
     onInfinite(page) {
-      this.$$api.order.getList(this.list.filter, page || this.list.page).then(data => {
+      this.$$api.customer.getCouponList({
+        customer_id: this.$route.query.id,
+        ...this.list.filter
+      }, page || this.list.page).then(data => {
         let returnList = data.list
         this.list.data = data.page > 1 ? this.list.data.concat(returnList) : returnList
 
@@ -63,12 +75,34 @@ export default {
       }).catch(_ => {
         this.$refs.infinite.$emit('$InfiniteLoading:complete')
       })
+    },
+    openEdit(item) {
+      this.edit.slted = item
+      this.edit.disabled = true
+      this.$$utils.copyObj(this.edit.data, item)
+      this.edit.data.customer_id = item.id
+      this.edit.data.nickname = ''
+      this.edit.opened = true
+    },
+    saveEdit() {
+      this.$f7.showIndicator()
+      this.$$api.customer.update(this.edit.data).then(({data}) => {
+        // this.$$utils.copyObj(this.edit.slted, this.edit.data)
+        this.edit.slted.nickname = this.edit.data.nickname
+      }).finally(_ => {
+        this.$f7.hideIndicator()
+        this.closeEdit()
+      })
+    },
+    closeEdit(item) {
+      this.edit.opened = false
     }
-  },
-	mounted() {
+	},
+  mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
+      this.title = this.$route.query.name || '券列表'
     })
-	}
+  }
 }
 </script>

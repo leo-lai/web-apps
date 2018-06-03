@@ -304,7 +304,17 @@ const api = {
   customer: {
     update(formData = {}) {
       return fetch.post('/seller/customer/update', formData)
-    }
+    },
+    getCouponList(formData = {}, page = 1, rows = 10000) {
+      formData.per_page = rows
+      formData.page_number = page - 1      
+      return fetch.post('/seller/customer/coupon/list ', formData).then(({data}) => {
+        data.total = data.count
+        data.page = page
+        data.rows = rows
+        return data
+      })
+    },
   },
   order: {
     getList(formData = {}, page = 1, rows = 10000) {

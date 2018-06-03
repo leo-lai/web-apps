@@ -5,7 +5,7 @@
       <img style="width: 6.75rem; height: 6.75rem;" src="../../assets/20180318001.jpg" alt="">
     </div>
 
-    <div class="l-panel-pay">
+    <!-- <div class="l-panel-pay">
       <p class="l-text-gray l-fs-m">支付金额</p>
       <div class="_ipt _ipt2 l-flex-hc">
         <b style="margin: 0.25rem 0.75rem 0 0 ;">RMB</b>
@@ -14,14 +14,14 @@
           <input ref="money" v-model="money" readonly @click="showKeyboard($event.target)" placeholder="">  
         </div>
       </div>
-    </div>
+    </div> -->
   
     <div class="l-panel-coupon">
       <f7-list class="l-margin-0 l-coupon-form" form>
         <f7-list-item>
           <f7-label style="width: auto;">选择优惠券：</f7-label>
           <f7-input type="select" v-model="couponType" @change="getCouponList">
-            <option value="full_cut">满减券</option>
+            <!-- <option value="full_cut">满减券</option> -->
             <option value="times">次数券</option>
           </f7-input>
         </f7-list-item>
@@ -69,7 +69,7 @@ export default {
         'full_cut': '满减券',
         'times': '次数券'
       },
-      couponType: 'full_cut',
+      couponType: 'times',
       couponList: [],
       couponSlted: {},
       money: ''
@@ -87,6 +87,7 @@ export default {
           this.title = data.store_name || this.title
 
           this.getCouponList()
+          this.getLottery()
         }else {
           this.$f7.hideIndicator()
           this.$f7.alert('该设备次数不足，请告知商家充值。')
@@ -109,6 +110,17 @@ export default {
         this.$f7.hideIndicator()
       })
     },
+    getLottery() { // 抽奖信息
+      this.$$api.pay.getLottery({
+        device: this.number
+      }).then(({data}) => {
+        if(data){
+          this.$f7.confirm('您有一次抽取马尔代夫游的机会，请问您要参加吗？', _ => {
+            window.location.href = `http://api.nrmbe.gzmypay.com/lettery/?uid=${this.userInfo.id}&token=${this.userInfo.token}&device=${this.number}`
+          })
+        }
+      })
+    },
     couponSlt(item) {
       this.couponSlted = item
     },
@@ -129,11 +141,12 @@ export default {
         formData.coupon_id = this.couponSlted.id
       }else {
         formData.type = 'buy'
+        this.$$utils.toptip('请选择次数券进行支付')
       }
 
       if(formData.coupon_type !== 'times' && formData.coupon_type !== 'plat_times'){
         if(this.money === '') {
-          this.$$utils.toptip('请输入支付金额')
+          // this.$$utils.toptip('请输入支付金额')
           return
         }
         formData.money = Number(this.money) * 100

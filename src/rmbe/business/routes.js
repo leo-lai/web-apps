@@ -39,9 +39,19 @@ const routes = [
     component: require('./pages/order-list')
   },
   {
+    title: '消费者',
+    path: '/customer/',
+    component: require('./pages/customer')
+  },
+  {
     title: '消费者列表',
     path: '/customer/list/',
     component: require('./pages/customer-list')
+  },
+  {
+    title: '消费者券列表',
+    path: '/customer/coupon/',
+    component: require('./pages/customer-coupon')
   },
   {
     title: '优惠券',

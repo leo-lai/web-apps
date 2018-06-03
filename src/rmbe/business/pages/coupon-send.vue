@@ -10,11 +10,13 @@
         <div slot="inner" style="width: 100%;">
           <div class="l-flex-hc">
             <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb"></div>
-            <div class="l-rest">
-              <p class="l-text-nowrap">昵&emsp;&emsp;称： {{item.nickname}}</p>
-              <p class="l-text-nowrap">手机号码： {{item.tel}}</p>
+            <div class="l-rest l-text-wrap1" style="width: 60%;">
+              <p class="l-text-wrap1">昵&emsp;&emsp;称： {{item.nickname}}</p>
+              <p class="l-text-wrap1">手机号码： {{item.tel}}</p>
             </div>
-            <f7-button @click="couponOpen(item)">发放</f7-button>
+            <div>
+              <f7-button @click="couponOpen(item)">发放</f7-button>
+            </div>
           </div>
         </div>
       </f7-list-item>
@@ -38,7 +40,7 @@
         <f7-list-item>
           <f7-label style="width:auto;">优惠券类型：</f7-label>
           <f7-input type="select" v-model="coupon.data.type" @change="getCouponList">
-            <option value="full_cut">满减券</option>
+            <!-- <option value="full_cut">满减券</option> -->
             <option value="times">次数券</option>
           </f7-input>
         </f7-list-item>
@@ -95,7 +97,7 @@ export default {
         slted: {},
 				data: {
           customer_id: '',
-          type: 'full_cut',
+          type: 'times',
           coupon_id: '',
           count: '',
           expire_date: ''

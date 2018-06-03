@@ -6,10 +6,13 @@
         <div slot="inner" style="width: 100%;">
           <div class="l-flex-hc">
             <div class="l-margin-r" v-if="item.thumb"><img class="l-avatar" :src="item.thumb"></div>
-            <div class="l-rest">
-              <p class="l-text-nowrap">昵称： {{item.nickname}}</p>
+            <div class="l-rest" style="width: 60%;">
+              <p>昵称： {{item.nickname}}</p>
             </div>
-            <f7-button @click="openEdit(item)">修改</f7-button>
+            <div>
+              <f7-button @click="openEdit(item)">修改</f7-button>
+              <f7-button class="l-margin-t-s" :href="'/customer/coupon?id=' + item.id + '&name=' + item.nickname">查看券</f7-button>  
+            </div>
           </div>
         </div>
       </f7-list-item>
