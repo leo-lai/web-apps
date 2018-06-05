@@ -1,7 +1,7 @@
 <template>
 	<div class="l-main-body">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
-		  <el-tab-pane label="组织列表" name="zuzhi">
+		  <el-tab-pane v-if="userInfo.orgLevel == 1" label="组织列表" name="zuzhi">
 		  	<base-setting-zuzhi></base-setting-zuzhi>
 		  </el-tab-pane>
 		  <el-tab-pane label="系统用户" name="user">
@@ -21,6 +21,7 @@ import baseSettingZuzhi from './base-setting-zuzhi'
 import baseSettingUser from './base-setting-user'
 import baseSettingRole from './base-setting-role'
 import baseSettingGroup from './base-setting-group'
+import { mapGetters } from 'vuex'
 export default {
 	name: 'base-setting',
 	components: {
@@ -34,6 +35,11 @@ export default {
 			tabActive: ''
 		}
 	},
+	computed: {
+		...mapGetters([
+			'userInfo',
+    ])
+	},
 	methods: {
 		tabClick() {
 			this.$$utils.history.replace('?tab=' + this.tabActive)
@@ -41,7 +47,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.tabActive = this.$route.query.tab || 'zuzhi'
+		this.tabActive = this.$route.query.tab || (this.userInfo.orgLevel == 1 ? 'zuzhi' : 'user')
 		this.tabClick()
 	}
 }

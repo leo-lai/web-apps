@@ -2,11 +2,11 @@
 	<div class="l-main-body">
     <div class="l-tab-cont-none">
       <el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
-        <el-tab-pane label="全部" name="order-0">
+        <el-tab-pane label="全部资源订单" name="order-0">
         </el-tab-pane>
-        <el-tab-pane label="待支付定金" name="order-1">
+        <el-tab-pane label="待支付定金订单" name="order-1">
         </el-tab-pane>
-        <el-tab-pane label="待支付尾款" name="order-2">
+        <el-tab-pane label="待支付尾款订单" name="order-2">
         </el-tab-pane>
       </el-tabs>
       <div class="l-padding">

@@ -202,7 +202,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -305,7 +305,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.zuzhi.getList(this.list.filter, page, rows)
+			this.$$api.zuzhi.getList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				if(data) {
 					this.list.total = data.total

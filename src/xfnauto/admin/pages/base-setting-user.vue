@@ -6,7 +6,7 @@
   		</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-				  <el-form-item prop="orgId">
+				  <el-form-item v-if="userInfo.orgLevel == 1" prop="orgId">
   					<el-select v-model="list.filter.orgId" placeholder="请选择所属组织" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
@@ -171,7 +171,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -230,6 +230,7 @@ export default {
 	},
 	computed: {
 		...mapGetters([
+			'userInfo',
   		'zuzhiList'
     ])
 	},
@@ -242,7 +243,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.user.getList(this.list.filter, page, rows)
+			this.$$api.user.getList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page

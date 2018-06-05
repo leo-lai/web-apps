@@ -1,9 +1,9 @@
 <template>
 	<div>
 		<el-row>
-  		<el-col :span="24" >
+  		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-  				<el-form-item prop="orgId">
+  				<el-form-item v-if="userInfo.orgLevel === 1" prop="orgId">
   					<el-select v-model="list.filter.orgId" placeholder="请选择公司/门店" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
@@ -206,14 +206,14 @@ export default {
 				},
 				rules: {
 					dateRange: [],
-					carsName: [],
+					cars_info: [],
 					frame_number: [],
 					orgId: [],
 					state: [],
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -244,6 +244,7 @@ export default {
 	},
 	computed: {
 		...mapGetters([
+			'userInfo',
   		'zuzhiList'
     ])
 	},
@@ -260,7 +261,6 @@ export default {
 			if(value) {
 				this.list.filter.startTime = value[0] || ''
 				this.list.filter.endTime = value[1] || ''
-				
 			}else {
 				this.list.filter.startTime = ''
 				this.list.filter.endTime = ''
@@ -275,7 +275,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.stock.getList(this.list.filter, page, rows)
+			this.$$api.stock.getList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -296,7 +296,7 @@ export default {
 		},
 		clear() {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
-			this.getList()
+			this.filterDateChange()
 		},
 		showDialogInfo(type = 'view', row) { // 查看库存详情
 			this.dialogInfo.type = type
@@ -323,7 +323,7 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
-			this.$refs.infoForm.resetFields()
+			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
 		submitDialogInfo() { // 完善库存信息
@@ -361,7 +361,9 @@ export default {
 			if(activeName === 'list' && this.list.data.length === 0) {
 				this.$$parent = that
 				this.getList()
-				this.$store.dispatch('getZuzhiList')
+				if(this.userInfo.orgLevel == 1) {
+					this.$store.dispatch('getZuzhiList')
+				}
 			}
 		})
 	}

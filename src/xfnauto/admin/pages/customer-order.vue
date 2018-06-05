@@ -15,19 +15,19 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading" highlight-current-row>
-	    <el-table-column class-name="l-fs-xs" label="订单号" prop="customerOrderCode" min-width="100"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderId" min-width="100"></el-table-column>
 	    <el-table-column label="客户姓名" prop="customerName"></el-table-column>
-	    <el-table-column label="客户手机号" prop="customerPhoneNumber"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="购置车辆" prop="carsName" min-width="160"></el-table-column>
+	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="购置车辆" prop="carName" min-width="160"></el-table-column>
 	    <el-table-column label="销售顾问" prop="systemUserName" align="center"></el-table-column>
-	    <el-table-column label="购车状态" prop="customerOrderStateName" align="center"></el-table-column>
+	    <el-table-column label="购车状态" prop="orderStateName" align="center"></el-table-column>
 	    <!-- <el-table-column label="购车方案" prop="expectWayName" align="center"></el-table-column> -->
 	    <el-table-column label="操作" align="center" min-width="120">
 	    	<template slot-scope="scope">
-					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + scope.row.customerOrderId" target="_blank">购车合同</a>
-					<el-button v-if="scope.row.customerOrderState === 1" size="mini" type="text" @click="showDialogPay(1, scope.row)">收定金</el-button>
-					<el-button v-if="scope.row.customerOrderState > 1 && scope.row.customerOrderState < 17" size="mini" type="text" @click="showDialogPay(2, scope.row)">收尾款</el-button>
-					<el-button v-if="scope.row.customerOrderState > 13 && scope.row.customerOrderState < 17" size="mini" type="text" @click="finishPay(scope.row)">完款交车</el-button>
+					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + scope.row.id" target="_blank">购车合同</a>
+					<el-button v-if="scope.row.orderState === 1" size="mini" type="text" @click="showDialogPay(1, scope.row)">收定金</el-button>
+					<el-button v-if="scope.row.orderState > 1 && scope.row.orderState < 17" size="mini" type="text" @click="showDialogPay(2, scope.row)">收尾款</el-button>
+					<el-button v-if="scope.row.orderState > 13 && scope.row.orderState < 17" size="mini" type="text" @click="finishPay(scope.row)">完款交车</el-button>
 	        <el-button type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
 	      </template>
 	    </el-table-column>
@@ -68,27 +68,27 @@
 					</tr>
 				</table>
 				<table class="l-table-info">
-					<caption>订单费用明细</caption>
+					<caption>订单费用组成</caption>
 					<tr>
 						<td class="_tit">车辆购置税</td>
-						<td class="_cont">{{dialogInfo.data.purchaseTaxPriace}}元</td>
+						<td class="_cont">{{ dialogInfo.data.purchaseTaxPriace ? dialogInfo.data.purchaseTaxPriace + '元' : '--' }}</td>
 						<td class="_tit">上牌费用</td>
-						<td class="_cont">{{dialogInfo.data.licensePlatePriace}}元</td>
+						<td class="_cont">{{ dialogInfo.data.licensePlatePriace ? dialogInfo.data.licensePlatePriace + '元' : '--' }}</td>
 						<td class="_tit">商业保险费用</td>
-						<td class="_cont">{{dialogInfo.data.insurancePriace}}元</td>
+						<td class="_cont">{{ dialogInfo.data.insurancePriace ? dialogInfo.data.insurancePriace + '元' : '--' }}</td>
 					</tr>
 					<tr>
 						<td class="_tit">按揭费用</td>
-						<td class="_cont">{{dialogInfo.data.mortgagePriace}}元</td>
+						<td class="_cont">{{ dialogInfo.data.mortgagePriace ? dialogInfo.data.mortgagePriace + '元' : '--' }}</td>
 						<td class="_tit">精品选装费用</td>
-						<td class="_cont">{{dialogInfo.data.boutiquePriace}}元</td>
+						<td class="_cont">{{ dialogInfo.data.boutiquePriace ? dialogInfo.data.boutiquePriace + '元' : '--' }}</td>
 						<td class="_tit">车船税</td>
-						<td class="_cont">{{dialogInfo.data.vehicleAndVesselTax}}元</td>
+						<td class="_cont">{{ dialogInfo.data.vehicleAndVesselTax ? dialogInfo.data.vehicleAndVesselTax + '元' : '--' }}</td>
 					</tr>
 					<tr>
 						<td class="_tit">实际成交裸车价</td>
 						<td class="_cont">{{dialogInfo.data.carUnitPrice}}元</td>
-						<td class="_tit">订单总费用</td>
+						<td class="_tit">合计总费用</td>
 						<td class="_cont l-text-error">{{dialogInfo.data.amount}}元</td>
 						<td class="_tit">定金金额</td>
 						<td class="_cont l-text-warn">{{dialogInfo.data.depositPrice}}元</td>
@@ -140,12 +140,12 @@
 		<!-- 支付定金 -->
 		<el-dialog class="l-padding-t-0" append-to-body :close-on-click-modal="false" :close-on-press-escape="false" :title="dialogPay.title" :visible.sync="dialogPay.visible" width="620px">
 			<div v-if="dialogPay.type === 1" class="l-margin">
-				订单中定金金额：{{dialogInfo.data.depositPrice}}元，定金只能收取一次
+				定金金额：{{dialogInfo.data.depositPrice}}元，定金只能收取一次
 			</div>
 			<div v-if="dialogPay.type === 2" class="l-margin">
-				<p>合计应收费用：{{dialogInfo.data.totalAmount}}元，当前已收费用：{{(dialogInfo.data.totalAmount - dialogInfo.data.payAmount).toFixed(2)}}元，剩余{{dialogInfo.data.payAmount}}元未收。</p>
+				<p>订单应付金额：{{dialogInfo.data.totalAmount}}元，当前已收费用：{{(dialogInfo.data.totalAmount - dialogInfo.data.payAmount).toFixed(2)}}元，剩余{{dialogInfo.data.payAmount}}元未收。</p>
 				<p>
-					<a class="l-text-link l-margin-r" @click="showDialogOther(1)">查看订单费用</a>
+					<a class="l-text-link l-margin-r" @click="showDialogOther(1)">查看费用组成</a>
 					<a class="l-text-link" @click="showDialogOther(2)">查看收款历史</a>
 				</p>
 			</div>
@@ -191,7 +191,7 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td>车辆最终成交价</td>
+							<td>实际成交裸车价</td>
 							<td style="text-align:center;">{{dialogOther.data1.carUnitPrice}}</td>
 						</tr>
 						<tr>
@@ -217,6 +217,10 @@
 						<tr>
 							<td>车船税</td>
 							<td style="text-align:center;">{{dialogOther.data1.vehicleAndVesselTax}}</td>
+						</tr>
+						<tr class="l-text-main">
+							<td>合计总费用</td>
+							<td style="text-align:center;">{{dialogInfo.data.amount}}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -274,7 +278,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -346,7 +350,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			let listPromise = this.$$api.customer.getOrderList(this.list.filter, page, rows)
+			let listPromise = this.$$api.customer.getOrderList(this.list.filter, page, rows || this.list.rows)
 			listPromise.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -379,7 +383,7 @@ export default {
 		},
 		showDialogInfo(row) {
 			let loading = this.$loading()
-			this.getOrderInfo(row.customerOrderId).then(_ => {
+			this.getOrderInfo(row.id).then(_ => {
 				this.dialogInfo.visible = true
 			}).finally(_ => {
 				loading.close()
@@ -387,11 +391,12 @@ export default {
 		},
 		showDialogPay(type = 1, row) {
 			let loading = this.$loading()
-			this.getOrderInfo(row.customerOrderId).then(orderInfo => {
+			this.getOrderInfo(row.id).then(orderInfo => {
 				this.dialogPay.visible = true
 				this.dialogPay.type = type
 				this.dialogPay.title = type === 1 ? '支付定金' : '支付尾款'
 				this.dialogPay.isDepositPrice = type === 1 ? 1 : 0
+				// depositPrice 定金  payAmount 尾款 amount 订单总费用  totalAmount 订单应付费用
 				this.dialogPay.data.amount = type === 1 ? orderInfo.depositPrice : orderInfo.payAmount
 			}).finally(_ => {
 				loading.close()
@@ -494,7 +499,7 @@ export default {
         type: 'warning'
       }).then(_ => {
       	let loading = this.$loading()
-				this.$$api.pay.finish(row.customerOrderId).then(_ => {
+				this.$$api.pay.finish(row.id).then(_ => {
 					this.$message({
 						type: 'success',
 						message: '操作成功'

@@ -11,18 +11,13 @@
 							<el-menu-item index="/stock">库存管理</el-menu-item>
 							<el-menu-item index="/order">资源订单</el-menu-item>
 							<el-menu-item index="/customer">客户管理</el-menu-item>
-							<el-menu-item index="/school">文章管理</el-menu-item>
 							<el-menu-item index="/base/setting">用户管理</el-menu-item>
-							<el-menu-item index="/base/data">基础设置</el-menu-item>
-							<!-- 
-							<el-submenu index="/base">
-								<template slot="title">基础设置</template>
-								<el-menu-item index="/base/setting">基本设置</el-menu-item>
-								<el-menu-item index="/base/data">资料设置</el-menu-item>
-							</el-submenu> 
-							-->
 						</template>
-					  <el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
+						<el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
+						<template  v-if="userInfo.orgLevel == 1">
+							<el-menu-item index="/school">文章管理</el-menu-item>
+							<el-menu-item index="/base/data">基础设置</el-menu-item>
+						</template>
 					</el-menu>
     		</div>
     		<div class="l-text-right l-padding-lr">

@@ -198,7 +198,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -321,7 +321,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.car.getList(this.list.filter, page, rows)
+			this.$$api.car.getList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
@@ -355,6 +355,7 @@ export default {
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改车型资料'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
+				this.dialogInfo.data.yearPattern = Number(row.yearPattern)
 				this.cascader.value = [row.brandId, row.familyId, row.styleId]
 
 				if(row.brandId) {

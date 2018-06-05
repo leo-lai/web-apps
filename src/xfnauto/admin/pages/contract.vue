@@ -32,7 +32,7 @@
           <td>车型</td>
           <td style="font-size:12px;">{{info.carsName}}</td>
           <td>官方指导价</td>
-          <td>¥ {{info.guidingPrice || info.guidancePrice}}</td>
+          <td>¥ {{info.guidingPrice}}</td>
         </tr>
         <tr>
           <td>车身颜色</td>
@@ -44,7 +44,7 @@
           <td colspan="4">应付费用</td>
         </tr>
         <tr>
-          <td>合计应付费用</td>
+          <td>合计总费用</td>
           <td>¥ {{info.amount}}</td>
           <td colspan="2">{{info.amountMoney}}</td>
         </tr>
@@ -57,26 +57,26 @@
           <td colspan="4">费用组成</td>
         </tr>
         <tr>
-          <td>车辆最终成交价</td>
+          <td>实际成交裸车价</td>
           <td>¥ {{info.carUnitPrice}}</td>
-          <td><span :class="{'l-hidden': !info.purchaseTaxPriace}">车辆购置税</span></td>
-          <td><span :class="{'l-hidden': !info.purchaseTaxPriace}">¥ {{info.purchaseTaxPriace}}</span></td>
+          <td><span>车辆购置税</span></td>
+          <td><span>{{info.purchaseTaxPriace ? '¥ ' + info.purchaseTaxPriace : '--'}}</span></td>
         </tr>
         <tr>
-          <td><span :class="{'l-hidden': !info.licensePlatePriace}">上牌费</span></td>
-          <td><span :class="{'l-hidden': !info.licensePlatePriace}">¥ {{info.licensePlatePriace}}</span></td>
-          <td><span :class="{'l-hidden': !info.insurancePriace}">商业保险费用</span></td>
-          <td><span :class="{'l-hidden': !info.insurancePriace}">¥ {{info.insurancePriace}}</span></td>
+          <td><span>上牌费</span></td>
+          <td><span>{{info.licensePlatePriace ? '¥ ' + info.licensePlatePriace : '--'}}</span></td>
+          <td><span>商业保险费用</span></td>
+          <td><span>{{info.insurancePriace ? '¥ ' + info.insurancePriace : '--'}}</span></td>
         </tr>
         <tr>
-          <td><span :class="{'l-hidden': !info.mortgagePriace}">按揭费用</span></td>
-          <td><span :class="{'l-hidden': !info.mortgagePriace}">¥ {{info.mortgagePriace}}</span></td>
-          <td><span :class="{'l-hidden': !info.boutiquePriace}">精品选装费</span></td>
-          <td><span :class="{'l-hidden': !info.boutiquePriace}">¥ {{info.boutiquePriace}}</span></td>
+          <td><span>按揭费用</span></td>
+          <td><span>{{info.mortgagePriace ? '¥ ' + info.mortgagePriace : '--'}}</span></td>
+          <td><span>精品选装费</span></td>
+          <td><span>{{info.boutiquePriace ? '¥ ' + info.boutiquePriace : '--'}}</span></td>
         </tr>
         <tr>
-          <td><span :class="{'l-hidden': !info.vehicleAndVesselTax}">车船税</span></td>
-          <td><span :class="{'l-hidden': !info.vehicleAndVesselTax}">¥ {{info.vehicleAndVesselTax}}</span></td>
+          <td><span>车船税</span></td>
+          <td><span>{{info.vehicleAndVesselTax ? '¥ ' + info.vehicleAndVesselTax : '--'}}</span></td>
           <td></td>
           <td></td>
         </tr>

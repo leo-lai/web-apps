@@ -4,11 +4,12 @@
 			<el-col :span="16">
 				<el-card class="l-index-store" style="height:190px;">
 					<div class="l-flex-h">
-						<img class="l-margin-r" width="150" height="150" :src="organization.imageArr[0]">
+						<img class="l-margin-r" width="150" height="150" :src="userInfo.headPortrait">
 						<div class="l-rest">
-							<h3>{{organization.shortName}}</h3>
-							<p class="l-margin-tb-m l-text-gray">{{$$config.baseData.orgLevel[organization.orgLevel-1]}}</p>
-							<p class="l-margin-tb-m l-text-gray">{{organization.address}}</p>
+							<h3>登录账号：{{userInfo.phoneNumber}}</h3>
+							<p class="l-margin-tb-m l-text-gray">真实姓名：{{userInfo.realName}}</p>
+							<p class="l-margin-tb-m l-text-gray">所属组织：{{userInfo.orgName}}</p>
+							<p class="l-margin-tb-m l-text-gray">系统角色：{{userInfo.roles}}</p>
 							<!-- <p><router-link class="l-text-link" to="/base/setting?tab=zuzhi">更改基础设置</router-link></p> -->
 						</div>
 					</div>
@@ -26,7 +27,7 @@
 				</el-card>
 			</el-col>
 		</el-row>
-		<el-row class="l-margin-t">
+		<!-- <el-row class="l-margin-t">
 			<el-col :span="24">
 				<el-card>
 				  <div slot="header" class="clearfix">
@@ -62,8 +63,8 @@
 				  </ul>
 				</el-card>
 			</el-col>
-		</el-row>
-		<el-row class="l-margin-t">
+		</el-row> -->
+		<!-- <el-row class="l-margin-t">
 			<el-col :span="24">
 				<el-card>
 				  <div slot="header" class="clearfix">
@@ -89,7 +90,7 @@
 				  </ul>
 				</el-card>
 			</el-col>
-		</el-row>
+		</el-row> -->
 		<!-- <el-row class="l-margin-t">
 			<el-col :span="24">
 				<el-card>
@@ -121,6 +122,7 @@ export default {
 	name: 'index',
 	data() {
 		return {
+			userInfo: {},
 			organization: {
 				imageArr: [],
 			},
@@ -129,12 +131,17 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$api.index.getCount().then(({data}) => {
-			data.organization.imageArr = data.organization.imageUrl ? data.organization.imageUrl.split(',') : []
-			this.organization = data.organization
-			this.stockOrder = data.stockOrder
-			this.customerOrder = data.customerOrderMap
+		
+		this.$$api.index.getUserInfo().then(({data}) => {
+			data.headPortrait = data.headPortrait ? data.headPortrait.split(',')[0] : ''
+			this.userInfo = data
 		})
+		// this.$$api.index.getCount().then(({data}) => {
+		// 	data.organization.imageArr = data.organization.imageUrl ? data.organization.imageUrl.split(',') : []
+		// 	this.organization = data.organization
+		// 	this.stockOrder = data.stockOrder
+		// 	this.customerOrder = data.customerOrderMap
+		// })
 	}
 }
 </script>

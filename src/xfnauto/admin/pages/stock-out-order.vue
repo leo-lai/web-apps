@@ -177,7 +177,7 @@
   				<td class="_tit">随车资料</td>
   				<td class="_cont" colspan="3">
   					<ul class="l-gou-list" v-if="viewInfo.data.followInformation">
-	  					<li v-for="item in viewInfo.data.followInformation.split(',')"><i>√</i>{{item}}</li>
+	  					<li v-for="item in viewInfo.data.followInformation.split(',')" :key="item"><i>√</i>{{item}}</li>
   					</ul>
   				</td>
   			</tr>
@@ -356,7 +356,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -482,7 +482,7 @@ export default {
 		getList(page = 1, rows) {
 			this.list.loading = true
 			this.list.filter.isSellList = 1
-			this.$$api.stock.getOrderList(this.list.filter, page, rows)
+			this.$$api.stock.getOrderList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page

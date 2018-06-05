@@ -180,7 +180,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -247,7 +247,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.stock.getInList(this.list.filter, page, rows)
+			this.$$api.stock.getInList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page

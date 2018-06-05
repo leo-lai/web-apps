@@ -1,15 +1,15 @@
 <template>
 	<div>
 		<el-row>
-  		<el-col :span="24">
+  		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-					<el-form-item prop="orgId">
+					<!-- <el-form-item prop="orgId">
   					<el-select style="width:180px;" v-model="list.filter.orgId" placeholder="公司/门店" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
-  				</el-form-item>
+  				</el-form-item> -->
 					<el-form-item prop="state">
-  					<el-select style="width:130px;" v-model="list.filter.state" placeholder="订单状态" @change="search()">
+  					<el-select v-model="list.filter.state" placeholder="订单状态" @change="search()">
 				      <el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value"></el-option>
 				    </el-select>
   				</el-form-item>
@@ -373,6 +373,7 @@ export default {
 				{ label: '待收定金', value: 5},
 				{ label: '待配车', value: 10},
 				{ label: '待验车', value: 15},
+				{ label: '待收尾款', value: 35},
 				{ label: '待出库', value: 40},
 				{ label: '待上传票证', value: 45},
 				{ label: '已退款', value: 37},
@@ -396,7 +397,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -513,7 +514,7 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.order.getList(this.list.filter, page, rows)
+			this.$$api.order.getList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				if(data.list) {
 					this.list.total = data.total
@@ -796,7 +797,7 @@ export default {
 				}
 				
 				this.getList()
-				this.$store.dispatch('getZuzhiList')
+				// this.$store.dispatch('getZuzhiList')
 			}
 		})
 	}

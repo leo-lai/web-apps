@@ -116,7 +116,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 100,
+				rows: 20,
 				total: 0,
 				data: []
 			},
@@ -149,9 +149,9 @@ export default {
 			this.list.loading = true
 			let listPromise = null
 			if(this.type === 'track') {
-				listPromise = this.$$api.customer.getTrackList(this.list.filter, page, rows)
+				listPromise = this.$$api.customer.getTrackList(this.list.filter, page, rows || this.list.rows)
 			}else{
-				listPromise = this.$$api.customer.getList(this.list.filter, page, rows)
+				listPromise = this.$$api.customer.getList(this.list.filter, page, rows || this.list.rows)
 			}
 			listPromise.then(({data}) => {
 				this.list.total = data.total
