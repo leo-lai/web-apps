@@ -68,7 +68,7 @@
 			    <el-input :disabled="dialogInfo.type == 'edit'" v-model="dialogInfo.data.phoneNumber" placeholder="请输入手机号码" :maxlength="11"></el-input>
 			  </el-form-item>
 				<el-form-item label="真实姓名" prop="realName">
-			  	<el-input v-model="dialogInfo.data.realName" :maxlength="10" ></el-input>
+			  	<el-input v-model="dialogInfo.data.realName" :maxlength="50" ></el-input>
 			  </el-form-item>
 			  <el-form-item class="_flex" label="所属组织" prop="orgId">
 			    <el-select style="width: 511px;" v-model="dialogInfo.data.orgId" placeholder="请选择" @change="zhuzhiChange">
@@ -171,7 +171,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},
@@ -278,7 +278,8 @@ export default {
 			})
 		},
 		getParentList(orgId = '') { // 上级主管列表
-			return this.$$api.user.getParentList(orgId).then(({data}) => {
+			console.log(this.dialogInfo.data.id)
+			return this.$$api.user.getParentList(orgId, this.dialogInfo.data.id).then(({data}) => {
 				this.dialogInfo.parentList = data
 				return data
 			})
@@ -323,6 +324,7 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.dialogInfo.uploadList = []
 			this.resetDialogInfo()
 		},
 		resetDialogInfo() {
@@ -381,8 +383,11 @@ export default {
 	mounted() {
 		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'user' && this.list.data.length === 0) {
-				this.$store.dispatch('getZuzhiList')
 				this.getList()
+				
+				if(this.userInfo.orgLevel == 1) {
+					this.$store.dispatch('getZuzhiList')
+				}
 			}
 		})
 	}

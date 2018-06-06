@@ -2,37 +2,43 @@
 	<div id="app">
 		<el-container direction="vertical " class="l-h100" :class="{'l-fullscreen': fullscreen}">
 	    <el-header class="l-header l-flex-hc">
-	    	<div class="l-header-logo">喜蜂鸟管理后台</div>
-    		<div class="l-rest l-header-nav">
-    			<el-menu class="l-menu" :default-active="$route.path" mode="horizontal" :router="true"
-    				background-color="#334057" text-color="#b7c3d1" active-text-color="#21a0ff">
-						<template v-if="userInfo.orgType < 4">
-							<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
-							<el-menu-item index="/stock">库存管理</el-menu-item>
-							<el-menu-item index="/order">资源订单</el-menu-item>
-							<el-menu-item index="/customer">客户管理</el-menu-item>
-							<el-menu-item index="/base/setting">用户管理</el-menu-item>
-						</template>
-						<el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
-						<template  v-if="userInfo.orgLevel == 1">
-							<el-menu-item index="/school">文章管理</el-menu-item>
-							<el-menu-item index="/base/data">基础设置</el-menu-item>
-						</template>
-					</el-menu>
-    		</div>
-    		<div class="l-text-right l-padding-lr">
-    			<el-dropdown size="medium" trigger="click">
-					  <span class="el-dropdown-link">
-					    {{userInfo.realName}}<i class="el-icon-setting l-fs-m l-margin-l-s" title="个人设置"></i>
-					  </span>
-					  <el-dropdown-menu slot="dropdown">
-					    <el-dropdown-item @click.native="pwdForm.visible = true">修改密码</el-dropdown-item>
-					    <el-dropdown-item @click.native="logout">退出系统</el-dropdown-item>
-					  </el-dropdown-menu>
-					</el-dropdown>
-					<span class="l-margin-l-s" @click="fullScreen">
-						<i class="el-icon-rank l-fs-m" title="切换全屏"></i>
-					</span>
+				<div style="min-width: 15%;">
+	    		<div class="l-header-logo">喜蜂鸟管理后台</div>
+				</div>
+				<div class="l-rest">
+					<div class="l-header-nav">
+						<el-menu class="l-menu" :default-active="$route.path" mode="horizontal" :router="true"
+							background-color="#334057" text-color="#b7c3d1" active-text-color="#21a0ff">
+							<template v-if="userInfo.orgType < 4">
+								<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
+								<el-menu-item index="/stock">库存管理</el-menu-item>
+								<el-menu-item index="/order">资源订单</el-menu-item>
+								<el-menu-item index="/customer">客户管理</el-menu-item>
+								<el-menu-item index="/base/setting">用户管理</el-menu-item>
+							</template>
+							<el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
+							<template  v-if="userInfo.orgLevel == 1">
+								<el-menu-item index="/school">文章管理</el-menu-item>
+								<el-menu-item index="/base/data">基础设置</el-menu-item>
+							</template>
+						</el-menu>
+					</div>
+				</div>
+    		<div style="min-width: 15%;">
+					<div class="l-padding-lr l-text-right">
+						<el-dropdown size="medium" trigger="click">
+							<span class="el-dropdown-link">
+								{{userInfo.realName}}<i class="el-icon-setting l-fs-m l-margin-l-s" title="个人设置"></i>
+							</span>
+							<el-dropdown-menu slot="dropdown">
+								<el-dropdown-item @click.native="pwdForm.visible = true">修改密码</el-dropdown-item>
+								<el-dropdown-item @click.native="logout">退出系统</el-dropdown-item>
+							</el-dropdown-menu>
+						</el-dropdown>
+						<span class="l-margin-l-s" @click="fullScreen">
+							<i class="el-icon-rank l-fs-m" title="切换全屏"></i>
+						</span>
+					</div>
     		</div>
 	    </el-header>
       <el-main class="l-main">

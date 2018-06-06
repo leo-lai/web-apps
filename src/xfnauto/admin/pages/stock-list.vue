@@ -34,7 +34,7 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="车辆型号" prop="carsName" width="300">
+	    <el-table-column class-name="l-fs-xs" label="车辆型号" prop="carsName" min-width="280">
 				<template slot-scope="scope">
 					<p>{{scope.row.carsName}}</p>
 					<p class="l-text-gray">
@@ -43,16 +43,16 @@
 					</p>
 	      </template>
 			</el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="车架号" prop="frameNumber" align="center" width="140"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="车架号" prop="frameNumber" width="150"></el-table-column>
 			<el-table-column label="库存状态" prop="state" align="center" width="100"></el-table-column>
 	    <el-table-column label="指导价" prop="guidingPrice" align="center" width="100"></el-table-column>
 	    <el-table-column label="采购价" prop="unitPrice" align="center" width="100"></el-table-column>
 	    <el-table-column label="运费/辆" prop="freight" align="center" width="100"></el-table-column>
 	    <el-table-column label="其他费用" prop="othersFee" align="center" width="100"></el-table-column>
-			<el-table-column class-name="l-fs-xs" label="所属门店" prop="orgName" align="center" width="120"></el-table-column>
+			<el-table-column class-name="l-fs-xs" label="所属门店" prop="orgName" width="200"></el-table-column>
 	    <el-table-column label="仓位" prop="warehouseName" align="center" width="100"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="入库时间" prop="createDate" align="center" width="90"></el-table-column>
-	    <el-table-column label="操作" align="center" fixed="right" width="140">
+	    <el-table-column class-name="l-fs-xs" label="入库时间" prop="createDate" align="center" width="150"></el-table-column>
+	    <el-table-column label="操作" align="center" fixed="right" width="150">
 	    	<template slot-scope="scope">
 					<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('edit', scope.row)">完善库存信息</el-button>
 	    		<el-button class="l-text-link" type="text" size="small" @click="showDialogInfo('view', scope.row)">查看</el-button>
@@ -213,7 +213,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},
@@ -267,7 +267,7 @@ export default {
 			}
 			this.search()	
 		},
-		sizeChange(size = 100) {
+		sizeChange(size = 10) {
 			this.getList(1, size)
 		},
 		pageChange(page = 1) {
@@ -359,7 +359,6 @@ export default {
 	mounted() {
 		this.$$event.$on('stock:tab', (activeName, that) => {
 			if(activeName === 'list' && this.list.data.length === 0) {
-				this.$$parent = that
 				this.getList()
 				if(this.userInfo.orgLevel == 1) {
 					this.$store.dispatch('getZuzhiList')

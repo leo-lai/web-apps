@@ -1,5 +1,5 @@
 <template>
-	<div class="l-main-body">
+	<div class="l-main-body" style="width: 1300px;">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
 			<!-- <template v-if="userInfo.orgLevel === 3">
 				<el-tab-pane label="预约客户" name="bespeak">

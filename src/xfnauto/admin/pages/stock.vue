@@ -1,5 +1,5 @@
 <template>
-	<div class="l-main-body">
+	<div class="l-main-body" style="width: 1630px;">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
 		  <el-tab-pane label="库存列表" name="list">
 		  	<stock-list></stock-list>

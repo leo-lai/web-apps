@@ -98,7 +98,7 @@
 			  	<el-input type="textarea" placeholder="" :maxlength="500" v-model="dialogInfo.data.introduce"></el-input>
 			  </el-form-item>
 			  <el-form-item label="银行卡账号" prop="bankAccount">
-			  	<el-input :maxlength="20" v-model="dialogInfo.data.bankAccount"></el-input>
+			  	<el-input :maxlength="23" v-model="dialogInfo.data.bankAccount"></el-input>
 			  </el-form-item>
 			  <el-form-item label="开户姓名" prop="nameOfAccount">
 			  	<el-input :maxlength="20" v-model="dialogInfo.data.nameOfAccount"></el-input>
@@ -202,7 +202,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},

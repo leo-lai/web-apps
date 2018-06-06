@@ -1,5 +1,5 @@
 <template>
-	<div class="l-main-body">
+	<div class="l-main-body" style="width: 1300px;">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
 		  <el-tab-pane v-if="userInfo.orgLevel == 1" label="组织列表" name="zuzhi">
 		  	<base-setting-zuzhi></base-setting-zuzhi>

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="width: 700px;">
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent >
@@ -120,7 +120,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},

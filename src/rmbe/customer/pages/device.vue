@@ -1,9 +1,7 @@
 <template>
   <f7-page class="l-bg-white" name="device">
     <f7-navbar :title="title" sliding></f7-navbar>
-    <div class="l-padding l-text-center">
-      <img style="width: 6.75rem; height: 6.75rem;" src="../../assets/20180318001.jpg" alt="">
-    </div>
+    <div class="l-device-bg"></div>
 
     <!-- <div class="l-panel-pay">
       <p class="l-text-gray l-fs-m">支付金额</p>
@@ -41,7 +39,7 @@
       </f7-list>
       <div v-if="couponList.length === 0" class="l-padding l-text-gray l-text-center">暂无可用{{couponText[couponType]}}</div>
     </div>
-    <div style="margin: 1rem;">
+    <div style="margin: 1rem 0.75rem;">
       <f7-button style="background-color:#323232;" big fill @click="pay">开&nbsp;&nbsp;启</f7-button>
       <div class="l-text-center l-margin" style="font-size: 1rem;">
         蜕&nbsp;变&nbsp;之&nbsp;旅
@@ -190,11 +188,15 @@ export default {
 </style>
 
 <style scoped lang="less">
+.l-device-bg{
+  background: url('../../assets/20180606001.jpg') no-repeat 50% 50%;
+  background-size: cover; height: 50%;
+}
 .l-panel-coupon{
-  margin: 0.75rem; background-color: #fff; padding: 1rem; border: 1px solid #ccc; border-radius: 5px;
+  margin: -1.75em 0.75rem 0.75rem; background-color: #fff; padding: 0.75rem; border: 1px solid #666; border-radius: 5px;
 }
 .l-panel-pay{
-  margin: 0.75rem; background-color: #fff; padding: 1rem; border: 1px solid #ccc; border-radius: 5px;
+  margin: 0.75rem; background-color: #fff; padding: 0.75rem; border: 1px solid #ccc; border-radius: 5px;
   ._ipt2{
     input::-webkit-input-placeholder{
       /* font-size: 0.85rem; */ color: #333;

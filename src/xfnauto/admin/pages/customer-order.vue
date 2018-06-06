@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="l-main-body">
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
@@ -24,11 +24,11 @@
 	    <!-- <el-table-column label="购车方案" prop="expectWayName" align="center"></el-table-column> -->
 	    <el-table-column label="操作" align="center" min-width="120">
 	    	<template slot-scope="scope">
-					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + scope.row.id" target="_blank">购车合同</a>
-					<el-button v-if="scope.row.orderState === 1" size="mini" type="text" @click="showDialogPay(1, scope.row)">收定金</el-button>
-					<el-button v-if="scope.row.orderState > 1 && scope.row.orderState < 17" size="mini" type="text" @click="showDialogPay(2, scope.row)">收尾款</el-button>
+					<el-button class="l-text-warn" v-if="scope.row.orderState === 1" size="mini" type="text" @click="showDialogPay(1, scope.row)">收定金</el-button>
+					<el-button class="l-text-error" v-if="scope.row.orderState > 1 && scope.row.orderState < 17" size="mini" type="text" @click="showDialogPay(2, scope.row)">收尾款</el-button>
 					<el-button v-if="scope.row.orderState > 13 && scope.row.orderState < 17" size="mini" type="text" @click="finishPay(scope.row)">完款交车</el-button>
 	        <el-button type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
+					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'contract?id=' + scope.row.id" target="_blank">购车合同</a>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -278,7 +278,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},

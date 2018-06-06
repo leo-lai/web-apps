@@ -126,7 +126,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},
@@ -327,9 +327,12 @@ export default {
 	mounted() {
 		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'role' && this.list.data.length === 0) {
-				this.$store.dispatch('getZuzhiList')
 				this.getMenuList()
 				this.getList()
+
+				if(this.userInfo.orgLevel == 1) {
+					this.$store.dispatch('getZuzhiList')
+				}
 			}
 		})
 	}

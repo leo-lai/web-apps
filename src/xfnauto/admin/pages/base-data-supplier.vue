@@ -21,9 +21,9 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="供应商名称" prop="supplierName"></el-table-column>
-	    <el-table-column label="服务公司" prop="orgName"></el-table-column>
-	    <el-table-column label="联系方式" prop="phoneNumber"></el-table-column>
+	    <el-table-column label="供应商名称" prop="supplierName" width="250"></el-table-column>
+	    <el-table-column label="服务公司" prop="orgName" width="250"></el-table-column>
+	    <el-table-column label="联系方式" align="center" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="备注" prop="remark" min-width="200"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
@@ -84,7 +84,7 @@ export default {
 				},
 				loading: false,
 				page: 1,
-				rows: 20,
+				rows: 10,
 				total: 0,
 				data: []
 			},

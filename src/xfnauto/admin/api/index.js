@@ -261,8 +261,8 @@ const api = {
     getSalesList(formData = {}) {
       return fetch.post(baseURL1 + '/salesList', formData)
     },
-    getParentList(orgId = '') { // 上级主管列表
-      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/higherups', { orgId })
+    getParentList(orgId = '', id = '') { // 上级主管列表
+      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/higherups', { orgId, id })
     },
   },
   role: { // 角色管理

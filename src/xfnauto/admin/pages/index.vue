@@ -1,5 +1,5 @@
 <template>
-	<div class="l-main-body">
+	<div class="l-main-body" style="width: 1200px;">
 		<el-row :gutter="20">
 			<el-col :span="16">
 				<el-card class="l-index-store" style="height:190px;">
@@ -133,7 +133,7 @@ export default {
 	mounted() {
 		
 		this.$$api.index.getUserInfo().then(({data}) => {
-			data.headPortrait = data.headPortrait ? data.headPortrait.split(',')[0] : ''
+			data.headPortrait = data.headPortrait ? data.headPortrait.split(',')[0] : 'https://res.xfnauto.com/www/20180527043.png'
 			this.userInfo = data
 		})
 		// this.$$api.index.getCount().then(({data}) => {

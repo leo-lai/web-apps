@@ -1,5 +1,5 @@
 <template>
-	<div class="l-main-body">
+	<div class="l-main-body" style="width: 1300px;">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
 		  <el-tab-pane label="文章列表" name="list">
 		  	<school-list></school-list>
