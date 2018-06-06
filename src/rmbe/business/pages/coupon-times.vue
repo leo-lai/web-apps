@@ -26,19 +26,19 @@
     </infinite-loading>
 		<!-- popup -->
     <f7-popup :opened="coupon.opened" theme="lightblue">
-      <div class="navbar l-text-center" style="line-height: 44px;">生成满减券</div>
+      <div class="navbar l-text-center" style="line-height: 44px;">生成次数券</div>
       <div class="l-text-center l-padding l-text-error">
         剩余设备使用次数：{{userInfo.rest_device_count}}
       </div>
       <f7-list form style="margin:0;">
         <f7-list-item>
           <f7-label>次数</f7-label>
-          <f7-input type="tel" placeholder="请输入优惠券次数" v-model="coupon.data.device_count" :maxlength="7"/>
+          <f7-input type="tel" placeholder="请输入次数券次数" v-model="coupon.data.device_count" :maxlength="7"/>
         </f7-list-item>
-        <f7-list-item>
+        <!-- <f7-list-item>
           <f7-label>张数</f7-label>
           <f7-input type="tel" placeholder="请输入生成张数" v-model="coupon.data.count" :maxlength="7"/>
-        </f7-list-item>
+        </f7-list-item> -->
       </f7-list>
 
       <div class="l-margin">
@@ -73,7 +73,7 @@ export default {
 				data: {
           type: 'times',
           device_count: '',
-          count: '',
+          count: 1,
 				}
 			}
 		}

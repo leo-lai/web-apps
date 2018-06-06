@@ -1,6 +1,6 @@
 <template>
   <f7-page name="coupon">
-    <f7-navbar title="发放优惠券" back-link="返回" sliding></f7-navbar>
+    <f7-navbar title="发放次数券" back-link="返回" sliding></f7-navbar>
     <f7-searchbar cancel-link="取消" placeholder="输入昵称查询" :clear="true" 
       @input="onSearch" @click:clear="onClear" @click:cancel="onClear">
     </f7-searchbar>
@@ -28,7 +28,7 @@
     </infinite-loading>
 		<!-- popup -->
     <f7-popup :opened="coupon.opened" theme="lightblue">
-      <div class="navbar l-text-center" style="line-height: 44px;">发放优惠券</div>
+      <div class="navbar l-text-center" style="line-height: 44px;">发放次数券</div>
 			<div class="l-flex-hc l-padding">
         <div class="l-margin-r" v-if="customer.thumb"><img class="l-avatar" :src="customer.thumb"></div>
         <div class="l-rest">
@@ -38,7 +38,7 @@
       </div>
       <f7-list form style="margin:0;">
         <f7-list-item>
-          <f7-label style="width:auto;">优惠券类型：</f7-label>
+          <f7-label style="width:auto;">次数券类型：</f7-label>
           <f7-input type="select" v-model="coupon.data.type" @change="getCouponList">
             <!-- <option value="full_cut">满减券</option> -->
             <option value="times">次数券</option>
@@ -46,11 +46,11 @@
         </f7-list-item>
       </f7-list>
       <f7-list class="l-scroll" form style="margin:0; max-height: 15.0rem;">
-        <f7-list-item radio name="coupon" :title="'优惠券名称： ' + item.title +'（剩余'+item.rest_count+'张）'" v-for="item in coupon.list" :key="item.id" @click="couponSlt(item)"></f7-list-item>
-        <div class="l-text-gray l-padding l-text-center" v-if="coupon.list.length === 0">暂无优惠券</div>
+        <f7-list-item radio name="coupon" :title="'次数券名称： ' + item.title +'（剩余'+item.rest_count+'张）'" v-for="item in coupon.list" :key="item.id" @click="couponSlt(item)"></f7-list-item>
+        <div class="l-text-gray l-padding l-text-center" v-if="coupon.list.length === 0">暂无次数券</div>
       </f7-list>
 
-      <f7-list form style="margin:15px 0 0 0;">
+      <!-- <f7-list form style="margin:15px 0 0 0;">
         <f7-list-item>
           <f7-label>数量</f7-label>
           <f7-input type="tel" v-model="coupon.data.count" placeholder="请输入发放数量" maxlength="10"/>
@@ -59,9 +59,9 @@
       <f7-list form style="margin:0;">
         <f7-list-item>
           <f7-label>过期时间</f7-label>
-          <f7-input type="date" v-model="coupon.data.expire_date" placeholder="请选择优惠券过期时间" />
+          <f7-input type="date" v-model="coupon.data.expire_date" placeholder="请选择次数券过期时间" />
         </f7-list-item>
-      </f7-list>
+      </f7-list> -->
 
       <div class="l-margin">
         <f7-button big fill @click="couponSend">确定发放</f7-button>  
@@ -99,7 +99,7 @@ export default {
           customer_id: '',
           type: 'times',
           coupon_id: '',
-          count: '',
+          count: 1,
           expire_date: ''
 				}
 			}
@@ -172,7 +172,7 @@ export default {
     },
     couponSend() {
       if(!this.coupon.data.coupon_id) {
-        this.$$utils.toptip('请选择发放优惠券')
+        this.$$utils.toptip('请选择发放次数券')
         return
       }
       if(!/^\d{1,}$/.test(this.coupon.data.count)) {
@@ -190,14 +190,13 @@ export default {
       //     this.coupon.data.expire_date += ':00'  
       //   }
       // }
-      console.log(this.coupon.data.expire_date)
       let promise1 = this.$$api.coupon.send(this.coupon.data)
       // let promise2 = this.$$api.coupon.update(this.coupon.data)
 
       this.$f7.showIndicator()
       Promise.all([promise1]).then(_ => {
         this.couponClose()
-        this.$f7.alert('优惠券发放成功')
+        this.$f7.alert('次数券发放成功')
       }).finally(_ => {
         this.$f7.hideIndicator()
       })

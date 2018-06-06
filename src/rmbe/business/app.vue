@@ -46,7 +46,7 @@
                 <td>
                   <f7-link href="/device/list/">
                     <f7-icon f7="drawers_fill"></f7-icon>
-                    <p>设备</p>
+                    <p>多台设备管理</p>
                   </f7-link>
                 </td>
               </tr>
@@ -69,7 +69,7 @@
                 <td>
                   <f7-link href="/order/list/">
                     <f7-icon f7="list_fill"></f7-icon>
-                    <p>订单</p>
+                    <p>设备使用订单</p>
                   </f7-link>
                 </td>
                 <td>
@@ -83,7 +83,7 @@
                 <td>
                   <f7-link href="/customer/list/">
                     <f7-icon f7="persons_fill"></f7-icon>
-                    <p>消费者列表</p>
+                    <p>次卡会员列表</p>
                   </f7-link>
                 </td>
                 <td>
