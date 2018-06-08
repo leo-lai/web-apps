@@ -89,7 +89,7 @@
 						<span class="l-text-warn">订单状态：{{dialogInfo.data.orderStateName}}</span>
 					</div>
 					<div class="l-order-info-base">
-						<span>订单编号：{{dialogInfo.data.orderId}}</span>
+						<span>订单编号：{{dialogInfo.data.orderCode || dialogInfo.data.orderId}}</span>
 						<span>订单类型：{{dialogInfo.data.orderType ? orderType[dialogInfo.data.orderType - 1] : '常规单'}}</span>
 						<span>
 							总定金：￥{{dialogInfo.data.totalDepositPrice}}

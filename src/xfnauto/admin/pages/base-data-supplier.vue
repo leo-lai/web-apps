@@ -7,7 +7,7 @@
   		<el-col :span="16" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
 				  <el-form-item prop="orgName">
-				    <el-input placeholder="请输入门店/公司名称" v-model="list.filter.orgName"></el-input>
+				    <el-input placeholder="请输入组织名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
 				  <el-form-item prop="supplierName">
 				    <el-input placeholder="请输入供应商名称" v-model="list.filter.supplierName"></el-input>
@@ -22,7 +22,7 @@
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
 	    <el-table-column label="供应商名称" prop="supplierName" width="250"></el-table-column>
-	    <el-table-column label="服务公司" prop="orgName" width="250"></el-table-column>
+	    <el-table-column label="所属组织" prop="orgName" width="250"></el-table-column>
 	    <el-table-column label="联系方式" align="center" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="备注" prop="remark" min-width="200"></el-table-column>
 	    <el-table-column label="操作">
@@ -211,7 +211,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.$$event.$on('base-data:tab', activeName => {
+		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'supplier' && this.list.data.length === 0) {
 				this.getList()
 			}

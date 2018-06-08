@@ -511,12 +511,12 @@ const api = {
       formData.rows = rows
       return fetch.post(baseURL1 + '/bespeakCustomerOrgList', formData)
     },
-    notBuy(customerUsersOrgId = '') { // 标记为不购买
-      return fetch.post(baseURL1 + '/notBuyCustomerOrg', { customerUsersOrgId })
-    },
-    track(formData = {}) { // 标记为已到店
-      return fetch.post(baseURL1 + '/systenUserChangeCustomerOrg', formData)
-    }
+    // notBuy(customerUsersOrgId = '') { // 标记为不购买
+    //   return fetch.post(baseURL1 + '/notBuyCustomerOrg', { customerUsersOrgId })
+    // },
+    // track(formData = {}) { // 标记为已到店
+    //   return fetch.post(baseURL1 + '/systenUserChangeCustomerOrg', formData)
+    // }
   },
   stock: { // 库存管理
     toExcel(formData = {}) {
@@ -538,9 +538,9 @@ const api = {
     getInfo(id = '') {
       return fetch.ajax(baseURL2 + '/backend_v1/stock/detail', { id })
     },
-    editInfo_bak(formData = {}) { // 编辑车辆库存详情
-      return fetch.post(baseURL1 + '/stockCarEdit', formData)
-    },
+    // editInfo(formData = {}) { // 编辑车辆库存详情
+    //   return fetch.post(baseURL1 + '/stockCarEdit', formData)
+    // },
     editInfo(formData = {}) {
       return fetch.post(baseURL2 + '/backend_v1/stock/edit', formData)
     },

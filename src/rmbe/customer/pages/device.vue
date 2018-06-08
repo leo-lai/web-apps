@@ -116,6 +116,8 @@ export default {
           this.$f7.confirm('您有一次抽取马尔代夫游的机会，请问您要参加吗？', _ => {
             window.location.href = `http://api.nrmbe.gzmypay.com/lettery/?uid=${this.userInfo.id}&token=${this.userInfo.token}&device=${this.number}`
           })
+        }else{
+          this.$f7.alert('现在办理10次套卡，就有机会抽取马尔代夫双人游，还有笔记本电脑手机、等5重豪礼等你来，弹无虚发100%中奖！')
         }
       })
     },

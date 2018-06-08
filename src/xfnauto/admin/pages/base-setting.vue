@@ -1,18 +1,21 @@
 <template>
 	<div class="l-main-body" style="width: 1300px;">
 		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
-		  <el-tab-pane v-if="userInfo.orgLevel == 1" label="组织列表" name="zuzhi">
+		  <el-tab-pane v-if="userInfo.orgLevel == 1" label="系统组织管理" name="zuzhi">
 		  	<base-setting-zuzhi></base-setting-zuzhi>
 		  </el-tab-pane>
-		  <el-tab-pane label="系统用户" name="user">
+		  <el-tab-pane label="系统用户管理" name="user">
 		  	<base-setting-user></base-setting-user>
 		  </el-tab-pane>
-		  <el-tab-pane label="系统角色" name="role">
+		  <el-tab-pane label="系统角色管理" name="role">
 		  	<base-setting-role></base-setting-role>
 		  </el-tab-pane>
 			<!-- <el-tab-pane label="人员分组" name="group">
 		  	<base-setting-group></base-setting-group>
 		  </el-tab-pane> -->
+			<el-tab-pane label="供应商管理" name="supplier">
+		  	<base-data-supplier></base-data-supplier>
+		  </el-tab-pane>
 		</el-tabs>
 	</div>
 </template>
@@ -20,7 +23,8 @@
 import baseSettingZuzhi from './base-setting-zuzhi'
 import baseSettingUser from './base-setting-user'
 import baseSettingRole from './base-setting-role'
-import baseSettingGroup from './base-setting-group'
+// import baseSettingGroup from './base-setting-group'
+import baseDataSupplier from './base-data-supplier'
 import { mapGetters } from 'vuex'
 export default {
 	name: 'base-setting',
@@ -28,7 +32,7 @@ export default {
 		baseSettingZuzhi,
 		baseSettingUser,
 		baseSettingRole,
-		baseSettingGroup
+		baseDataSupplier
 	},
 	data() {
 		return {

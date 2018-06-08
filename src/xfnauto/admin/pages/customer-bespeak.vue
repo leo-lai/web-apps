@@ -45,7 +45,7 @@
 	    		<span v-show="!scope.row.doing">
 	    			<el-button type="text" size="mini" @click="showDialogInfo('edit', scope.row)">编辑</el-button>
 		        <el-button type="text" size="mini" @click="showDialogTrack(scope.row)">分配销售顾问</el-button>
-		        <el-button type="text" size="mini" @click="notBuy(scope.row)">标记不购车</el-button>
+		        <!-- <el-button type="text" size="mini" @click="notBuy(scope.row)">标记不购车</el-button> -->
 	        </span>
 	        <span v-show="scope.row.doing" class="l-text-warn"><i class="el-icon-loading"></i>&nbsp;操作中</span>
 	      </template>

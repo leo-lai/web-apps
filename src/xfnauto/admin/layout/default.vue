@@ -9,18 +9,14 @@
 					<div class="l-header-nav">
 						<el-menu class="l-menu" :default-active="$route.path" mode="horizontal" :router="true"
 							background-color="#334057" text-color="#b7c3d1" active-text-color="#21a0ff">
-							<template v-if="userInfo.orgType < 4">
-								<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
-								<el-menu-item index="/stock">库存管理</el-menu-item>
-								<el-menu-item index="/order">资源订单</el-menu-item>
-								<el-menu-item index="/customer">客户管理</el-menu-item>
-								<el-menu-item index="/base/setting">用户管理</el-menu-item>
-							</template>
-							<el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item>
-							<template  v-if="userInfo.orgLevel == 1">
-								<el-menu-item index="/school">文章管理</el-menu-item>
-								<el-menu-item index="/base/data">基础设置</el-menu-item>
-							</template>
+							<el-menu-item index="/">&ensp;首页&ensp;</el-menu-item>
+							<el-menu-item index="/stock">库存管理</el-menu-item>
+							<el-menu-item index="/order">资源订单</el-menu-item>
+							<el-menu-item index="/customer">客户管理</el-menu-item>
+							<el-menu-item v-if="userInfo.orgLevel == 1" index="/school">文章管理</el-menu-item>
+							<el-menu-item index="/base/setting">系统管理</el-menu-item>
+							<el-menu-item v-if="userInfo.orgLevel == 1" index="/base/data">基础设置</el-menu-item>
+							<!-- <el-menu-item v-if="userInfo.orgType === 4" index="/bank">银行资料审核</el-menu-item> -->
 						</el-menu>
 					</div>
 				</div>

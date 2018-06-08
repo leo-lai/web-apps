@@ -53,16 +53,14 @@ export default {
 				rules: {
 					menuName: [
 						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					src: [
-						{ required: true, message: '必填项', trigger: 'blur' }
 					]
 				},
 				data: {
 					parentId: 0,
 					menuId: '',
 					menuName: '',
-					src: ''
+					src: '',
+					remark: ''
 				}
 			}
     }
@@ -81,13 +79,14 @@ export default {
 			this.dialogInfo.type = type
 			if(type === 'edit') {
 				this.dialogInfo.title = '修改菜单'
+				console.log(data)
 				this.$$utils.copyObj(this.dialogInfo.data, data)
 				this.dialogInfo.data.menuId = data.id
 				this.dialogInfo.data.menuName = data.name
 			} else {
 				this.dialogInfo.title = '新增菜单'
 				this.resetDialogInfo()
-				this.dialogInfo.data.parentId = data ? data.menuId : 0
+				this.dialogInfo.data.parentId = data ? data.id : 0
 			}
 			this.dialogInfo.visible = true
 		},
@@ -112,10 +111,9 @@ export default {
 						this.dialogInfo.data.menuId = data.menuId || this.dialogInfo.data.menuId || Date.now()
 						if(this.dialogInfo.type == 'edit') {
 							message = '修改菜单成功'
-							this.dialogInfo._data.menuName = this.dialogInfo.data.menuName
+							this.dialogInfo._data.name = this.dialogInfo.data.menuName
 							this.dialogInfo._data.src = this.dialogInfo.data.src
-							this.$refs.menuTree.setCurrentKey(this.dialogInfo.data.menuId)
-							console.log(this.$refs.menuTree)
+							this.$refs.menuTree.setCurrentKey(this.dialogInfo.data.id)
 						}else {
 							message = '新增菜单成功'
 							let newChild = { 
@@ -147,14 +145,14 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(_ => {
-				this.$$api.menu.del(data.menuId).then(_ => {
+				this.$$api.menu.del(data.id).then(_ => {
 					this.$message.success('删除菜单成功')
 
+					console.log(node)
 					const parent = node.parent
 		      const children = parent.data.children || parent.data
-		      const index = children.findIndex(menu => menu.menuId === data.menuId)
+		      const index = children.findIndex(menu => menu.id === data.id)
 		      children.splice(index, 1)
-
 				})
       })
 		},
@@ -162,7 +160,7 @@ export default {
       return (
         <div style="flex:1;" class="l-flex-hc">
           <span class="l-rest">
-            <span>{data.name}</span>
+            <span id={data.id}>{data.name}</span>
           </span>
           <span class="l-padding-r" onClick={ preventClick }>
             <el-button class="l-text-link" type="text" onClick={ _ => this.showDialogInfo('edit', data) }>编辑</el-button>
