@@ -303,6 +303,9 @@ export default {
 				this.getList()
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('base-setting:tab')
 	}
 }
 </script>

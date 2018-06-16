@@ -406,6 +406,9 @@ export default {
 				})
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('base-data:tab')
 	}
 }
 </script>

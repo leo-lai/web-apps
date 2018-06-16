@@ -177,7 +177,10 @@ export default {
 				this.getList()
 			}
 		})
-  }
+  },
+	beforeDestroy() {
+		this.$$event.$off('base-data:tab')
+	}
 }
 </script>
 <style scoped lang="less">

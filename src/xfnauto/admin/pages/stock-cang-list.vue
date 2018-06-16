@@ -9,8 +9,8 @@
 				  <el-form-item prop="orgName">
 				    <el-input placeholder="请输入组织名称" v-model="list.filter.orgName"></el-input>
 				  </el-form-item>
-				  <el-form-item prop="supplierName">
-				    <el-input placeholder="请输入供应商名称" v-model="list.filter.supplierName"></el-input>
+				  <el-form-item prop="keywords">
+				    <el-input placeholder="请输入仓库名称" v-model="list.filter.keywords"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -21,9 +21,8 @@
   	</el-row>
   	<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" 
   		:data="list.data" v-loading="list.loading">
-	    <el-table-column label="供应商名称" prop="supplierName" width="250"></el-table-column>
+	    <el-table-column label="仓库名称" prop="name" width="250"></el-table-column>
 	    <el-table-column label="所属组织" prop="orgName" width="250"></el-table-column>
-	    <el-table-column label="联系方式" align="center" prop="phoneNumber"></el-table-column>
 	    <el-table-column label="备注" prop="remark" min-width="200"></el-table-column>
 	    <el-table-column label="操作">
 	    	<template slot-scope="scope">
@@ -46,16 +45,13 @@
 			</el-pagination>
 	  </el-row>
 
-	  <!-- 新增/编辑供应商 -->
+	  <!-- 新增/编辑仓库 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
 			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="480px">
   		<el-form ref="infoForm" label-width="100px" style="width: 432px;"
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @submit.native.prevent @keyup.enter.native="submitDialogInfo">
-			  <el-form-item class="_flex" label="供应商名称" prop="supplierName" >
-			    <el-input v-model="dialogInfo.data.supplierName" :maxlength="50"></el-input>
-			  </el-form-item>
-			  <el-form-item class="_flex" label="联系方式" prop="phoneNumber" >
-			    <el-input v-model="dialogInfo.data.phoneNumber" :maxlength="20"></el-input>
+			  <el-form-item class="_flex" label="仓库名称" prop="name" >
+			    <el-input v-model="dialogInfo.data.name" :maxlength="50"></el-input>
 			  </el-form-item>
 			  <el-form-item label="备注" prop="remark">
 			  	<el-input type="textarea" v-model="dialogInfo.data.remark" :maxlength="500"></el-input>
@@ -70,16 +66,16 @@
 </template>
 <script>
 export default {
-	name: 'base-data-supplier',
+	name: 'stock-cang-list',
 	data() {
 		return {
 			list: {
 				filter: {
-					supplierName: '',
+					keywords: '',
 					orgName: ''
 				},
 				rules: {
-					supplierName: [],
+					keywords: [],
 					orgName: []
 				},
 				loading: false,
@@ -90,24 +86,17 @@ export default {
 			},
 			dialogInfo: {
 				type: 'new',
-				title: '新增供应商',
+				title: '新增仓库',
 				visible: false,
 				loading: false,
 				rules: {
-					supplierName: [
+					name: [
 						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					phoneNumber: [
-						{ required: true, message: '必填项', trigger: 'blur' }
-					],
-					orgId: [
-						{ required: true, type: 'number', message: '必填项', trigger: 'blur' }
 					]
 				},
 				data: {
-					supplierId: '',
-					supplierName: '',
-					phoneNumber: '',
+					id: '',
+					name: '',
 					remark: ''
 				}
 			}
@@ -122,12 +111,13 @@ export default {
 		},
 		getList(page = 1, rows) {
 			this.list.loading = true
-			this.$$api.supplier.getList(this.list.filter, page, rows || this.list.rows)
+			this.$$api.cang.getList(this.list.filter, page, rows || this.list.rows)
 			.then(({data}) => {
 				this.list.total = data.total
         this.list.page = data.page
         this.list.rows = data.rows
         this.list.data = data.list.map(item => {
+          item.name = item.warehouseName
         	item.doing = false
         	return item
         })
@@ -145,13 +135,13 @@ export default {
 			this.$refs.listFilter && this.$refs.listFilter.resetFields()
 			this.getList()
 		},
-		showDialogInfo(type = 'new', row) { // 新增/修改供应商弹出信息
+		showDialogInfo(type = 'new', row) { // 新增/修改仓库
 			this.dialogInfo.type = type
 			if(type === 'edit') {
-				this.dialogInfo.title = '修改供应商'
+				this.dialogInfo.title = '修改仓库信息'
 				this.$$utils.copyObj(this.dialogInfo.data, row)
 			} else {
-				this.dialogInfo.title = '新增供应商'
+				this.dialogInfo.title = '新增仓库'
 				this.resetDialogInfo()
 			}
 
@@ -169,15 +159,16 @@ export default {
 			this.$refs.infoForm && this.$refs.infoForm.resetFields()
 			this.$$utils.copyObj(this.dialogInfo.data, '')
 		},
-		submitDialogInfo() { // 提交供应商
+		submitDialogInfo() { // 提交仓库
 			this.$refs.infoForm.validate(valid => {
         if (valid) {
           this.dialogInfo.loading = true
-          this.$$api.supplier.add(this.dialogInfo.data).then(_ => {
+          let promise = this.dialogInfo.data.id ? this.$$api.cang.edit(this.dialogInfo.data) : this.$$api.cang.add(this.dialogInfo.data)
+          promise.then(_ => {
             this.closeDialogInfo()
             this.$message({
 							type: 'success',
-							message: (this.dialogInfo.type === 'new' ? '新增' : '修改') + '供应商成功'
+							message: (this.dialogInfo.data.id ? '修改' : '新增') + '仓库成功'
 						})
             this.refreshList()
           }).finally(()=>{
@@ -191,17 +182,17 @@ export default {
         }
       })
 		},
-		deleteInfo(row) { // 禁用/启用供应商
-			this.$confirm('是否确定删除该供应商?', '提示', {
+		deleteInfo(row) { // 禁用/启用仓库
+			this.$confirm('是否确定删除该仓库？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(_ => {
       	row.doing = true
-				this.$$api.supplier.del(row.supplierId).then(_ => {
+				this.$$api.cang.del(row.id).then(_ => {
 					this.$message({
 						type: 'success',
-						message: '删除供应商成功'
+						message: '删除仓库成功'
 					})
 					this.refreshList()
 				}).finally(_ => {
@@ -212,7 +203,7 @@ export default {
 	},
 	mounted() {
 		this.$$event.$on('base-setting:tab', activeName => {
-			if(activeName === 'supplier' && this.list.data.length === 0) {
+			if(activeName === 'cang' && this.list.data.length === 0) {
 				this.getList()
 			}
 		})

@@ -335,6 +335,9 @@ export default {
 				}
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('base-setting:tab')
 	}
 }
 </script>

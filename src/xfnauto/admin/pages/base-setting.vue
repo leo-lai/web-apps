@@ -16,6 +16,9 @@
 			<el-tab-pane label="供应商管理" name="supplier">
 		  	<base-data-supplier></base-data-supplier>
 		  </el-tab-pane>
+			<el-tab-pane label="仓库管理" name="cang">
+				<stock-cang-list></stock-cang-list>
+			</el-tab-pane>
 		</el-tabs>
 	</div>
 </template>
@@ -25,6 +28,7 @@ import baseSettingUser from './base-setting-user'
 import baseSettingRole from './base-setting-role'
 // import baseSettingGroup from './base-setting-group'
 import baseDataSupplier from './base-data-supplier'
+import StockCangList from './stock-cang-list'
 import { mapGetters } from 'vuex'
 export default {
 	name: 'base-setting',
@@ -32,7 +36,8 @@ export default {
 		baseSettingZuzhi,
 		baseSettingUser,
 		baseSettingRole,
-		baseDataSupplier
+		baseDataSupplier,
+		StockCangList,
 	},
 	data() {
 		return {

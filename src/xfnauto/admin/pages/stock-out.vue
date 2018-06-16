@@ -69,8 +69,8 @@
   			</tr>
   		</table>
   		<div class="l-block-tit">现有库存</div>
-  		<el-table class="l-table-hdbg" stripe :data="outStockInfo.data.list" @selection-change="outStockSlted" 
-  			empty-text="无该车型库存，请在前往“库存管理”-“订车列表”模块订车">
+  		<el-table class="l-table-hdbg" stripe :data="outStockInfo.data.list" @selection-change="outStockSlted">
+        <div slot="empty">该车型无库存，<a class="l-text-link" :href="$$config.router.base + 'stock?tab=in'">请先入库车辆</a></div>
   			<el-table-column type="selection" width="55" :selectable="outStockSltable"></el-table-column>
 		    <el-table-column label="车架号" prop="frameNumber"></el-table-column>
 		    <el-table-column label="发动机号" prop="engineNumber"></el-table-column>
@@ -289,16 +289,19 @@ export default {
       if (imagesArr && imagesArr.length > 0) {
         this.$refs.viewer.show(0, imagesArr);
       } else {
-        this.$message.info("没有可查看图片");
+        this.$message.info("没有可查看图片")
       }
     }
   },
   mounted() {
     this.$$event.$on("stock:tab", activeName => {
       if (activeName === "out" && this.list.data.length === 0) {
-        this.getList();
+        this.getList()
       }
-    });
-  }
+    })
+  },
+	beforeDestroy() {
+		this.$$event.$off('stock:tab')
+	}
 };
 </script>

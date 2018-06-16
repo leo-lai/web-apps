@@ -363,6 +363,9 @@ export default {
 				})
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('stock:tab')
 	}
 }
 </script>

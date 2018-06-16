@@ -734,6 +734,9 @@ export default {
 				this.getList()
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('stock:tab')
 	}
 }
 </script>

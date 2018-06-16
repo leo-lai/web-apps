@@ -59,7 +59,7 @@
 
 	  <!-- 新增/编辑组织 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo" 
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="995px">
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="997px">
   		<el-form class="l-form1" ref="infoForm" label-width="100px"  inline
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="名称" prop="shortName">
@@ -97,22 +97,31 @@
 			  <el-form-item class="_flex" label="简要介绍" prop="introduce">
 			  	<el-input type="textarea" placeholder="" :maxlength="500" v-model="dialogInfo.data.introduce"></el-input>
 			  </el-form-item>
-			  <el-form-item label="银行卡账号" prop="bankAccount">
-			  	<el-input :maxlength="23" v-model="dialogInfo.data.bankAccount"></el-input>
-			  </el-form-item>
-			  <el-form-item label="开户姓名" prop="nameOfAccount">
-			  	<el-input :maxlength="20" v-model="dialogInfo.data.nameOfAccount"></el-input>
-			  </el-form-item>
-			  <el-form-item></el-form-item>
-			  <el-form-item label="银行名称" prop="bankName">
-			  	<el-input :maxlength="50" v-model="dialogInfo.data.bankName"></el-input>
-			  </el-form-item>
-			  <el-form-item label="开户支行" prop="openingBranch">
-			  	<el-input :maxlength="50" v-model="dialogInfo.data.openingBranch"></el-input>
-			  </el-form-item>
+				<div class="l-flex-h">
+					<div style="width: 640px;">
+						<el-form-item label="银行卡账号" prop="bankAccount">
+							<el-input :maxlength="24" v-model="dialogInfo.data.bankAccount"></el-input>
+						</el-form-item>
+						<el-form-item label="开户姓名" prop="nameOfAccount">
+							<el-input :maxlength="20" v-model="dialogInfo.data.nameOfAccount"></el-input>
+						</el-form-item>
+						<el-form-item label="银行名称" prop="bankName">
+							<el-input :maxlength="50" v-model="dialogInfo.data.bankName"></el-input>
+						</el-form-item>
+						<el-form-item label="开户支行" prop="openingBranch">
+							<el-input :maxlength="50" v-model="dialogInfo.data.openingBranch"></el-input>
+						</el-form-item>
+					</div>
+					<div>
+						<el-form-item label="电子印章" prop="signetUpload">
+							<uploader ref="signetUpload" :limit="1" :file-list.sync="dialogInfo.signetList"></uploader>
+						</el-form-item>
+					</div>
+				</div>
+			  
 			  <el-form-item class="_flex" prop="upload">
 			  	<div slot="label" style="display:inline;">
-			  		显示照片<p style="font-size:12px;" class="l-text-gray">(最多上传9张)</p></div>
+			  		展示照片<p style="font-size:12px;" class="l-text-gray">(最多上传9张)</p></div>
 			  	<uploader ref="dialogInfoUpload" :file-list.sync="dialogInfo.uploadList"></uploader>
 			  </el-form-item>
 			</el-form>
@@ -160,11 +169,12 @@ export default {
 			}
 		}
 
-		let validateParent = function(rule, value, callback) {
-			if(that.dialogInfo.data.orgLevel === 1 || that.dialogInfo.data.parentId) {
+		let validateUpload2 = function(rule, value, callback) {
+			if(that.$refs.signetUpload.waiting > 0) {
+				callback(new Error('印章正在上传中'))
+			}else {
+				that.dialogInfo.data.signet = that.dialogInfo.signetList.map(item => item.src || item.url).join(',')
 				callback()
-			}else if(!that.dialogInfo.data.parentId){
-				callback(new Error('必选项'))
 			}
 		}
 
@@ -210,7 +220,8 @@ export default {
 				title: '新增组织',
 				visible: false,
 				isParent: true,
-				uploadList: [],
+				uploadList: [], // 展示图片
+				signetList: [], // 电子印章
 				zuzhiParents: [],
 				rules: {
 					shortName: [
@@ -248,6 +259,9 @@ export default {
 					],
 					upload: [
 						{ required: true, validator: validateUpload, trigger: 'change' },
+					],
+					signetUpload: [
+						{ required: false, validator: validateUpload2, trigger: 'change' },
 					]
 				},
 				data: {
@@ -270,6 +284,7 @@ export default {
 					nameOfAccount: '',
 					bankName: '',
 					openingBranch: '',
+					signet: '',
 					introduce: '',
 					imageurl: ''
 				}
@@ -346,15 +361,26 @@ export default {
 					// this.orgLevelChange(data.orgLevel)
 
 					this.dialogInfo.uploadList = this.dialogInfo.data.imageurl ? 
-					this.dialogInfo.data.imageurl.split(',').map(img => {
-						return {
-							url: this.$$utils.image.thumb(img, 150), 
-							thumb: this.$$utils.image.thumb(img, 150), 
-							src: img, 
-							name: img, 
-							status: 'success'
-						}
-					}) : []
+						this.dialogInfo.data.imageurl.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						}) : []
+					
+					this.dialogInfo.signetList = this.dialogInfo.data.signet ? 
+						this.dialogInfo.data.signet.split(',').map(img => {
+							return {
+								url: this.$$utils.image.thumb(img, 150), 
+								thumb: this.$$utils.image.thumb(img, 150), 
+								src: img, 
+								name: img, 
+								status: 'success'
+							}
+						}) : []
 
 					this.dialogInfo.visible = true
 				}).finally(_ => {

@@ -1,8 +1,13 @@
 <template>
-	<div class="l-main-body">
+	<div>
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
+					<el-form-item prop="state">
+  					<el-select v-model="list.filter.state" placeholder="订单状态" @change="search()">
+				      <el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+				    </el-select>
+  				</el-form-item>
 				  <el-form-item prop="keywords">
 				    <el-input placeholder="请输入手机号码或订单号" v-model="list.filter.keywords"></el-input>
 				  </el-form-item>
@@ -18,9 +23,9 @@
 	    <el-table-column class-name="l-fs-xs" label="订单号" prop="orderId" min-width="100"></el-table-column>
 	    <el-table-column label="客户姓名" prop="customerName"></el-table-column>
 	    <el-table-column label="客户手机号" prop="phoneNumber"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="购置车辆" prop="carName" min-width="160"></el-table-column>
+	    <el-table-column class-name="l-fs-xs" label="车型" prop="carName" min-width="160"></el-table-column>
 	    <el-table-column label="销售顾问" prop="systemUserName" align="center"></el-table-column>
-	    <el-table-column label="购车状态" prop="orderStateName" align="center"></el-table-column>
+	    <el-table-column label="订单状态" prop="orderStateName" align="center"></el-table-column>
 	    <!-- <el-table-column label="购车方案" prop="expectWayName" align="center"></el-table-column> -->
 	    <el-table-column label="操作" align="center" min-width="120">
 	    	<template slot-scope="scope">
@@ -269,12 +274,27 @@ export default {
         { id: 8, name: '鹤山农村信用合作社' },
         { id: 9, name: '锐诚金融' }
 			],
+			stateList: [
+				{ label: '待收定金', value: 1},
+				{ label: '待银行审核', value: 3},
+				{ label: '银行审核不通过', value: 4},
+				{ label: '待车辆出库', value: 5},
+				{ label: '待加装精品', value: 7},
+				{ label: '待上牌', value: 9},
+				{ label: '待贴膜', value: 11},
+				{ label: '待客户提车', value: 13},
+				{ label: '已人车合照', value: 15},
+				{ label: '已完款', value: 17},
+				// { label: '已回访', value: 19},
+			],
 			list: {
 				filter: {
 					keywords: '',
+					state: '',
 				},
 				rules: {
 					keywords: [],
+					state: [],
 				},
 				loading: false,
 				page: 1,
@@ -307,7 +327,7 @@ export default {
 					customerOrderId: '',
 					amount: '',
 					remarks: '',
-					isDepositPrice: 1,
+					// isDepositPrice: 1,
 					payMethod: 5
 				}
 			},
@@ -395,7 +415,7 @@ export default {
 				this.dialogPay.visible = true
 				this.dialogPay.type = type
 				this.dialogPay.title = type === 1 ? '支付定金' : '支付尾款'
-				this.dialogPay.isDepositPrice = type === 1 ? 1 : 0
+				// this.dialogPay.isDepositPrice = type === 1 ? 1 : 0
 				// depositPrice 定金  payAmount 尾款 amount 订单总费用  totalAmount 订单应付费用
 				this.dialogPay.data.amount = type === 1 ? orderInfo.depositPrice : orderInfo.payAmount
 			}).finally(_ => {
@@ -408,7 +428,7 @@ export default {
         if (valid) {
         	if(this.dialogPay.data.payMethod === 5) { // 通联pos支付
 						this.dialogPay.loading = true
-	          this.$$api.customer.payOrder(this.dialogPay.data).then(({data}) => {
+	          this.$$api.customer.pay(this.dialogPay.data).then(({data}) => {
 	            this.qrcode.visible = true
 							this.qrcode.opts = Object.assign({}, this.$$config.qrcodeOption, { data })
 	          }).finally(_ => {
@@ -421,7 +441,7 @@ export default {
 		          type: 'warning'
 		        }).then(() => {
 		          this.dialogPay.loading = true
-		          this.$$api.customer.payOrder(this.dialogPay.data).then(_ => {
+		          this.$$api.customer.pay(this.dialogPay.data).then(_ => {
 		          	// this.getOrderInfo()
 		          	this.dialogPay.visible = false
 								this.$message.success('支付成功')

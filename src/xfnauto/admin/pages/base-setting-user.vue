@@ -61,7 +61,7 @@
 
 	  <!-- 新增/编辑用户 -->
 		<el-dialog :close-on-click-modal="false" :close-on-press-escape="false" :before-close="closeDialogInfo"
-			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="653px">
+			:title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="655px">
   		<el-form class="l-form1" ref="infoForm" label-width="90px" inline 
   			:model="dialogInfo.data" :rules="dialogInfo.rules" @keyup.enter.native="submitDialogInfo">
 			  <el-form-item label="登录账号" prop="phoneNumber" >
@@ -384,12 +384,12 @@ export default {
 		this.$$event.$on('base-setting:tab', activeName => {
 			if(activeName === 'user' && this.list.data.length === 0) {
 				this.getList()
-				
-				if(this.userInfo.orgLevel == 1) {
-					this.$store.dispatch('getZuzhiList')
-				}
+				this.$store.dispatch('getZuzhiList')
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('base-setting:tab')
 	}
 }
 </script>

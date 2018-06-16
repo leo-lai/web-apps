@@ -702,7 +702,7 @@ export default {
         if (valid) {
         	if(this.dialogPay.data.payMethod === 5) { // 通联pos支付
 						this.dialogPay.loading = true
-	          this.$$api.customer.payOrder(this.dialogPay.data).then(({data}) => {
+	          this.$$api.customer.pay(this.dialogPay.data).then(({data}) => {
 	            this.qrcode.visible = true
 							this.qrcode.opts = Object.assign({}, this.$$config.qrcodeOption, { data })
 	          }).finally(_ => {
@@ -715,7 +715,7 @@ export default {
 		          type: 'warning'
 		        }).then(() => {
 		          this.dialogPay.loading = true
-		          this.$$api.customer.payOrder(this.dialogPay.data).then(_ => {
+		          this.$$api.customer.pay(this.dialogPay.data).then(_ => {
 		          	// this.getOrderInfo()
 		          	this.parent && this.parent.getInfo()
 		          	this.dialogPay.visible = false

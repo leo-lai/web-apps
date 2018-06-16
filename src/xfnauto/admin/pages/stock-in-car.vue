@@ -445,6 +445,9 @@ export default {
 			this.stockRow = row
 			this.showDialogInfo('new', row)
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('stock:car-add')
 	}
 }
 </script>

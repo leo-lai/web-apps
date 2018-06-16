@@ -4,6 +4,12 @@
 		  <el-tab-pane label="库存列表" name="list">
 		  	<stock-list></stock-list>
 		  </el-tab-pane>
+			<el-tab-pane label="车辆入库" name="in">
+				<stock-in></stock-in>
+			</el-tab-pane>
+			<el-tab-pane label="车辆出库" name="out">
+				<stock-out></stock-out>
+			</el-tab-pane>
 		  <!-- <template v-if="userInfo.orgLevel === 3">
 			  <el-tab-pane label="订车列表" name="order">
 			  	<stock-order></stock-order>
@@ -25,19 +31,19 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import stockList from './stock-list'
-// import stockIn from './stock-in'
-// import stockOut from './stock-out'
-// import stockOrder from './stock-order'
-// import stockOutOrder from './stock-out-order'
+import StockList from './stock-list'
+import StockIn from './stock-in'
+import StockOut from './stock-out'
+// import StockOrder from './stock-order'
+// import StockOutOrder from './stock-out-order'
 export default {
 	name: 'stock',
 	components: {
-		stockList,
-		// stockIn,
-		// stockOut,
-		// stockOrder,
-		// stockOutOrder
+		StockList,
+		StockIn,
+		StockOut,
+		// StockOrder,
+		// StockOutOrder
 	},
 	data() {
 		return {

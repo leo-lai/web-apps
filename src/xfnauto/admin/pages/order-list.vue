@@ -3,8 +3,8 @@
 		<el-row>
   		<el-col :span="24" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent @keyup.enter.native="search">
-					<!-- <el-form-item prop="orgId">
-  					<el-select style="width:180px;" v-model="list.filter.orgId" placeholder="公司/门店" @change="search()">
+					<!-- <el-form-item v-if="userInfo.orgLevel === 1" prop="orgId">
+  					<el-select v-model="list.filter.orgId" filterable placeholder="请选择所属组织" @change="search()">
 				      <el-option v-for="item in zuzhiList" :key="item.orgId" :label="item.shortName" :value="item.orgId"></el-option>
 				    </el-select>
   				</el-form-item> -->
@@ -61,8 +61,10 @@
 	    		<el-button class="l-text-link" type="text" size="mini" @click="showDialogInfo(scope.row)">查看</el-button>
 					<a class="el-button el-button--text el-button--mini" :href="$$config.router.base + 'order/contract?id=' + scope.row.id" target="_blank">打印合同</a>
 					<el-button class="l-text-warn" v-if="scope.row.countermandApply == 1" type="text" size="mini" @click="showDialogRefund(scope.row)">退款审核</el-button>
-	    		<el-button class="l-text-error" v-if="scope.row.orderState == 5" type="text" size="mini" @click="showDialogPay(1, scope.row)">收定金</el-button>
-	    		<el-button class="l-text-error" v-if="scope.row.orderState == 35" type="text" size="mini" @click="showDialogPay(2, scope.row)">收尾款</el-button>
+					<template v-else>
+						<el-button class="l-text-error" v-if="scope.row.orderState == 5" type="text" size="mini" @click="showDialogPay(1, scope.row)">收定金</el-button>
+	    			<el-button class="l-text-error" v-if="scope.row.orderState == 35" type="text" size="mini" @click="showDialogPay(2, scope.row)">收尾款</el-button>
+					</template>
 	      </template>
 	    </el-table-column>
 	  </el-table>
@@ -81,18 +83,20 @@
 		<el-dialog custom-class="l-order-info-dialog" :title="dialogInfo.title" :visible.sync="dialogInfo.visible" width="1100px" >
 			<div class="l-order-info l-scroll">
 				<div class="_hd">
-					<div class="l-order-info-base"><span>订购门店：{{dialogInfo.data.orgName}}</span></div>
 					<div class="l-order-info-base">
-						<span>联&ensp;系&ensp;人：{{dialogInfo.data.orgLinker}}</span>
-						<span>联系电话：{{dialogInfo.data.orgPhone}}</span>
-						<span>车辆总数：{{dialogInfo.data.carNum}}</span>
+						<span class="_xl">订购门店：{{dialogInfo.data.orgName}}</span>
+						<span class="_xl">联&ensp;系&ensp;人：{{dialogInfo.data.orgLinker}}</span>
+						<span class="_xl">联系电话：{{dialogInfo.data.orgPhone}}</span>
+					</div>
+					<div class="l-order-info-base">
+						<span class="_xl">订单编号：{{dialogInfo.data.orderCode || dialogInfo.data.orderId}}</span>
+						<span class="_xl">订单类型：{{dialogInfo.data.orderType ? orderType[dialogInfo.data.orderType - 1] : '常规单'}}</span>
 						<span class="l-text-warn">订单状态：{{dialogInfo.data.orderStateName}}</span>
 					</div>
 					<div class="l-order-info-base">
-						<span>订单编号：{{dialogInfo.data.orderCode || dialogInfo.data.orderId}}</span>
-						<span>订单类型：{{dialogInfo.data.orderType ? orderType[dialogInfo.data.orderType - 1] : '常规单'}}</span>
-						<span>
-							总定金：￥{{dialogInfo.data.totalDepositPrice}}
+						<span class="_xl">车辆总数：{{dialogInfo.data.carNum}}</span>
+						<span class="_xl">
+							总&ensp;定&ensp;金：￥{{dialogInfo.data.totalDepositPrice}}
 							<a v-if="dialogInfo.data.pay1Image && dialogInfo.data.pay1Image.length > 0" class="l-btn-link l-margin-l-s" @click="showImages(0, dialogInfo.data.pay1Image)">定金支付凭证</a>
 						</span>
 						<span>
@@ -110,44 +114,43 @@
 					</div>
 				</div>
 
-				<div class="l-margin">
+				<div class="l-margin-m">
 					<h4 class="_tit"><span>客户信息</span></h4>
 					<div v-for="item in dialogInfo.data.customers" :key="item.id">
 						<div class="_customer">
 							<div class="l-order-info-base">
-								<span><b>客户1姓名：{{item.userName}}</b></span>
-								<span>手机号码：{{item.userPhone}}</span>
-							</div>
-							<div>身份证照片：</div>
-							<div>
-								<img @click="showImages(0, [item.idCardPicOn, item.idCardPicOff])" style="width: 100px; height: 50px;" :src="item.idCardPicOn">
-								<img @click="showImages(1, [item.idCardPicOn, item.idCardPicOff])" style="width: 100px; height: 50px; margin-left: 10px;" :src="item.idCardPicOff">
+								<span class="_xl">
+									客户姓名：{{item.userName}}<br>
+									手机号码：{{item.userPhone}}
+								</span>
+								<span>
+									身份证照片：
+									<img @click="showImages(0, [item.idCardPicOn, item.idCardPicOff])" style="width: 80px; height: 40px;" :src="item.idCardPicOn">
+									<img @click="showImages(1, [item.idCardPicOn, item.idCardPicOff])" style="width: 80px; height: 40px; margin-left: 10px;" :src="item.idCardPicOff">
+								</span>
 							</div>
 						</div>
-						<div class="_car l-margin" v-for="carItem in item.infos" :key="carItem.id">
-							<div class="l-flex-hc">
-								<div class="l-rest">
-									<b>{{carItem.carsName}}</b>
-									<span class="l-margin-l">|</span>
-									<span class="l-margin-l">车身颜色：{{carItem.colorName}}</span>
-									<span class="l-margin-l">指导价：￥{{carItem.guidePrice}}</span>
-									<!-- <span class="l-margin-l" style="color:#00b7ee;">车辆状态：已验车</span> -->
-								</div>
+						<div class="_car l-margin-m" v-for="carItem in item.infos" :key="carItem.id">
+							<div><b>{{carItem.carsName}}</b></div>
+							<div class="l-order-info-base">
+								<span>车&emsp;身：{{carItem.colorName}}</span>
+								<span>内&emsp;饰：{{carItem.interiorName}}</span>
+								<span>指导价：￥{{carItem.guidePrice}}</span>
+								<span>购买数量：{{carItem.carNum}}</span>
 							</div>
-							<div v-if='carItem.remark' class="l-text-gray">备注：{{carItem.remark}}</div>
-							<!-- <div>
-								<span>购买数量：{{carItem.colorName}}</span>
-								<span class="l-margin-l">裸车价：￥{{carItem.nakedPrice}}</span>
-								<span class="l-margin-l">交强险：￥{{carItem.trafficCompulsoryInsurancePrice || 0}}</span>
-								<span class="l-margin-l">商业险：￥{{carItem.commercialInsurancePrice || 0}}</span>
-								<span class="l-margin-l">{{carItem.changePrice > 0 ? '加价金额' : '优惠金额'}}：￥{{carItem.changePrice2}}</span>
-							</div> -->
+							<div class="l-order-info-base">
+								<span>裸车价：￥{{carItem.nakedPrice}}</span>
+								<span>交强险：￥{{carItem.trafficCompulsoryInsurancePrice || 0}}</span>
+								<span>商业险：￥{{carItem.commercialInsurancePrice || 0}}</span>
+								<span>{{carItem.changePrice > 0 ? '加价金额' : '优惠金额'}}：￥{{carItem.changePrice2}}</span>
+							</div>
+							<div v-if='carItem.remark' class="l-text-gray">备&emsp;注：{{carItem.remark}}</div>
 							<div v-if="carItem.cars && carItem.cars.length > 0" v-for="frame in carItem.cars" :key="frame.id">
-								<div class="l-text-gray l-margin-t">
-									<span>车架号：{{frame.vin}}</span>
-									<span class="l-margin-l">发动机号：{{frame.stockCar && frame.stockCar.engineNumber}}</span>
-									<span class="l-margin-l">内饰颜色：{{frame.interiorName}}</span>
-									<el-button class="l-margin-l" type="primary" size="mini" plain @click="showDialogTick(frame)">上传票证</el-button>
+								<div class="l-text-gray l-margin-t l-order-info-base">
+									<span>车&ensp;架&ensp;号：{{frame.vin}}</span>
+									<span>发动机号：{{frame.stockCar && frame.stockCar.engineNumber}}</span>
+									<span>内饰颜色：{{frame.interiorName}}</span>
+									<span><el-button type="primary" size="mini" plain @click="showDialogTick(frame)">上传票证</el-button></span>
 								</div>
 								<div class="_pic">
 									<div class="l-margin-b" style="font-weight:700;"><span>换车或修改价格备注</span>{{frame.auditRemark}}</div>
@@ -201,9 +204,9 @@
 					</div>
 				</div>
 
-				<div class="l-margin">
+				<div class="l-margin-m">
 					<h4 class="_tit"><span>物流信息</span></h4>
-					<div class="l-margin">
+					<div class="l-margin-m">
 						<div class="l-order-info-base" v-if="dialogInfo.data.logisticsType == 3">
 							<span>物流方式：送车</span>
 						</div>
@@ -472,6 +475,7 @@ export default {
 	},
 	computed: {
 		...mapGetters([
+			'userInfo',
   		'zuzhiList'
     ])
 	},
@@ -797,15 +801,20 @@ export default {
 				}
 				
 				this.getList()
-				// this.$store.dispatch('getZuzhiList')
+				// if(this.userInfo.orgLevel == 1) {
+				// 	this.$store.dispatch('getZuzhiList')
+				// }
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('order:tab')
 	}
 }
 </script>
 <style lang="less">
 .l-order-info-dialog{
-	.el-dialog__header{background-color: #f5f7fa;}
+	.el-dialog__header{background-color: #f5f7fa; padding: 15px;}
 	.el-dialog__body{padding:0 0 1px 0; }
 }
 .l-order-info{
@@ -831,8 +840,10 @@ export default {
 }
 .l-order-info-item:last-child{border-bottom: none; padding-bottom: 0; margin-bottom: 0;}
 .l-order-info-base{
-	span {display: inline-block; min-width: 250px;}
+	span{display: inline-block; min-width: 150px; vertical-align: top; margin-right: 15px;}
+	span._xl{min-width: 300px;}
 }
+
 
 .l-frame-list{
 	background:#eee; width: 100%; border-collapse: collapse;

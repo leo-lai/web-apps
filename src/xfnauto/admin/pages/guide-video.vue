@@ -19,6 +19,9 @@ export default {
 
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('school:tab')
 	}
 }
 </script>

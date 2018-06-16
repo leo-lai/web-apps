@@ -770,6 +770,9 @@ export default {
 				this.$store.dispatch('getZuzhiList')
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('order:tab')
 	}
 }
 </script>

@@ -157,7 +157,7 @@ const api = {
     },
     login(formData = {}) {
       formData.userName = (formData.userName || '').trim()
-      return fetch.post(baseURL2 + '/backend_v1/login', formData)
+      return fetch.post(baseURL2 + '/backend_v2/login', formData)
       // return fetch.post(baseURL1 + '/login', formData)
     },
     logout(toLogin = true) {
@@ -179,7 +179,7 @@ const api = {
       return fetch.post(baseURL1 + '/changePassword', formData)
     },
     getZuzhiList() {
-      return fetch.ajax(baseURL2 + '/backend_v1/organization/getorg')
+      return fetch.ajax(baseURL2 + '/backend_v2/organization/getorg')
     },
     getRoleList() {
       return fetch.post(baseURL1 + '/roleListList')
@@ -190,7 +190,7 @@ const api = {
       return fetch.post(baseURL1 + '/index')
     },
     getUserInfo() {
-      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/info')
+      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/info')
     }
   },
   zuzhi: { // 组织架构管理
@@ -202,7 +202,7 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/organization/index', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/organization/index', formData)
     },
     getParent(orgLevel = 0) {
       return fetch.post(baseURL1 + '/organizationLevelListByLevel', { orgLevel })
@@ -211,23 +211,42 @@ const api = {
     //   return fetch.post(baseURL1 + '/organizationInfo', { orgId })
     // },
     getInfo(id = '') {
-      return fetch.ajax(baseURL2 + '/backend_v1/organization/detail', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/organization/detail', { id })
     },
-    enable(orgId = '', isOn = '') {
-      return fetch.post(baseURL1 + '/organizationOnOff', {orgId, isOn})
+    // enable(orgId = '', isOn = '') {
+    //   return fetch.post(baseURL1 + '/organizationOnOff', {orgId, isOn})
+    // },
+    enable(orgId = '') {
+      return fetch.ajax(baseURL2 + '/backend_v2/organization/remove', { id: orgId })
     },
     // add(formData = {}) {
     //   return fetch.post(baseURL1 + '/organizationEdit', formData)
     // },
     add(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/organization/create', formData)
+      return fetch.post(baseURL2 + '/backend_v2/organization/create', formData)
     },
     edit(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/organization/edit', formData)
+      return fetch.post(baseURL2 + '/backend_v2/organization/edit', formData)
     },
     getCangList() { // 仓库列表
       return fetch.post(baseURL1 + '/organizationWarehouseList')
     }
+  },
+  cang: { // 仓库管理
+    getList(formData = {}, page = 1, rows = 20) {
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v2/stocklist', formData)
+    },
+    add(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v2/createstock', formData)
+    },
+    edit(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v2/editstock', formData)
+    },
+    del(id ='') {
+      return fetch.ajax(baseURL2 + '/backend_v2/removestock', { id })
+    },
   },
   user: { // 系统用户管理
     // getList(formData = {}, page = 1, rows = 20) {
@@ -238,31 +257,31 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/index', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/index', formData)
     },
     getInfo(id = '') {
-      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/detail', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/detail', { id })
     },
     // enable(userId = '', isEnable = '') {
     //   return fetch.post(baseURL1 + '/userIsEnable', {userId, isEnable})
     // },
     enable(id = '') {
-      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/remove', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/remove', { id })
     },
     // add_bak(formData = {}) {
     //   return fetch.post(baseURL1 + '/addUser', formData)
     // },
     add(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/systemuser/create', formData)
+      return fetch.post(baseURL2 + '/backend_v2/systemuser/create', formData)
     },
     edit(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/systemuser/edit', formData)
+      return fetch.post(baseURL2 + '/backend_v2/systemuser/edit', formData)
     },
     getSalesList(formData = {}) {
       return fetch.post(baseURL1 + '/salesList', formData)
     },
     getParentList(orgId = '', id = '') { // 上级主管列表
-      return fetch.ajax(baseURL2 + '/backend_v1/systemuser/higherups', { orgId, id })
+      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/higherups', { orgId, id })
     },
   },
   role: { // 角色管理
@@ -274,31 +293,31 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/role/index', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/role/index', formData)
     },
     getDownList(orgId = '') { // 角色列表(下拉)
-      return fetch.ajax(baseURL2 + '/backend_v1/role/list', { orgId })
+      return fetch.ajax(baseURL2 + '/backend_v2/role/list', { orgId })
     },
     add(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/role/create', formData)
+      return fetch.post(baseURL2 + '/backend_v2/role/create', formData)
     },
     edit(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/role/edit', formData)
+      return fetch.post(baseURL2 + '/backend_v2/role/edit', formData)
     },
     del(roleId = '') {
-      return fetch.ajax(baseURL2 + '/backend_v1/role/remove', { roleId })
+      return fetch.ajax(baseURL2 + '/backend_v2/role/remove', { roleId })
     },
     // getMenuList(roleId = '') {
     //   return fetch.post(baseURL1 + '/menuListTree', { roleId })
     // },
     getMenuList(id = '') { // 根据角色返回当前菜单
-      return fetch.ajax(baseURL2 + '/backend_v1/roleaccess/index', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/roleaccess/index', { id })
     },
     // setRoleMenu(formData = {}) {
     //   return fetch.post(baseURL1 + '/setRoleMenu', formData)
     // },
     setMenuList(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/roleaccess/addauth', formData)
+      return fetch.post(baseURL2 + '/backend_v2/roleaccess/addauth', formData)
     }
   },
   group: { // 分组管理
@@ -328,19 +347,19 @@ const api = {
   },
   menu: {
     getList() { // orgLevel = 1 返回所有菜单
-      return fetch.ajax(baseURL2 + '/backend_v1/menu/index')
+      return fetch.ajax(baseURL2 + '/backend_v2/menu/index')
     },
     // add(formData = {}) {
     //   return fetch.post(baseURL1 + '/editMenu', formData)
     // },
     add(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/menu/create', formData)
+      return fetch.post(baseURL2 + '/backend_v2/menu/create', formData)
     },
     edit(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/menu/edit', formData)
+      return fetch.post(baseURL2 + '/backend_v2/menu/edit', formData)
     },
     del(menuId = '') {
-      return fetch.ajax(baseURL2 + '/backend_v1/menu/remove', { menuId })
+      return fetch.ajax(baseURL2 + '/backend_v2/menu/remove', { menuId })
     },
   },
   supplier: { // 供应商管理
@@ -352,7 +371,7 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/supplier', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/supplier', formData)
     },
     add(formData = {}) {
       return fetch.post(baseURL1 + '/supplierEdit', formData)
@@ -373,7 +392,7 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/car', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/car', formData)
     },
     add(formData = {}) {
       return fetch.post(baseURL1 + '/carsEdit', formData)
@@ -385,7 +404,7 @@ const api = {
     //   return fetch.post(baseURL1 + '/carsBrandList')
     // },
     getBrandList() { // 品牌列表
-      return fetch.ajax(baseURL2 + '/backend_v1/brand')
+      return fetch.ajax(baseURL2 + '/backend_v2/brand')
     },
     getFamilyList(brandId = '') { // 车系列表
       return fetch.post(baseURL1 + '/carsFamilyList', { brandId })
@@ -412,7 +431,7 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) { // 车系列表(分页)
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/car/family', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/car/family', formData)
     },
     getCheshenList(familyId = '') { // 获取车身颜色列表
       return fetch.post(baseURL1 + '/carColourGetByBrand', { familyId })
@@ -465,20 +484,23 @@ const api = {
     getOrderList(formData = {}, page = 1, rows = 20) { // 客户订单列表
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/customer', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/customer', formData)
     },
     // getOrderInfo(customerOrderId = '') { // 获取订单详情
     //   return fetch.post(baseURL1 + '/customerOrderInfo', { customerOrderId })
     // },
     getOrderInfo(customerOrderId = '') { // 获取订单详情
-      return fetch.ajax(baseURL2 + '/backend_v1/customer/detail', { customerOrderId })
+      return fetch.ajax(baseURL2 + '/backend_v2/customer/detail', { customerOrderId })
     },
     getContractInfo(customerOrderId = '') { // 合同信息
       // return fetch.post(baseURL1 + '/customerOrderPrint', { customerOrderId })
-      return fetch.ajax(baseURL2 + '/backend_v1/customer/detail', { customerOrderId })
+      return fetch.ajax(baseURL2 + '/backend_v2/customer/detail', { customerOrderId })
     },
-    payOrder(formData = {}) { // 支付定金
-      return fetch.post(baseURL1 + '/payInOrder', formData)
+    // payOrder(formData = {}) { // 支付定金
+    //   return fetch.post(baseURL1 + '/payInOrder', formData)
+    // },
+    pay(formData = {}) { // 收定金或尾款
+      return fetch.post(baseURL2 + '/backend_v1/customer/pay', formData)
     },
     orderPrice(customerOrderId = '') { // 订单费用
       return fetch.post(baseURL1 + '/orderPriceList', { customerOrderId })
@@ -520,7 +542,7 @@ const api = {
   },
   stock: { // 库存管理
     toExcel(formData = {}) {
-      return fetch.ajax(baseURL2 + '/backend_v1/stock/export', formData) 
+      return fetch.ajax(baseURL2 + '/backend_v2/stock/export', formData) 
     },
     // getList(formData = {}, page = 1, rows = 20) { // 车辆库存列表
     //   formData.page = page
@@ -530,19 +552,19 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/stock', formData) 
+      return fetch.ajax(baseURL2 + '/backend_v2/stock', formData) 
     },
-    getInfo_bak(formData = {}){ // 车辆库存详情
-      return fetch.post(baseURL1 + '/stockCarInfo', formData)
-    },
+    // getInfo(formData = {}){ // 车辆库存详情
+    //   return fetch.post(baseURL1 + '/stockCarInfo', formData)
+    // },
     getInfo(id = '') {
-      return fetch.ajax(baseURL2 + '/backend_v1/stock/detail', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/stock/detail', { id })
     },
     // editInfo(formData = {}) { // 编辑车辆库存详情
     //   return fetch.post(baseURL1 + '/stockCarEdit', formData)
     // },
     editInfo(formData = {}) {
-      return fetch.post(baseURL2 + '/backend_v1/stock/edit', formData)
+      return fetch.post(baseURL2 + '/backend_v2/stock/edit', formData)
     },
     getInList(formData = {}, page = 1, rows = 20) { // 入库单列表
       formData.page = page
@@ -609,7 +631,7 @@ const api = {
   },
   order: { // 代购管理
     toExcel(formData = {}) {
-      return fetch.ajax(baseURL2 + '/backend_v1/consumer/export', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/consumer/export', formData)
     },
     // getList(formData = {}, page = 1, rows = 20) { // 代购单列表
     //   formData.page = page
@@ -619,16 +641,22 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) { // 资源订单列表
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/consumer/index', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/consumer/index', formData)
     },
     getInfo(orderId = '') {
       return fetch.post(baseURL1 + '/ConsumerOrder/getOrderDetail', { orderId })
     },
+    // getPayInfo(orderId = '') { // 获取支付信息
+    //   return fetch.post(baseURL1 + '/ConsumerOrder/getPaymentInfo', { orderId })
+    // },
     getPayInfo(orderId = '') { // 获取支付信息
-      return fetch.post(baseURL1 + '/ConsumerOrder/getPaymentInfo', { orderId })
+      return fetch.ajax(baseURL2 + '/backend_v2/consumer/getpayinfo', { orderId })
     },
+    // pay(formData = {}) { // 上传支付凭证
+    //   return fetch.post(baseURL1 + '/ConsumerOrderPayment/create', formData)
+    // },
     pay(formData = {}) { // 上传支付凭证
-      return fetch.post(baseURL1 + '/ConsumerOrderPayment/create', formData)
+      return fetch.post(baseURL2 + '/backend_v2/consumer/pay', formData)
     },
     tickPic(formData = {}) { // 上传票证图片
       return fetch.post(baseURL1 + '/ConsumerOrderCar/uploadTickPic', formData)
@@ -638,7 +666,7 @@ const api = {
     },
     getContractInfo(id = '') { // 合同信息
       // return fetch.post(baseURL1 + '/ConsumerOrder/getContractInfo', { orderId })
-      return fetch.ajax(baseURL2 + '/backend_v1/consumer/detail', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/consumer/detail', { id })
     },
     refund(formData = {}) { // 退款
       return fetch.post(baseURL1 + '/ConsumerOrder/countermandExamine', formData)
@@ -666,27 +694,27 @@ const api = {
     getList(formData = {}, page = 1, rows = 20) { // 文章列表
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/article/index', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/article/index', formData)
     },
     getInfo(id = '') { // 文章详情
-      return fetch.ajax(baseURL2 + '/backend_v1/article/detail', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/article/detail', { id })
     },
     add(formData = {}) { // 新增
-      return fetch.post(baseURL2 + '/backend_v1/article/create', formData)
+      return fetch.post(baseURL2 + '/backend_v2/article/create', formData)
     },
     edit(formData = {}) { // 编辑
-      return fetch.post(baseURL2 + '/backend_v1/article/edit', formData)
+      return fetch.post(baseURL2 + '/backend_v2/article/edit', formData)
     },
     del(id = '') { // 删除
-      return fetch.ajax(baseURL2 + '/backend_v1/article/remove', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/article/remove', { id })
     },
     publish(id = '') { // 发布
-      return fetch.ajax(baseURL2 + '/backend_v1/article/publish', { id })
+      return fetch.ajax(baseURL2 + '/backend_v2/article/publish', { id })
     },
     getMsgList(formData = {}, page = 1, rows = 20) {
       formData.page = page
       formData.rows = rows
-      return fetch.ajax(baseURL2 + '/backend_v1/note', formData)
+      return fetch.ajax(baseURL2 + '/backend_v2/note', formData)
     }
   },
 }

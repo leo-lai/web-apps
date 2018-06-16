@@ -100,6 +100,9 @@ export default {
 				this.getList()
 			}
 		})
+	},
+	beforeDestroy() {
+		this.$$event.$off('school:tab')
 	}
 }
 </script>
