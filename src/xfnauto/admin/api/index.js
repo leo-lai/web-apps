@@ -265,8 +265,8 @@ const api = {
     // enable(userId = '', isEnable = '') {
     //   return fetch.post(baseURL1 + '/userIsEnable', {userId, isEnable})
     // },
-    enable(id = '') {
-      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/remove', { id })
+    enable(id = '', status) {
+      return fetch.ajax(baseURL2 + '/backend_v2/systemuser/remove', { id, act: status })
     },
     // add_bak(formData = {}) {
     //   return fetch.post(baseURL1 + '/addUser', formData)
@@ -373,11 +373,18 @@ const api = {
       formData.rows = rows
       return fetch.ajax(baseURL2 + '/backend_v2/supplier', formData)
     },
+    // add(formData = {}) {
+    //   return fetch.post(baseURL1 + '/supplierEdit', formData)
+    // },
     add(formData = {}) {
-      return fetch.post(baseURL1 + '/supplierEdit', formData)
+      formData.id = formData.supplierId
+      return fetch.post(baseURL2 + '/backend_v2/supplier/create', formData)
     },
+    // del(supplierId = '') {
+    //   return fetch.post(baseURL1 + '/supplierDelete', { supplierId })
+    // },
     del(supplierId = '') {
-      return fetch.post(baseURL1 + '/supplierDelete', { supplierId })
+      return fetch.ajax(baseURL2 + '/backend_v2/supplier/remove', { id: supplierId })
     },
     getListDown() {
       return fetch.post(baseURL1 + '/supplierListList')
@@ -500,7 +507,7 @@ const api = {
     //   return fetch.post(baseURL1 + '/payInOrder', formData)
     // },
     pay(formData = {}) { // 收定金或尾款
-      return fetch.post(baseURL2 + '/backend_v1/customer/pay', formData)
+      return fetch.post(baseURL2 + '/backend_v2/customer/pay', formData)
     },
     orderPrice(customerOrderId = '') { // 订单费用
       return fetch.post(baseURL1 + '/orderPriceList', { customerOrderId })

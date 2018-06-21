@@ -251,7 +251,7 @@
 			  </el-form-item>
 			  <el-form-item label="支付方式" prop="payMethod">
 			  	<el-radio-group v-model="dialogPay.data.payMethod">
-			      <el-radio :label="5" border>POS刷卡</el-radio>
+			      <el-radio :label="5" border>POS机刷卡</el-radio>
 			      <el-radio :label="6" border>现金支付</el-radio>
 			      <el-radio :label="14" border>其他POS机刷卡</el-radio>
 			    </el-radio-group>

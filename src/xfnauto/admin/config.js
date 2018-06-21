@@ -11,7 +11,7 @@ let config = {
     baseURL1: window.location.host.indexOf('xfnauto.com') !== -1? 
       'https://tomcat.xfnauto.com/tauto/management/admin' : 'http://tomcat.mifengqiche.com/tauto/management/admin',
     baseURL2: window.location.host.indexOf('xfnauto.com') !== -1 ?
-      'https://api.xfnauto.com' : 'http://api.mifengqiche.com'
+      'https://v2.xfnauto.com' : 'http://api.mifengqiche.com'
   },
   pay: {
     url: window.location.host.indexOf('xfnauto.com') !== -1 ? 

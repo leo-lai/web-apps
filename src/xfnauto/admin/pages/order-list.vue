@@ -14,7 +14,7 @@
 				    </el-select>
   				</el-form-item>
 					<el-form-item prop="keywords">
-				    <el-input placeholder="客户姓名/车架号" v-model="list.filter.keywords"></el-input>
+				    <el-input placeholder="输入客户姓名/车架号" v-model="list.filter.keywords"></el-input>
 				  </el-form-item>
 				  <el-form-item prop="dateRange" style="width:300px;">
 				  	<el-date-picker style="width: 100%;" type="daterange" value-format="yyyy-MM-dd"
@@ -48,7 +48,7 @@
 	    <el-table-column label="定金" prop="totalDepositPrice" align="center" width="100"></el-table-column>
 	    <el-table-column label="尾款" prop="totalRestPrice" align="center" width="100"></el-table-column>
 	    <el-table-column label="运费" prop="freight" align="center" width="100"></el-table-column>
-	    <el-table-column label="建单员" prop="creator" align="center" width="110"></el-table-column>
+	    <el-table-column label="建单员" prop="creator" align="center" width="120"></el-table-column>
 			<el-table-column class-name="l-fs-xs" label="建单日期" prop="createTime" align="center" width="150"></el-table-column>
 			<el-table-column label="订单类型" prop="orderType" align="center" width="100">
 				<template slot-scope="scope">
@@ -427,7 +427,7 @@ export default {
 				data: {
 					orderId: '',
 					amount: '',
-					payType: 2,
+					payType: '',
 					voucher: '',
 					remark: ''
 				}
@@ -602,6 +602,8 @@ export default {
 		// 支付
 		showDialogPay(type = 1, row) {
 			this.$$utils.copyObj(this.dialogPay.data, '')
+			this.dialogPay.uploadList = []
+			this.dialogPay.data.payType = 1
 			this.dialogPay.visible = true
 			this.dialogPay.type = type
 			this.dialogPay.title = type === 1 ? '收定金' : '收尾款'

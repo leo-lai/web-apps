@@ -74,8 +74,8 @@
 			  	<el-select v-model="dialogInfo.data.orgType" placeholder="请选择">
 			    	<el-option label="直营" :value="1"></el-option>
 			    	<el-option label="加盟" :value="2"></el-option>
-			    	<el-option label="联盟" :value="3"></el-option>
-			    	<el-option label="其他" :value="4"></el-option>
+			    	<el-option label="联盟" :value="4"></el-option>
+			    	<el-option label="其他" :value="5"></el-option>
 			    </el-select>
 			  </el-form-item>
 			  <!-- <el-form-item label="上级组织" prop="parentId">

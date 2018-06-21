@@ -369,7 +369,7 @@ export default {
 		},
 		enable(row, status = 1) { // 禁用or启用用户
 			row.doing = true
-			this.$$api.user.enable(row.id).then(_ => {
+			this.$$api.user.enable(row.id, status == 1 ? 'enable' : 'forbid').then(_ => {
 				row.isEnable = status
 				this.$message({
 					type: 'success',

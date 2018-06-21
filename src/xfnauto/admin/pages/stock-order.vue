@@ -216,7 +216,7 @@
   				<td colspan="5" class="_cont">
   					<el-radio-group v-model="payInfo.payWay">
 					    <el-radio :label="1" border>银联支付</el-radio>
-					    <el-radio :label="2" border>POS机</el-radio>
+					    <el-radio :label="2" border>POS机刷卡</el-radio>
 					  </el-radio-group>
   				</td>
   			</tr>
