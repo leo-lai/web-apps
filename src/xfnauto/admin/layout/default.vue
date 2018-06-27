@@ -13,6 +13,7 @@
 							<el-menu-item index="/stock">库存管理</el-menu-item>
 							<el-menu-item index="/order">资源订单</el-menu-item>
 							<el-menu-item index="/customer">客户管理</el-menu-item>
+							<el-menu-item index="/loan">垫资管理</el-menu-item>
 							<el-menu-item v-if="userInfo.orgLevel == 1" index="/school">文章管理</el-menu-item>
 							<el-menu-item index="/base/setting">系统管理</el-menu-item>
 							<el-menu-item v-if="userInfo.orgLevel == 1" index="/base/data">基础设置</el-menu-item>

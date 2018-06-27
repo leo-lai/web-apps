@@ -59,7 +59,7 @@ const routes = [
     children: [
       {
         path: '',
-        meta: { title: '喜蜂鸟学堂' },
+        meta: { title: '文章管理' },
         component: resolve => require(['../pages/school'], resolve),
       }
     ],
@@ -71,7 +71,7 @@ const routes = [
     children: [
       {
         path: '',
-        meta: { title: '代购管理' },
+        meta: { title: '资源管理' },
         component: resolve => require(['../pages/order'], resolve),
       }
     ],
@@ -83,10 +83,22 @@ const routes = [
     children: [
       { 
         path: '', 
-        meta: { title: '客户体系' },
+        meta: { title: '客户管理' },
         component: resolve => require(['../pages/customer'], resolve),
       }
     ], 
+  },
+  {
+    path: '/loan',
+    component: layout,
+    meta: { hidden: true },
+    children: [
+      {
+        path: '',
+        meta: { title: '垫资管理' },
+        component: resolve => require(['../pages/loan'], resolve),
+      }
+    ],
   },
   {
     path: '/bank',
@@ -95,7 +107,7 @@ const routes = [
     children: [
       { 
         path: '', 
-        meta: { title: '客户体系' },
+        meta: { title: '银行审核' },
         component: resolve => require(['../pages/bank'], resolve),
       }
     ], 

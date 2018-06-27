@@ -37,7 +37,12 @@ let config = {
       '13': '等待交付车辆',
       '15': '等待支付尾款',
       '17': '订单完成'
-    }
+    },
+    storeType: [
+      { key: 1, value: '4S店' }, 
+      { key: 2, value: '资源公司' }, 
+      { key: 3, value: '汽贸公司' }
+    ],
   },
   editorOption: {
     placeholder: '请在这里输入内容...',

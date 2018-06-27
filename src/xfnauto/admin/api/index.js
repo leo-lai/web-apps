@@ -724,6 +724,35 @@ const api = {
       return fetch.ajax(baseURL2 + '/backend_v2/note', formData)
     }
   },
+  loan: { // 垫资管理
+    getStoreList(formData = {}, page = 1, rows = 20) { // 商铺列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v3/shop/index', formData)
+    },
+    getStoreInfo(id = '') {
+      return fetch.ajax(baseURL2 + '/backend_v3/shop/detail', { id })
+    },
+    authStore(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v3/shop/verify', formData)
+    },
+    getLoanList(formData = {}, page = 1, rows = 20) { // 商铺列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploanverify/index', formData)
+    },
+    getLoanInfo(id = '') {
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploanverify/detail', { id })
+    },
+    authLoan(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v3/shoploanverify/verify', formData)
+    },
+    getOrderList(formData = {}, page = 1, rows = 20) { // 垫资订单列表
+      formData.page = page
+      formData.rows = rows
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/index', formData)
+    },
+  }
 }
 
 export default api

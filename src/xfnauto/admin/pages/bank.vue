@@ -69,7 +69,7 @@
 			</div>
   		<div class="l-text-gray">资料照片</div>
   		<div class="l-bankAuditsImage">
-  			<img v-for="(item,index) in images" key="tick" :src="item.thumb" @click="previewImage(index)">
+  			<img v-for="(item,index) in images" :key="item.tick" :src="item.thumb" @click="previewImage(index)">
   		</div>
   		<div class="l-text-gray l-margin-t">客户签名视频</div>
   		<div class="l-bankAuditsvideo">
