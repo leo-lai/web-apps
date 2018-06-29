@@ -8,8 +8,8 @@
 				      <el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value"></el-option>
 				    </el-select>
   				</el-form-item>
-				  <el-form-item prop="orgName">
-				    <el-input placeholder="请输入门店名称" v-model="list.filter.orgName"></el-input>
+				  <el-form-item prop="keywords">
+				    <el-input placeholder="请输入门店名称" v-model="list.filter.keywords"></el-input>
 				  </el-form-item>
 				  <el-form-item>
 				    <el-button type="primary" @click="search">查询</el-button>
@@ -67,7 +67,7 @@
 						</tr>
 						<tr>
 							<td>商铺地址：</td>
-							<td>{{dialogInfo.info.provinceName + dialogInfo.info.cityName + dialogInfo.info.areaName + dialogInfo.info.address}}</td>
+							<td>{{getAddress()}}</td>
 						</tr>
 						<tr v-if="dialogInfo.info.describes">
 							<td>商铺描述：</td>
@@ -121,9 +121,7 @@
 import viewerImages from 'components/viewer-images'
 export default {
 	name: 'store-auth-list',
-	components: {
-		viewerImages,
-  },
+	components: { viewerImages },
 	data() {
 		return {
 			stateList: [
@@ -133,11 +131,11 @@ export default {
 			],
 			list: {
 				filter: {
-					orgName: '',
+					keywords: '',
 					state: ''
 				},
 				rules: {
-					orgName: [],
+					keywords: [],
 					state: []
 				},
 				loading: false,
@@ -162,6 +160,11 @@ export default {
 				}
 			})
     	this.$refs.viewer.show(index, imagesArr)
+		},
+		getAddress() {
+			let { provinceName = '', cityName = '', areaName = '', address = '' } = this.dialogInfo.info
+			if(!provinceName) return address
+      return (provinceName === cityName ? provinceName : provinceName + cityName) + areaName + address
     },
 		getStoreType(key = 1) {
       return (this.$$config.baseData.storeType.filter(item => item.key === key)[0] || {}).value || ''

@@ -725,6 +725,9 @@ const api = {
     }
   },
   loan: { // 垫资管理
+    toExcel(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v3/shoploan/export', formData) 
+    },
     getStoreList(formData = {}, page = 1, rows = 20) { // 商铺列表
       formData.page = page
       formData.rows = rows
@@ -752,6 +755,21 @@ const api = {
       formData.rows = rows
       return fetch.ajax(baseURL2 + '/backend_v3/shoploan/index', formData)
     },
+    getOrderInfo(id = '') { // 垫资订单详情
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/detail', { id })
+    },
+    setSetting(formData = {}) { // 设置手续费率
+      return fetch.post(baseURL2 + '/backend_v3/shoploan/setrate', formData)
+    },
+    getSetting() { // 获取设置信息
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/getrate')
+    },
+    authOrder(formData = {}) {
+      return fetch.post(baseURL2 + '/backend_v3/shoploan/verify', formData)
+    },
+    saveVoucher1(formData = {}) { // 上传凭证并放款
+      return fetch.post(baseURL2 + '/backend_v3/shoploan/loanVoucher', formData)
+    }
   }
 }
 

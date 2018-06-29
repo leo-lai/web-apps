@@ -483,6 +483,7 @@ export default {
 		toExcel() {
 			this.exceling = true
 			this.$$api.order.toExcel(this.list.filter).then(({data}) => {
+				this.$message.success('导出Excel成功')
 				window.location.href = data.url
 			}).finally(_ => {
 				this.exceling = false
