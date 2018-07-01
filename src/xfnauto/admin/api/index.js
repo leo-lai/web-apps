@@ -769,7 +769,28 @@ const api = {
     },
     saveVoucher1(formData = {}) { // 上传凭证并放款
       return fetch.post(baseURL2 + '/backend_v3/shoploan/loanVoucher', formData)
-    }
+    },
+    saveVoucher2(formData = {}) { // 上传还款凭证
+      return fetch.post(baseURL2 + '/backend_v3/shoploan/payVoucher', formData)
+    },
+    getUnpayCars(id = '') { // 未还款车辆
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/unpayList', {orderId: id})
+    },
+    getPayRecord(id = '') { // 还款记录
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/payRecord', {orderId: id})
+    },
+    getDeferInfo(id = '') { // 获取延期详情
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/overdueDetail', {orderId: id})
+    },
+    defer(formData = {}) { // 延期
+      return fetch.post(baseURL2 + '/backend_v3/shoploan/overdue', formData)
+    },
+    dealCar(id = '') { // 处理车辆
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/transferdeal', {orderId: id})
+    },
+    deferRecord(id = '') { // 延期记录
+      return fetch.ajax(baseURL2 + '/backend_v3/shoploan/overduerecords', {orderId: id})
+    },
   }
 }
 

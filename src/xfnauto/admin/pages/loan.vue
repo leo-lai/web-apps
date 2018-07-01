@@ -1,18 +1,16 @@
 <template>
 	<div class="l-main-body" style="width: 1400px;">
-    <div class="l-tab-cont-none">
-      <el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
-        <el-tab-pane label="垫资单列表" name="loan-order">
-					<loan-order></loan-order>
-        </el-tab-pane>
-        <el-tab-pane label="垫资认证审核" name="loan-auth">
-					<loan-auth></loan-auth>
-        </el-tab-pane>
-        <el-tab-pane label="门店认证审核" name="store-auth">
-					<store-auth></store-auth>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
+		<el-tabs v-model="tabActive" @tab-click="tabClick" type="border-card">
+			<el-tab-pane label="垫资单列表" name="loan-order">
+				<loan-order></loan-order>
+			</el-tab-pane>
+			<el-tab-pane label="垫资认证审核" name="loan-auth">
+				<loan-auth></loan-auth>
+			</el-tab-pane>
+			<el-tab-pane label="门店认证审核" name="store-auth">
+				<store-auth></store-auth>
+			</el-tab-pane>
+		</el-tabs>
 	</div>
 </template>
 <script>

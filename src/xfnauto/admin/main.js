@@ -73,7 +73,7 @@ Vue.mixin({
 
 // 整数去两位小数点 10.00 -> 10
 Vue.filter('Int0', function (value) {
-  if (!value) return ''
+  if (!value) return 0
   return (value * 100) / 100
 })
 
