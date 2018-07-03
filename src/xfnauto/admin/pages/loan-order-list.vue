@@ -28,9 +28,18 @@
 	    <el-table-column label="门店名称" prop="orgName" min-width="150"></el-table-column>
 	    <el-table-column label="申请时间" prop="createTime" width="120" align="center"></el-table-column>
 	    <el-table-column label="本金总额(元)" prop="amount" width="120" align="center"></el-table-column>
-	    <el-table-column label="手续费总额(元)" prop="fee" width="120" align="center"></el-table-column>
-	    <el-table-column label="待还总额(元)" prop="unpayAmount" width="120" align="center"></el-table-column>
-	    <el-table-column label="垫资期限(天)" prop="period" width="120" align="center"></el-table-column>
+	    <el-table-column label="手续费总额(元)" prop="feeTotal" width="120" align="center"></el-table-column>
+	    <el-table-column label="待还总额(元)" width="120" align="center">
+				<template slot-scope="scope">
+					<span>{{scope.row.unpayAmount + scope.row.unpayFee}}</span>
+				</template>
+			</el-table-column>
+	    <el-table-column label="垫资期限(天)" prop="period" width="120" align="center">
+				<template slot-scope="scope">
+					<p>{{scope.row.period}}</p>
+					<p class="l-text-gray" style="font-size:11px;">剩余天数：{{scope.row.days}}</p>
+				</template>
+			</el-table-column>
 	    <el-table-column label="状态" prop="stateName" width="120" align="center">
 				<template slot-scope="scope">
 					<span :class="getState(scope.row.state).css">{{getState(scope.row.state).label}}</span>
@@ -93,6 +102,7 @@
 								<template v-if="dialogInfo.info.state < 3">
 									<p style="margin-left: -1em;">垫资本金总额：<b class="l-text-main">￥{{dialogInfo.info.amount}}</b></p>
 									<p>&emsp;&emsp;手续费：<span>￥{{dialogInfo.info.feeTotal}}</span></p>
+									<p>&emsp;垫资期限：{{dialogInfo.info.period}}天</p>
 								</template>
 								<template v-else-if="dialogInfo.info.state >= 3">
 									<p>
@@ -101,12 +111,14 @@
 									</p>
 									<p>&emsp;待还本金：￥{{dialogInfo.info.unpayAmount | Int0}} / <span class="l-text-gray">{{dialogInfo.info.amount | Int0}}</span></p>
 									<p>待还手续费：￥{{dialogInfo.info.unpayFee | Int0}} / <span class="l-text-gray">{{dialogInfo.info.feeTotal | Int0}}</span></p>
+									<p>&emsp;垫资期限：{{dialogInfo.info.period}}天 / <span class="l-text-gray">{{dialogInfo.info.deadline}}</span></p>
 								</template>
-								<p>&emsp;垫资期限：{{dialogInfo.info.period}}天 / <span class="l-text-gray">{{dialogInfo.info.deadline}}</span></p>
-								<p v-if="dialogInfo.info.days > 0 && dialogInfo.info.days < 7" class="l-text-error" style="font-size: 12px; margin-left: 12px;">*还有{{dialogInfo.info.days}}天到最终还款日期，请催促客户还款或延期。</p>
-								<p v-if="dialogInfo.info.state == 5" class="l-text-error" style="font-size: 12px; margin-left: 12px;">*已逾期，请延期或处理未还款车辆</p>
-								<p v-if="dialogInfo.info.state == 6" class="l-text-error" style="font-size: 12px; margin-left: 12px;">*已逾期，未还款或申请延期，车辆已由平台处理</p>
-								<br>
+								<template v-if="dialogInfo.info.state < 6">
+									<p v-if="dialogInfo.info.days > 0 && dialogInfo.info.days < 7" class="l-text-error" style="font-size: 12px; margin-left: 12px;">*还有{{dialogInfo.info.days}}天到最终还款日期，请催促客户还款或延期。</p>
+									<p v-if="dialogInfo.info.state == 5" class="l-text-error" style="font-size: 12px; margin-left: 12px;">*已逾期，请延期或处理未还款车辆</p>
+									<p v-if="dialogInfo.info.state == 6" class="l-text-error" style="font-size: 12px; margin-left: 12px;">*已逾期，未还款或申请延期，车辆已由平台处理</p>
+									<br>
+								</template>
 							</td>
 						</tr>
 						<tr>
@@ -133,28 +145,34 @@
 							</td>
 						</tr>
 					</table>
-					<!-- 拒绝审核 -->
-					<div v-if="dialogInfo.info.state === 1" class="_line">
-						<p class="l-text-gray">审核时间：{{dialogInfo.info.updateTime}}</p>
-						<p class="l-text-error">拒绝原因：{{dialogInfo.info.reason}}</p>
-					</div>
-					<!-- 放款凭证 -->
-					<div v-else-if="dialogInfo.info.state >= 3" class="_line l-text-gray">
-						<span>{{dialogInfo.info.updateTime}}</span><br>
-						<span class="l-text-link" @click="previewImage(0, dialogInfo.info.voucher)">查看放款凭证</span>&emsp;
-						<img width="80" height="80" style="margin:5px 5px 0 0;" v-for="(item, index) in dialogInfo.info.voucher" :key="index" :src="item" @click="previewImage(index, dialogInfo.info.voucher)">
-					</div>
-					<!-- 延期记录 -->
-					<div class="_line" v-if="dialogInfo.deferRecord.length > 0">
-						<div class="l-text-gray" v-for="item in dialogInfo.deferRecord" :key="item.id">
-							<span>{{item.createTime}}</span>
-							<span class="l-margin-l">加收{{item.downpayment | Int0}}%保证金，手续费率调整为{{item.rate | Int0}}%，延期{{item.period}}天</span>
-							<span class="l-margin-l l-text-error" v-if="item.voucher.length == 0">*该延期还未收款</span>
-							<p v-else>
-								<span class="l-text-link" @click="previewImage(0, item.voucher)">查看收款凭证</span>&emsp;
-								<img width="80" height="80" style="margin:5px 5px 0 0;" v-for="(img, index) in item.voucher" :key="index" :src="img" @click="previewImage(index, item.voucher)">
-							</p>
+					<div v-if="showMore">
+						<!-- 拒绝审核 -->
+						<div v-if="dialogInfo.info.state === 1" class="_line">
+							<p class="l-text-gray">审核时间：{{dialogInfo.info.updateTime}}</p>
+							<p class="l-text-error">拒绝原因：{{dialogInfo.info.reason}}</p>
 						</div>
+						<!-- 放款凭证 -->
+						<div v-else-if="dialogInfo.info.state >= 3" class="_line l-text-gray">
+							<span>{{dialogInfo.info.updateTime}}</span><br>
+							<span class="l-text-link" @click="previewImage(0, dialogInfo.info.voucher)">查看放款凭证</span>&emsp;
+							<img width="80" height="80" style="margin:5px 5px 0 0;" v-for="(item, index) in dialogInfo.info.voucher" :key="index" :src="item" @click="previewImage(index, dialogInfo.info.voucher)">
+						</div>
+						<!-- 延期记录 -->
+						<div class="_line" v-if="dialogInfo.deferRecord.length > 0">
+							<div class="l-text-gray" v-for="item in dialogInfo.deferRecord" :key="item.id">
+								<span>{{item.createTime}}</span>
+								<span class="l-margin-l">加收{{item.downpayment | Int0}}%保证金，手续费率调整为{{item.rate | Int0}}%，延期{{item.period}}天</span>
+								<span class="l-margin-l l-text-error" v-if="item.voucher.length == 0">*该延期还未收款</span>
+								<p v-else>
+									<span class="l-text-link" @click="previewImage(0, item.voucher)">查看收款凭证</span>&emsp;
+									<img width="80" height="80" style="margin:5px 5px 0 0;" v-for="(img, index) in item.voucher" :key="index" :src="img" @click="previewImage(index, item.voucher)">
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="l-fr l-text-gray" style="margin: -20px 0 0 20px; text-decoration: underline; overflow: hidden;" @click="showMore = !showMore">
+						<span v-if="!showMore"><b class="el-icon-caret-bottom l-fs-m" style="vertical-align: -1px"></b> 展开</span>
+						<span v-else><b class="el-icon-caret-top l-fs-m" style="vertical-align: -3px"></b> 收起</span>
 					</div>
 				</div>
 				<div class="l-car-list">
@@ -291,7 +309,7 @@
 								<span class="l-margin-r">手续费：￥{{carItem.fee | Int0}}</span>
 							</p>
 						</div>
-						<span class="_days">垫资{{carItem.number}}天</span>
+						<span class="_days">垫资{{item.loanDays}}天</span>
 					</div>
 					<div class="l-margin-t-m l-text-right">
 						<span @click="previewImage(0, item.voucher)">还款凭证：</span>
@@ -360,6 +378,7 @@ export default {
 	components: { uploader, viewerImages },
 	data() {
 		return {
+			showMore: false,
 			exceling: false,
 			stateList: [
 				{ label: '全部', value: '', css: '' },
@@ -635,6 +654,7 @@ export default {
 			}else{
 				this.dialogInfo.visible = false	
 			}
+			this.dialogInfo.deferRecord = []
 		},
 		// 审核垫资申请
 		authLoan(type = 2) {
@@ -688,6 +708,7 @@ export default {
 			this.$$api.loan.saveVoucher1(this.dialogLoan.data).then(_ => {
 				this.$message.success('放款成功')
 				this.dialogLoan.visible = false
+				this.dialogLoan.uploadList = []
 				this.showDialogInfo({id: this.dialogInfo.info.id})
 				this.getList()
 			}).finally(_ => {
@@ -698,6 +719,8 @@ export default {
 		showDialogRepayment() {
 			const loading = this.$loading()
 			this.$$api.loan.getUnpayCars(this.dialogInfo.info.id).then(({data}) => {
+				this.dialogRepayment.uploadList = []
+				this.$$utils.copyObj(this.dialogRepayment.data, null)
 				this.dialogRepayment.visible = true
 				if(data){
 					this.dialogRepayment.cars = data.map(item => {
@@ -776,7 +799,9 @@ export default {
 		showDialogDefer() { // 延期
 			const loading = this.$loading()
 			this.$$api.loan.getDeferInfo(this.dialogInfo.info.id).then(({data}) => {
+				this.dialogDefer.uploadList = []
 				this.$$utils.copyObj(this.dialogDefer.data, data)
+				this.getDeferAmount()
 				this.dialogDefer.visible = true
 			}).finally(_ => {
 				loading.close()
@@ -797,7 +822,7 @@ export default {
 			amount = downpayment / 100 * Number(this.dialogInfo.info.unpayAmount)
 			// this.dialogDefer.data.rate = rate
 			this.dialogDefer.data.downpayment = downpayment
-			this.dialogDefer.data.amount = amount
+			this.dialogDefer.data.amount = amount.toFixed(2)
 		},
 		submitDialogDefer(type = 1) {
 			if(type == 1 && !(this.dialogDefer.data.period > 0)) {
