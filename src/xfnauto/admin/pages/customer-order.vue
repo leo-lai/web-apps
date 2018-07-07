@@ -364,7 +364,7 @@ export default {
 		getBankName(id) {
 			return (this.bankList.filter(item => item.id == id)[0] || {}).name || ''
 		},
-		sizeChange(size = 100) {
+		sizeChange(size = 50) {
 			this.getList(1, size)
 		},
 		pageChange(page = 1) {

@@ -4,6 +4,7 @@ let config = {
 	},
 	api: {
 		baseURL: 'http://api.nrmbe.gzmypay.com/api/plat'
+		// baseURL: 'http://rmbe.frpgz1.idcfengye.com/api/plat'
 	},
 	shop: {
 		admin1: 'http://shop.nrmbe.gzmypay.com/admin/',

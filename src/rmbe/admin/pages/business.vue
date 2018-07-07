@@ -6,11 +6,11 @@
   		</el-col>
   		<el-col :span="20" class="l-text-right">
   			<el-form inline ref="listFilter" :model="list.filter" :rules="list.rules" @submit.native.prevent>
-  				<el-form-item style="width: 140px;" prop="name" lalel="">
-				    <el-input placeholder="商家姓名" v-model="list.filter.name"></el-input>
+  				<el-form-item style="width: 160px;" prop="name" lalel="">
+				    <el-input placeholder="输入店铺名称" v-model="list.filter.name"></el-input>
 				  </el-form-item>
 				  <el-form-item style="width: 140px;" prop="tel" lalel="">
-				    <el-input placeholder="手机号码" v-model="list.filter.tel"></el-input>
+				    <el-input placeholder="输入手机号码" v-model="list.filter.tel"></el-input>
 				  </el-form-item>
 				  <el-form-item style="width: 140px;" prop="related" label="">
 				  	<el-select v-model="list.filter.related" placeholder="是否有设备" @change="search()">
@@ -26,7 +26,7 @@
   		</el-col>
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" :data="list.data" v-loading="list.loading">
-	    <el-table-column label="商家姓名" prop="name" min-width="120"></el-table-column>
+	    <el-table-column label="店铺名称" prop="store_name" min-width="120"></el-table-column>
 	    <el-table-column label="商家地区" min-width="150">
 	    	<template slot-scope="scope">
 	    		<p>{{scope.row.province + scope.row.city + scope.row.district}}</p>

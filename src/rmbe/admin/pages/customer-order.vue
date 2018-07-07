@@ -8,13 +8,13 @@
 				  		range-separator="到" start-placeholder="开始时间" end-placeholder="结束时间"
 				  		v-model="list.filter.dateRange" :picker-options="dateOptions" @change="filterDateChange"></el-date-picker>
 				  </el-form-item>
-  				<el-form-item style="width: 120px;" prop="name" lalel="">
+  				<!-- <el-form-item style="width: 120px;" prop="name" lalel="">
 				    <el-input placeholder="商家姓名" v-model="list.filter.name"></el-input>
 				  </el-form-item>
 				  <el-form-item style="width: 120px;" prop="tel" lalel="">
 				    <el-input placeholder="商家手机号" v-model="list.filter.tel"></el-input>
-				  </el-form-item>
-				  <el-form-item style="width: 120px;" prop="store_name" lalel="">
+				  </el-form-item> -->
+				  <el-form-item prop="store_name" lalel="">
 				    <el-input placeholder="店铺名称" v-model="list.filter.store_name"></el-input>
 				  </el-form-item>
 				  <el-form-item>
@@ -25,25 +25,25 @@
   		</el-col>
   	</el-row>
 		<el-table class="l-table-hdbg" stripe element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" :data="list.data" v-loading="list.loading">
-	    <el-table-column class-name="l-fs-xs" label="订单号" prop="order_id" fixed width="230"></el-table-column>
-	    <el-table-column label="头像" prop="c_thumb" align="center" width="70">
+	    <!-- <el-table-column class-name="l-fs-xs" label="订单号" prop="order_id" fixed width="230"></el-table-column> -->
+	    <el-table-column label="消费者头像" prop="customer.thumb" align="left" width="150">
 	    	<template slot-scope="scope">
-	    		<img width="50" height="50" :src="scope.row.c_thumb" alt="">
+	    		<img v-if="scope.row.customer" width="50" height="50" :src="scope.row.customer.thumb" alt="">
 	    	</template>
 	    </el-table-column>
-	    <el-table-column label="昵称" prop="c_nickname" align="center" width="150"></el-table-column>
-	    <el-table-column label="启动设备号" prop="pay_data" align="center" width="120"></el-table-column>
-	    <el-table-column label="商家姓名" prop="s_name" align="center" width="120"></el-table-column>
-	    <el-table-column label="商家手机号" prop="s_tel" align="center" width="120"></el-table-column>
-	    <el-table-column label="店铺名称" prop="store_name" align="center" width="200"></el-table-column>
-	    <el-table-column label="店铺地区" width="200">
+	    <el-table-column label="消费者昵称" prop="customer.nickname" align="left" width="200"></el-table-column>
+	    <el-table-column label="启动设备号" prop="device_number" align="left" width="200"></el-table-column>
+	    <!-- <el-table-column label="商家姓名" prop="s_name" align="center" width="120"></el-table-column> -->
+	    <!-- <el-table-column label="商家手机号" prop="s_tel" align="center" width="120"></el-table-column> -->
+	    <el-table-column label="店铺名称" prop="seller.store_name" align="left" min-width="200"></el-table-column>
+	    <!-- <el-table-column label="店铺地区" width="200">
 	    	<template slot-scope="scope">
 	    		<p>{{scope.row.s_province + scope.row.s_city + scope.row.s_district}}</p>
 	    	</template>
-	    </el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="详细地址" prop="detail_address" width="300"></el-table-column>
-	    <el-table-column label="消费金额(元)" prop="amountStr" align="center" fixed="right" width="120"></el-table-column>
-	    <el-table-column class-name="l-fs-xs" label="消费时间" prop="create_time" align="center" width="150" fixed="right"></el-table-column>
+	    </el-table-column> -->
+	    <!-- <el-table-column class-name="l-fs-xs" label="详细地址" prop="detail_address" width="300"></el-table-column> -->
+	    <el-table-column label="券名称" prop="customer_coupon.title" align="center" fixed="right" width="200"></el-table-column>
+	    <el-table-column label="消费时间" prop="create_time" align="center" width="200" fixed="right"></el-table-column>
 	  </el-table>
 	  <el-row class="l-text-center l-margin-t">
 	  	<el-pagination layout="total, sizes, prev, pager, next, jumper"

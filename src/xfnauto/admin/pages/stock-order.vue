@@ -471,7 +471,7 @@ export default {
     		this.dialogInfo.info.depositPrice = data.depositPrice || 0
     	})
 		},
-		sizeChange(size = 100) {
+		sizeChange(size = 50) {
 			this.getList(1, size)
 		},
 		pageChange(page = 1) {

@@ -514,7 +514,7 @@ export default {
 		getState(value = 0) {
 			return this.stateList.filter(item => item.value === value)[0]
 		},
-		sizeChange(size = 100) {
+		sizeChange(size = 50) {
 			this.getList(1, size)
 		},
 		pageChange(page = 1) {

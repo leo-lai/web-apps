@@ -94,7 +94,7 @@ export default {
   data() {
     return {
     	userMenus,
-    	showShopAdmin: true,
+    	showShopAdmin: false,
     	pwdForm: {
     		visible: false,
 				submiting: false,
@@ -167,9 +167,11 @@ export default {
   	},
   	getRights() {
   		this.$$api.auth.getRights().then(({data}) => {
-  			if(data && data.length > 0 && data.filter(item => item.operation_route == 'plat:right:shopManagement')[0]) {
+  			if(data && data.length > 0 && data.filter(item => item.operation_route == 'plat:right:shopManagement').length > 0) {
   				this.showShopAdmin = true
-  			}
+  			}else{
+					this.showShopAdmin = false
+				}
   		})
   	}
   },
