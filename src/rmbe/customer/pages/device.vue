@@ -191,7 +191,7 @@ export default {
 
 <style scoped lang="less">
 .l-device-bg{
-  background: url('../../assets/gaoyuanyuan.gif') no-repeat 50% 50%;
+  background: url('../../assets/20180707001.gif') no-repeat 50% 50%;
   background-size: cover; height: 50%;
 }
 .l-panel-coupon{

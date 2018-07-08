@@ -33,8 +33,4 @@ let config = {
 	}
 }
 
-if (window.location.host.indexOf('leolai.cn') > -1) {
-	config.api.baseURL = 'http://api.leolai.cn/api'
-}
-
 export default config
