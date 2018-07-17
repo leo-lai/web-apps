@@ -8,7 +8,7 @@
         <p><b class="l-fs l-fr l-text-main">￥{{item.amount}}</b>充值次数：{{item.pay_data}}</p>
       </div>
     </div>
-    <infinite-loading :on-infinite="onInfinite" ref="infinite">
+    <infinite-loading :on-infinite="onInfinite" ref="infinite" :auto-start="false">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
       <div class="l-text-gray l-fs-m" slot="no-more">全部数据加载完毕</div>
@@ -72,7 +72,7 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
-      // this.resetInfinite()
+      this.resetInfinite()
     })
   }
 }

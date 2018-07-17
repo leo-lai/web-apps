@@ -1,5 +1,5 @@
 <template>
-  <f7-page name="coupon">
+  <f7-page name="coupon-record">
     <f7-navbar title="发放记录" back-link="返回" sliding></f7-navbar>
     <f7-list class="l-fs-m" style="margin:0;">
     	<f7-list-item v-for="(item,index) in list.data" :key="index">
@@ -14,7 +14,7 @@
         </div>
       </f7-list-item>
 		</f7-list>
-    <infinite-loading :on-infinite="onInfinite" ref="infinite">
+    <infinite-loading :on-infinite="onInfinite" ref="infinite" :auto-start="false">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
       <div class="l-text-gray l-fs-m" slot="no-more">没有更多了</div>
@@ -73,7 +73,7 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
-      // this.resetInfinite()
+      this.resetInfinite()
     })
   }
 }

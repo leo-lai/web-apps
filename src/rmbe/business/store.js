@@ -23,14 +23,14 @@ const store = new Vuex.Store({
 			return new Promise((resolve, reject) => {
 				let userInfo = storage.local.get('business_userinfo')
 				if(userInfo && userInfo.open_id){
-					store.dispatch('getUserInfo')
-					commit('USER_INFO', userInfo)
 					resolve(userInfo)
 				}else {
 					let wxInfo = storage.local.get('business_wxInfo')
 					if(wxInfo && wxInfo.open_id) {
+						// 如果本地缓存了微信授权信息
 						reject(wxInfo)
 					}else if(urlParams.open_id) {
+						// 如果刚刚微信授权完
 						storage.local.set('business_wxInfo', {
 							open_id: urlParams.open_id,
 							thumb: urlParams.thumb,
@@ -38,21 +38,24 @@ const store = new Vuex.Store({
 						}, 10 * 60 * 1000)
 						reject(urlParams)
 					}else {
+						// 微信授权登录
 						api.auth.grant(window.location.href)
 					}
 				}
 			})
 		},
 		login({ commit }, formData) {
-			return api.auth.login(formData).then(userInfo => {
-				storage.local.set('business_wxInfo', {
-					open_id: formData.open_id,
-					thumb: formData.thumb,
-					nickname: formData.nickname
-				})
-				commit('USER_INFO', userInfo)
-				store.dispatch('getUserInfo')
-				return userInfo
+			return new Promise((resolve, reject) => {
+				api.auth.login(formData).then(userInfo => {
+					storage.local.set('business_wxInfo', {
+						open_id: formData.open_id,
+						thumb: formData.thumb,
+						nickname: formData.nickname
+					})
+					store.dispatch('getUserInfo').then(userInfo => {
+						resolve(userInfo)
+					}).catch(reject)
+				}).catch(reject)
 			})
 		},
 		logout({ commit }, remote = false) {
@@ -62,7 +65,9 @@ const store = new Vuex.Store({
 		},
 		getUserInfo({ commit }) {
 			return api.auth.getInfo().then(({data}) => {
-				commit('USER_INFO', Object.assign(storage.local.get('business_userinfo'), data))
+				let userInfo = Object.assign(storage.local.get('business_userinfo'), data)
+				commit('USER_INFO', userInfo)
+				return userInfo
 			})
 		}
 	}

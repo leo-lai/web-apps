@@ -124,12 +124,11 @@
     </f7-login-screen>
 
     <!-- Popup. All modals should be outside of Views -->
-    <f7-popup id="popup">
+    <!-- <f7-popup id="popup">
       <f7-view>
         <f7-pages navbar-fixed>
           <f7-page>
             <f7-navbar title="Popup">
-              <!-- Link to close popup -->
               <f7-nav-right>
                 <f7-link close-popup>Close</f7-link>
               </f7-nav-right>
@@ -139,7 +138,7 @@
           </f7-page>
         </f7-pages>
       </f7-view>
-    </f7-popup>
+    </f7-popup> -->
   </div>
 </template>
 
@@ -169,22 +168,31 @@ export default {
     ])
   },
 	methods: {
+    // 检查登录
     checkLogin() {
       let args = this.$$utils.url.getArgs()
-      this.$store.dispatch('checkLogin', args).then(userInfo => {
-        this.$$event.$emit('user:login', userInfo)
-        this.$$api.index.getInfo().then(({data}) => {
-          if(data){
-            this.index.all_sum = (Number(data.all_sum) / 100).toFixed(2)
-            this.index.today_sum = (Number(data.today_sum) / 100).toFixed(2)
-          }
-        })
-        this.$f7.closeModal()
-      }).catch(urlParams => {
+      let promise = this.$store.dispatch('checkLogin', args)
+
+      promise.then(userInfo => { // 如果已经登录，触发登录事件
+        setTimeout(_ => {
+          this.$$event.$emit('user:login', userInfo)  
+        }, 50)
+      }).catch(urlParams => { // 如果未登录，弹出登录框
         this.$$utils.copyObj(this.loginForm, urlParams)
         this.$f7.loginScreen()
       })
+
+      return promise
     },
+    getIndexData() { // 首页统计
+      this.$$api.index.getInfo().then(({data}) => {
+        if(data){
+          this.index.all_sum = (Number(data.all_sum) / 100).toFixed(2)
+          this.index.today_sum = (Number(data.today_sum) / 100).toFixed(2)
+        }
+      })
+    },
+    // 登录
     loginSubmit() {
       if(!this.loginForm.username) {
         this.$$utils.toptip('请输入账号')
@@ -197,39 +205,48 @@ export default {
 
       this.$f7.showIndicator()
       this.$store.dispatch('login', this.loginForm).then(userInfo => {
-        this.$$event.$emit('user:login', userInfo)
-        this.$f7.closeModal()
+        setTimeout(_ => {
+          this.$f7.closeModal('#login-screen')
+        }, 200)
+        
+        this.checkLogin()
       }).finally(_ => {
         this.$f7.hideIndicator()
       })
     },
+    // 注销
     logoutSubmit() {
       this.$f7.showIndicator()
       this.$store.dispatch('logout').finally(_ => {
         this.$f7.hideIndicator()
+        this.checkLogin()
       })
     }
 	},
-  watch: {
-    userInfo(val) {
-      if(!val){
-        this.checkLogin()
-      }
-    }
-  },
 	mounted() {
     this.$nextTick(_ => {
       setTimeout(_ => {
-        this.$f7.onPageInit('*', page => {
-          this.$$api.auth.check().then(userInfo => {
-            this.$$event.$emit('user:login', userInfo)
+        // 每次加载页面检查是否登录
+        this.$f7.onPageBeforeInit('*', page => {
+          this.checkLogin().then(_ => {
+            if(page.name === 'index') {
+              this.getIndexData()    
+            }
           })
+        }).trigger({name: this.$route.path === '/' ? 'index' : ''})
+
+
+        this.$f7.onPageBeforeRemove('*', page => {
+          this.$f7.closeModal('.page-popup')
+        })
+
+        // 首页重新展示(内页返回到首页)
+        this.$f7.onPageReinit('index', page => {
+          this.getIndexData()
         })
 
         Toast(this.$f7)
-
-        this.checkLogin()
-      })
+      }, 200)
     })
 	}
 }

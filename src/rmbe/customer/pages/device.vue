@@ -84,7 +84,10 @@ export default {
           this.deviceInfo = data
           this.title = data.store_name || this.title
 
-          this.getCouponList()
+          setTimeout(_ => {
+            this.getCouponList()
+          }, 200)
+          
           this.getLottery()
         }else {
           this.$f7.hideIndicator()

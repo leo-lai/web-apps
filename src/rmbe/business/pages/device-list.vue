@@ -22,14 +22,14 @@
           </div>
         </f7-list-item>
       </f7-list>
-      <infinite-loading :on-infinite="onInfinite" ref="infinite">
+      <infinite-loading :on-infinite="onInfinite" ref="infinite" :auto-start="false">
         <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
         <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
         <div class="l-text-gray l-fs-m" slot="no-more">没有更多了</div>
       </infinite-loading>
     </div>
     <!-- popup -->
-    <f7-popup :opened="edit.opened" theme="lightblue">
+    <f7-popup class="page-popup" :opened="edit.opened" theme="lightblue">
       <div class="navbar l-text-center" style="line-height: 44px;">编辑设备</div>
       <f7-list form>
         <f7-list-item>
@@ -135,11 +135,8 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
-      // this.resetInfinite()
+      this.resetInfinite()
     })
-  },
-  beforeDestroy() {
-    this.closeEdit()
   }
 }
 </script>

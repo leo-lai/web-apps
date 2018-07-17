@@ -1,5 +1,5 @@
 <template>
-  <f7-page name="coupon">
+  <f7-page name="coupon-send">
     <f7-navbar title="发放次数券" back-link="返回" sliding></f7-navbar>
     <f7-searchbar cancel-link="取消" placeholder="输入昵称查询" :clear="true" 
       @input="onSearch" @click:clear="onClear" @click:cancel="onClear">
@@ -21,13 +21,13 @@
         </div>
       </f7-list-item>
 		</f7-list>
-    <infinite-loading :on-infinite="onInfinite" ref="infinite">
+    <infinite-loading :on-infinite="onInfinite" ref="infinite" :auto-start="false">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
       <div class="l-text-gray l-fs-m" slot="no-more">没有更多了</div>
     </infinite-loading>
 		<!-- popup -->
-    <f7-popup :opened="coupon.opened" theme="lightblue">
+    <f7-popup class="page-popup" :opened="coupon.opened" theme="lightblue">
       <div class="navbar l-text-center" style="line-height: 44px;">发放次数券</div>
 			<div class="l-flex-hc l-padding">
         <div class="l-margin-r" v-if="customer.thumb"><img class="l-avatar" :src="customer.thumb"></div>
@@ -209,6 +209,7 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
+      this.resetInfinite()
     })
   }
 }

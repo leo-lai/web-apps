@@ -1,5 +1,5 @@
 <template>
-  <f7-page name="coupon">
+  <f7-page name="coupon-times">
     <f7-navbar title="次数券" back-link="返回" sliding>
     	<f7-nav-right>
         <f7-link text="生成" icon-f7="add_round" @click="couponOpen"></f7-link>
@@ -19,13 +19,13 @@
       </div>
     </div>
 
-    <infinite-loading :on-infinite="onInfinite" ref="infinite">
+    <infinite-loading :on-infinite="onInfinite" ref="infinite" :auto-start="false">
       <div class="l-loading-inline" slot="spinner"><f7-preloader></f7-preloader><span class="_txt">正在加载...</span></div>
       <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
       <div class="l-text-gray l-fs-m" slot="no-more">没有更多了</div>
     </infinite-loading>
 		<!-- popup -->
-    <f7-popup :opened="coupon.opened" theme="lightblue">
+    <f7-popup class="page-popup" :opened="coupon.opened" theme="lightblue">
       <div class="navbar l-text-center" style="line-height: 44px;">生成次数券</div>
       <div class="l-text-center l-padding l-text-error">
         剩余设备使用次数：{{userInfo.rest_device_count}}
@@ -150,6 +150,7 @@ export default {
   mounted() {
     this.$$event.$once('user:login', userInfo => {
       this.userInfo = userInfo
+      this.resetInfinite()
     })
   }
 }

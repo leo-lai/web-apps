@@ -1,15 +1,13 @@
 <template>
   <div class="infinite-loading-container">
     <div v-show="isLoading">
-      <slot name="spinner">
-        <i :class="spinnerType"></i>
-      </slot>
+      <slot name="spinner"><i :class="spinnerType"></i></slot>
     </div>
-    <div class="infinite-status-prompt" v-show="!isLoading && isComplete && isFirstLoad">
-      <slot name="no-results">No results :(</slot>
+    <div v-show="!isLoading && isComplete && isFirstLoad">
+      <slot name="no-results">没有相关的数据</slot>
     </div>
-    <div class="infinite-status-prompt" v-show="!isLoading && isComplete && !isFirstLoad">
-      <slot name="no-more">No more data :)</slot>
+    <div v-show="!isLoading && isComplete && !isFirstLoad">
+      <slot name="no-more">已经没有更多了</slot>
     </div>
   </div>
 </template>
@@ -44,14 +42,12 @@
    */
   function getCurrentDistance(elm, dir) {
     let distance;
+    
     const scrollTop = isNaN(elm.scrollTop) ? elm.pageYOffset : elm.scrollTop;
     if (dir === 'top') {
       distance = scrollTop;
     } else {
-      const scrollElmHeight = elm === window ?
-                              window.innerHeight :
-                              elm.getBoundingClientRect().height;
-
+      const scrollElmHeight = elm === window ? window.innerHeight : elm.getBoundingClientRect().height;
       distance = this.$el.offsetTop - scrollTop - scrollElmHeight - (elm.offsetTop || 0);
     }
     return distance;
@@ -69,13 +65,17 @@
     },
     computed: {
       spinnerType() {
-        return spinnerMapping[this.spinner] || spinnerMapping.default;
+        return spinnerMapping[this.spinner] || spinnerMapping.waveDots;
       },
     },
     props: {
       distance: {
         type: Number,
         default: 50,
+      },
+      autoStart: {
+        type: Boolean,
+        default: true
       },
       onInfinite: Function,
       spinner: String,
@@ -93,7 +93,9 @@
         }
       }.bind(this);
 
-      setTimeout(this.scrollHandler, 1);
+      if(this.autoStart) {
+        this.autoStartId = setTimeout(this.scrollHandler, 500);
+      }
       this.scrollParent.addEventListener('scroll', this.scrollHandler);
 
       this.$on('$InfiniteLoading:loaded', () => {
@@ -113,7 +115,7 @@
         this.isFirstLoad = true;
         this.scrollParent.removeEventListener('scroll', this.scrollHandler);
         this.scrollParent.addEventListener('scroll', this.scrollHandler);
-        firstTime && setTimeout(this.scrollHandler, 1);
+        firstTime && setTimeout(this.scrollHandler);
       });
     },
     /**
@@ -133,37 +135,26 @@
         }
       },
     },
-    destroyed() {
+    beforeDestroy() {
+      clearTimeout(this.autoStartId)
       if (!this.isComplete) {
         this.scrollParent.removeEventListener('scroll', this.scrollHandler);
       }
-    },
+    }
   };
 </script>
 <style lang="less" scoped>
-  @import './styles/spinner';
-
-  .infinite-loading-container{
-    clear: both;
-    text-align: center;
-    padding: 1px 0;
-    *[class^=loading-]{
-      @size: 1.4rem;
-      display: inline-block;
-      margin: 0.75rem 0;
-      width: @size;
-      height: @size;
-      font-size: @size;
-      line-height: @size;
-      border-radius: 50%;
-    }
+@import './styles/spinner';
+.infinite-loading-container{
+  clear: both; text-align: center; margin: 15px 0; font-size: 14px; color: #666;
+  *[class^=loading-]{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+    border-radius: 50%;
+    vertical-align: -2px;
+    margin-right: 5px;
   }
-
-  .infinite-status-prompt{
-    color: #666;
-    font-size: 0.7rem;
-    text-align: center;
-    margin: 0.5rem 0;
-  }
-  
+}
 </style>
